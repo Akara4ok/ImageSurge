@@ -15,10 +15,6 @@ class TrainOneClassDataset(TrainDataset):
                  ):
         super().__init__(image_width, image_height, batch_size, random_seed, dataloader, train_image_count, test_image_count, target_image_percent)
 
-    def process_path(self, path: str, label: int) -> tuple[tf.Tensor, int]:
-        """ Function to map tf.data """
-        return self.process_image(path), label
-
     def load(self) -> None:
         train_images_list = self.one_class_dataloader.get_train_images_paths()
         random.Random(self.random_seed).shuffle(train_images_list)

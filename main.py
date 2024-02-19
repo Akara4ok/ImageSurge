@@ -7,9 +7,11 @@ from DataloaderImpl.NaturalMultiClassDataloader import NaturalMultiClassDataload
 sys.path.append('Dataset/')
 from InferenceDataset import InferenceDataset
 from TrainOneClassDataset import TrainOneClassDataset
+from TrainRefDataset import TrainRefDataset
 
-dataloader = AnimalsOneClassDataloader("../Data/Animals/animals", "", "lion")
-dataset = TrainOneClassDataset(224, 224, 10, 1, dataloader, 300, 300, 30)
+dataloader_one_class = AnimalsOneClassDataloader("../Data/Animals/animals", "", "lion")
+dataloader_ref = NaturalMultiClassDataloader("../Data/natural-images", "natural_images", "", False)
+dataset = TrainRefDataset(224, 224, 10, 1, dataloader_one_class, dataloader_ref, 300, 300, 0.3)
 dataset.load()
 print(len(dataset.get_train_data()))
 
