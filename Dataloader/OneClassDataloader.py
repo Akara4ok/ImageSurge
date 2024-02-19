@@ -17,7 +17,8 @@ class OneClassDataloader(TrainDataloader):
     def get_crop_info(self) -> tuple[dict[str, tuple[int, int, int, int]], tuple[int, int]]:
         """ Get dictionary of filepath adn its crop rectangle"""
         
-        print(self.annotation_path)
+        if(not self.annotation_path):
+            return
         
         tree = ET.parse(self.annotation_path)
         root = tree.getroot()

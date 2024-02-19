@@ -1,4 +1,4 @@
-import os
+import glob
 from ImageDataloader import ImageDataloader
 
 class InferenceDataloader(ImageDataloader):
@@ -10,4 +10,4 @@ class InferenceDataloader(ImageDataloader):
     def get_images_paths(self) -> list[str]:
         """ Load images paths from folder """
         
-        return os.listdir(self.base_folder_path)
+        return glob.glob(f'{self.base_folder_path}/*')
