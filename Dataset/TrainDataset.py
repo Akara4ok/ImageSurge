@@ -28,12 +28,6 @@ class TrainDataset(Dataset):
         """ Get test tf.Dataset """
         return self.test_dataset
     
-    def unzip_list(self, cur_list: list[tuple[str, int]]) -> tuple[list[str], list[int]]:
-        """ Unzip list of tuples """
-        
-        list_unzipped = [list(t) for t in zip(*cur_list)]
-        return list_unzipped[0], list_unzipped[1]
-    
     def process_path(self, path: str, label: int) -> tuple[tf.Tensor, int]:
         """ Function to map tf.data """
         return self.process_image(path), label

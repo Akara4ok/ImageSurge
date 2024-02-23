@@ -32,6 +32,8 @@ class TrainRefDataset(TrainDataset):
 
     def load(self) -> None:
         train_images_list = self.one_class_dataloader.get_train_images_paths()
+        if(not self.train_image_count):
+            self.train_image_count = len(train_images_list)
         random.Random(self.random_seed).shuffle(train_images_list)
         train_images_list = train_images_list[:self.train_image_count]
         train_paths, _ = self.unzip_list(train_images_list)
@@ -53,6 +55,8 @@ class TrainRefDataset(TrainDataset):
         self.train_dataset = self.combine_ds(self.train_one_dataset, train_ref_dataset)
         
         all_test_images = self.one_class_dataloader.get_test_images_paths()
+        if(not self.test_image_count):
+            self.test_image_count = len(all_test_images)
         test_images_not_target = list(filter(lambda x: x[1] == 0, all_test_images))
         random.Random(self.random_seed).shuffle(test_images_not_target)
         test_images_target = list(filter(lambda x: x[1] == 1, all_test_images))
