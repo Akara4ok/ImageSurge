@@ -1,6 +1,7 @@
 {
     "python.analysis.extraPaths": [
         "./Dataloader",
-        "./Dataset"
+        "./Dataset",
+        "./utils"
     ]
 }

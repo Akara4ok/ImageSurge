@@ -11,7 +11,10 @@ class MultiClassDataloader(TrainDataloader):
         self.label_path = base_folder_path + "/" + label_path
         self.save_labels = save_labels
         self.labels = self.read_labels()
-        
+    
+    def get_labels_count(self):
+        return len(self.labels)
+    
     def get_label(self, file_path: str) -> int:
         """ Get label from file_path """
         

@@ -17,3 +17,7 @@ class TrainModelDataset(TrainDataset):
     def get_train_model_data(self) -> tf.data.Dataset:
         """ Get train tf.Dataset """
         return self.train_model_dataset
+    
+    def get_labels_count(self):
+        """ Number of labels to train """
+        pass

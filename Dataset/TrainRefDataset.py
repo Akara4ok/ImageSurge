@@ -69,3 +69,6 @@ class TrainRefDataset(TrainModelDataset):
             self.process_path, num_parallel_calls=tf.data.AUTOTUNE)
         if(self.batch_size):
             self.test_dataset = self.test_dataset.batch(self.batch_size)
+    
+    def get_labels_count(self):
+        return self.multi_class_dataloader.get_labels_count()
