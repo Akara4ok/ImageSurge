@@ -1,13 +1,13 @@
 import sys
 import random
 import tensorflow as tf
-from TrainDataset import TrainDataset
+from TrainModelDataset import TrainModelDataset
 sys.path.append("Dataloader/")
 from OneClassDataloader import OneClassDataloader
 from MultiClassDataloader import MultiClassDataloader
 
 
-class TrainRefDataset(TrainDataset):
+class TrainRefDataset(TrainModelDataset):
     """ Implementation of dataset for one class classification with multiclass reference dataset"""
 
     def __init__(self, image_width: int, image_height: int, batch_size: int, random_seed: int = None,
@@ -17,7 +17,6 @@ class TrainRefDataset(TrainDataset):
                  ):
         super().__init__(image_width, image_height, batch_size, random_seed, one_class_dataloader, train_image_count, test_image_count, target_image_percent)
         self.multi_class_dataloader = multi_class_dataloader
-        self.train_one_dataset: tf.data.Dataset = None
 
     def combine_ds(self, train_ds_ref: tf.data.Dataset, train_ds: tf.data.Dataset):
         """ Combine one class dataset and ref dataset """
@@ -37,10 +36,10 @@ class TrainRefDataset(TrainDataset):
         random.Random(self.random_seed).shuffle(train_images_list)
         train_images_list = train_images_list[:self.train_image_count]
         train_paths, _ = self.unzip_list(train_images_list)
-        self.train_one_dataset = tf.data.Dataset.from_tensor_slices(train_paths).map(
+        self.train_dataset = tf.data.Dataset.from_tensor_slices(train_paths).map(
             self.process_train_path, num_parallel_calls=tf.data.AUTOTUNE)
         if(self.batch_size):
-            self.train_one_dataset = self.train_one_dataset.batch(self.batch_size)
+            self.train_dataset = self.train_dataset.batch(self.batch_size)
             
         
         train_ref_images_list = self.multi_class_dataloader.get_train_images_paths()
@@ -52,7 +51,7 @@ class TrainRefDataset(TrainDataset):
         if(self.batch_size):
             train_ref_dataset = train_ref_dataset.batch(self.batch_size)
         
-        self.train_dataset = self.combine_ds(self.train_one_dataset, train_ref_dataset)
+        self.train_model_dataset = self.combine_ds(self.train_dataset, train_ref_dataset)
         
         all_test_images = self.one_class_dataloader.get_test_images_paths()
         if(not self.test_image_count):
@@ -70,7 +69,3 @@ class TrainRefDataset(TrainDataset):
             self.process_path, num_parallel_calls=tf.data.AUTOTUNE)
         if(self.batch_size):
             self.test_dataset = self.test_dataset.batch(self.batch_size)
-            
-    def get_one_class_train(self) -> tf.data.Dataset:
-        """ train one dataset """
-        return self.train_one_dataset
