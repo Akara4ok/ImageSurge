@@ -6,6 +6,3 @@ class PreTrainedModel(ModelHandler):
     
     def train(self) -> None:
         pass
-    
-    def save(self, save_path: str) -> None:
-        pass

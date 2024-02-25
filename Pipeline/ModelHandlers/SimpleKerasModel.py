@@ -6,6 +6,8 @@ import keras.applications.resnet
 from keras.applications import ResNet50
 from keras.applications import VGG16
 from PreTrainedModel import PreTrainedModel
+from ModelLoader import Models
+import json
 
 class KerasModels(enum.Enum):
     VGG = 1
@@ -37,7 +39,20 @@ class SimpleKerasModel(PreTrainedModel):
     def extract_features(self, batch: np.ndarray) -> np.ndarray:
         return self.model(batch)
     
-    def load(self, load_path: str) -> None:
+    def save(self, save_path: str) -> None:
+        object_info = {
+            "class": Models.SimpleKeras.value,
+            "model_type": self.model_type,
+            "image_width": self.image_width,
+            "image_height": self.image_height
+        }
+        
+        json_object = json.dumps(object_info, indent=4)
+        
+        with open(save_path, "w") as f:
+            f.write(json_object)
+    
+    def load(self, load_path: str = None) -> None:
         match self.model_type:
             case KerasModels.VGG:
                 self.model = VGG16(input_shape=(self.image_width, self.image_height, 3), weights='imagenet', include_top=False, pooling='avg')
@@ -45,4 +60,3 @@ class SimpleKerasModel(PreTrainedModel):
                 self.model = ResNet50(input_shape=(self.image_width, self.image_height, 3), weights='imagenet', include_top=False, pooling='avg')
             case _:
                 raise Exception(f"Undefined model type {self.model_type.name}")
-        

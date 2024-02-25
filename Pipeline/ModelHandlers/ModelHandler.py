@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 import sys
+import enum
 sys.path.append("Dataset")
 from TrainModelDataset import TrainModelDataset
 
