@@ -1,12 +1,16 @@
 import enum
 import sys
 import pickle
+
+model_path_suffix = "_metainfo"
+
 sys.path.append("utils")
 from ExperimentInfo import ExperimentInfo
 sys.path.append("Pipeline")
 from ModelHandlers.ModelHandler import ModelHandler
 from ModelHandlers.ModelLoader import ModelLoader
 from SklearnInterface import SklearnInterface
+from pathlib import Path
 
 from sklearn.base import BaseEstimator
 
@@ -20,8 +24,6 @@ class PipelineStage(enum.Enum):
     FeatureReduction = 3
     OneClass = 4
 
-model_path_suffix = "_metainfo"
-
 class FileHandler:
     """ Class for saving and loading files """
     def __init__(self, base_folder_dir: str, experiment_info: ExperimentInfo) -> None:
@@ -29,12 +31,15 @@ class FileHandler:
         self.experiment_info = experiment_info
         
     def saveModelHandler(model: ModelHandler, path: str) -> None:
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         model.save(path)
     
     def saveSklearnModel(model: BaseEstimator, path: str) -> None:
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         pickle.dump(model, open(path, 'wb'))
     
     def saveUndefinedModel(model, path: str) -> None:
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         pickle.dump(model, open(path, 'wb'))
         
     def loadModelHandler(path: str) -> ModelHandler:

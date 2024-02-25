@@ -5,6 +5,11 @@ import enum
 sys.path.append("Dataset")
 from TrainModelDataset import TrainModelDataset
 
+class Models(enum.Enum):
+    SimpleKeras = 1
+    Clip = 2
+    ImprovedResnet = 3
+
 class ModelHandler(ABC):
     """ Abstract class for model handler """
     

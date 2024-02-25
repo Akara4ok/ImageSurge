@@ -1,7 +1,6 @@
 import numpy as np
-import tensorflow as tf
+from ModelHandler import Models
 from PreTrainedModel import PreTrainedModel
-from ModelLoader import Models
 from transformers import TFCLIPModel, AutoProcessor
 import json
 

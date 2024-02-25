@@ -6,7 +6,7 @@ import keras.applications.resnet
 from keras.applications import ResNet50
 from keras.applications import VGG16
 from PreTrainedModel import PreTrainedModel
-from ModelLoader import Models
+from ModelHandler import Models
 import json
 
 class KerasModels(enum.Enum):
@@ -42,7 +42,7 @@ class SimpleKerasModel(PreTrainedModel):
     def save(self, save_path: str) -> None:
         object_info = {
             "class": Models.SimpleKeras.value,
-            "model_type": self.model_type,
+            "model_type": self.model_type.value,
             "image_width": self.image_width,
             "image_height": self.image_height
         }

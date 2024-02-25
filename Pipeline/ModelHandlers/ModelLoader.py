@@ -1,14 +1,9 @@
 import enum
 import json
-from ModelHandler import ModelHandler
-from SimpleKerasModel import SimpleKerasModel
+from SimpleKerasModel import SimpleKerasModel, KerasModels
 from ClipModel import ClipModel
 from ImprovedResnet import ImprovedResnet
-
-class Models(enum.Enum):
-    SimpleKeras = 1
-    Clip = 2
-    ImprovedResnet = 3
+from ModelHandler import ModelHandler, Models
 
 class ModelLoader:
     def load(load_path: str) -> ModelHandler:
@@ -20,7 +15,7 @@ class ModelLoader:
         modelHandler: ModelHandler = None
         match model_type:
             case Models.SimpleKeras:
-                modelHandler = SimpleKerasModel(data["image_width"], data["image_height"], data["model_type"])
+                modelHandler = SimpleKerasModel(data["image_width"], data["image_height"], KerasModels(data["model_type"]))
                 modelHandler.load()
             case Models.Clip:
                 modelHandler = ClipModel()

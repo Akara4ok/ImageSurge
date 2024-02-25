@@ -5,8 +5,7 @@ from keras.applications.resnet import preprocess_input
 from keras.applications import ResNet50
 import sys
 import json
-from ModelHandler import ModelHandler
-from ModelLoader import Models
+from ModelHandler import ModelHandler, Models
 from losses.ReferenceTrainingLosses import one_class_loss, multi_class_loss
 from models.ResnetTrainingModel import ResnetTrainingModel
 sys.path.append("Dataset")

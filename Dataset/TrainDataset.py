@@ -1,8 +1,8 @@
-from OneClassDataloader import OneClassDataloader
 import sys
 import tensorflow as tf
 from Dataset import Dataset
 sys.path.append("Dataloader/")
+from OneClassDataloader import OneClassDataloader
 
 
 class TrainDataset(Dataset):
