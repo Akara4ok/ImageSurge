@@ -5,7 +5,7 @@ class SklearnInterface(ABC):
     """ Base interface for sklearn classes(used for type hint in major) """
     
     @abstractmethod
-    def fit(self, X, y = None, sample_weight = None) -> None:
+    def fit(self, X, y = None) -> None:
         pass
     
     @abstractmethod
@@ -14,4 +14,8 @@ class SklearnInterface(ABC):
     
     @abstractmethod
     def transform(self, X) -> np.ndarray:
+        pass
+    
+    @abstractmethod
+    def fit_transform(self, X, y = None) -> None:
         pass

@@ -8,6 +8,9 @@ from keras.applications import VGG16
 from PreTrainedModel import PreTrainedModel
 from ModelHandler import Models
 import json
+import sys
+sys.path.append("utils")
+from functions import to_numpy_image_label
 
 class KerasModels(enum.Enum):
     VGG = 1
@@ -23,7 +26,7 @@ class SimpleKerasModel(PreTrainedModel):
         self.model_type = model_type
         self.model: keras.Model = None
     
-    def preprocess(self, batch: np.ndarray) -> np.ndarray:
+    def preprocess(self, batch: tf.Tensor) -> tf.Tensor:
         if(len(batch.shape) == 3):
             batch = tf.expand_dims(batch, axis=0)
         match self.model_type:
@@ -36,8 +39,18 @@ class SimpleKerasModel(PreTrainedModel):
         
         return batch
     
-    def extract_features(self, batch: np.ndarray) -> np.ndarray:
+    def extract_features(self, batch: tf.Tensor) -> tf.Tensor:
         return self.model(batch)
+    
+    def extract_features_in_dataset(self, dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarray]:
+        def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
+            processed_x = self.preprocess(x)
+            features = self.extract_features(processed_x)
+            return features, y
+        
+        feature_ds = dataset.map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
+        
+        return to_numpy_image_label(feature_ds)
     
     def save(self, save_path: str) -> None:
         object_info = {

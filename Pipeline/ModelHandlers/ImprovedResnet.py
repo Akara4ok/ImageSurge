@@ -1,5 +1,5 @@
-import numpy as np
 import tensorflow as tf
+import numpy as np
 import keras
 from keras.applications.resnet import preprocess_input
 from keras.applications import ResNet50
@@ -13,6 +13,8 @@ from TrainModelDataset import TrainModelDataset
 from TrainRefDataset import TrainRefDataset
 sys.path.append("Pipeline")
 from utils.FileHandler import model_path_suffix
+sys.path.append("utils")
+from functions import to_numpy_image_label
 
 class ImprovedResnet(ModelHandler):
     """ Class for training resnet with reference dataset """
@@ -23,7 +25,7 @@ class ImprovedResnet(ModelHandler):
         self.image_height = image_height
         self.model: keras.Model = None
     
-    def preprocess(self, batch: np.ndarray) -> np.ndarray:
+    def preprocess(self, batch: tf.Tensor) -> tf.Tensor:
         if(len(batch.shape) == 3):
             batch = tf.expand_dims(batch, axis=0)
         batch = preprocess_input(batch)
@@ -43,8 +45,18 @@ class ImprovedResnet(ModelHandler):
         self.model.compile(loss=losses, optimizer=tf.keras.optimizers.SGD(learning_rate=0.0001))
         self.model.fit(dataset.get_train_model_data(), epochs = epochs)
     
-    def extract_features(self, batch: np.ndarray) -> np.ndarray:
+    def extract_features(self, batch: tf.Tensor) -> tf.Tensor:
         return self.model(batch)
+
+    def extract_features_in_dataset(self, dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarray]:
+        def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
+            processed_x = self.preprocess(x)
+            features = self.extract_features(processed_x)
+            return features, y
+        
+        feature_ds = dataset.map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
+        
+        return to_numpy_image_label(feature_ds)
     
     def save(self, save_path: str) -> None:
         inference_model = ResNet50(input_shape=(224, 224, 3), weights=None, include_top=False, pooling='avg')

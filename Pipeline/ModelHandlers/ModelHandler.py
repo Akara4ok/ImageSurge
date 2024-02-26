@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
+import tensorflow as tf
 import sys
 import enum
 sys.path.append("Dataset")
@@ -14,7 +15,7 @@ class ModelHandler(ABC):
     """ Abstract class for model handler """
     
     @abstractmethod
-    def preprocess(self, batch: np.ndarray) -> np.ndarray:
+    def preprocess(self, batch: tf.Tensor) -> np.ndarray:
         """ process image or batch for model """
         pass
     
@@ -24,8 +25,13 @@ class ModelHandler(ABC):
         pass
     
     @abstractmethod
-    def extract_features(self, batch: np.ndarray) -> np.ndarray:
+    def extract_features(self, batch: tf.Tensor) -> np.ndarray:
         """ extract features from image or batch """
+        pass
+    
+    @abstractmethod
+    def extract_features_in_dataset(self, dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarray]:
+        """ extract features from dataset """
         pass
     
     @abstractmethod

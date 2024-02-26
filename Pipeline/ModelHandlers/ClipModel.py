@@ -1,8 +1,12 @@
-import numpy as np
+import tensorflow as tf
 from ModelHandler import Models
 from PreTrainedModel import PreTrainedModel
 from transformers import TFCLIPModel, AutoProcessor
 import json
+import sys
+import numpy as np
+sys.path.append("utils")
+from functions import to_numpy_image_label
 
 class ClipModel(PreTrainedModel):
     """ Class for pretrained keras models """
@@ -12,11 +16,21 @@ class ClipModel(PreTrainedModel):
         self.model: TFCLIPModel = None
         self.processor: AutoProcessor = None
     
-    def preprocess(self, batch: np.ndarray) -> np.ndarray:
+    def preprocess(self, batch: tf.Tensor) -> tf.Tensor:
         return self.processor(images=batch, return_tensors="tf")
     
-    def extract_features(self, batch: np.ndarray) -> np.ndarray:
+    def extract_features(self, batch: tf.Tensor) -> tf.Tensor:
         return self.model.get_image_features(**batch)
+    
+    def extract_features_in_dataset(self, dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarray]:
+        def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
+            processed_x = self.preprocess(x.numpy())
+            features = self.extract_features(processed_x)
+            return features, y
+        
+        feature_ds = dataset.map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
+        
+        return to_numpy_image_label(feature_ds)
     
     def save(self, save_path: str) -> None:
         object_info = {
