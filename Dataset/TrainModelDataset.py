@@ -1,6 +1,7 @@
 import sys
 import tensorflow as tf
 from TrainDataset import TrainDataset
+import logging
 sys.path.append("Dataloader/")
 from OneClassDataloader import OneClassDataloader
 
@@ -16,6 +17,8 @@ class TrainModelDataset(TrainDataset):
 
     def get_train_model_data(self) -> tf.data.Dataset:
         """ Get train tf.Dataset """
+        if(self.train_dataset == None):
+            logging.warning("Dataset is not loaded. Call 'load' function")
         return self.train_model_dataset
     
     def get_labels_count(self):

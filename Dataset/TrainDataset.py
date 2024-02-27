@@ -1,9 +1,9 @@
 import sys
 import tensorflow as tf
 from Dataset import Dataset
+import logging
 sys.path.append("Dataloader/")
 from OneClassDataloader import OneClassDataloader
-
 
 class TrainDataset(Dataset):
     """ Implementation of dataset for training and testing """
@@ -22,10 +22,14 @@ class TrainDataset(Dataset):
 
     def get_train_data(self) -> tf.data.Dataset:
         """ Get train tf.Dataset """
+        if(self.train_dataset == None):
+            logging.warning("Dataset is not loaded. Call 'load' function")
         return self.train_dataset
 
     def get_test_data(self) -> tf.data.Dataset:
         """ Get test tf.Dataset """
+        if(self.train_dataset == None):
+            logging.warning("Dataset is not loaded. Call 'load' function")
         return self.test_dataset
     
     def process_path(self, path: str, label: int) -> tuple[tf.Tensor, int]:

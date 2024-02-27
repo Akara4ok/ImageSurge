@@ -5,12 +5,13 @@ from ModelHandlers.ModelHandler import ModelHandler
 import sys
 sys.path.append("Dataset")
 from TrainDataset import TrainDataset
+import logging
 
 class OneClassClassificationTrain(Pipeline):
     """ Class for training one class classification """
     
-    def __init__(self, image_width: int, image_height: int, random_seed: int, file_handler: FileHandler) -> None:
-        super().__init__(image_width, image_height, random_seed, file_handler)
+    def __init__(self, file_handler: FileHandler) -> None:
+        super().__init__(file_handler)
     
     def configure(self, feature_extractor: ModelHandler, one_class: SklearnInterface,
                   scaler: SklearnInterface = None, feature_reduction: SklearnInterface = None) -> None:
@@ -26,18 +27,23 @@ class OneClassClassificationTrain(Pipeline):
         
         #train and extract features
         self.feature_extractor.train(train_dataset, epochs)
-        X_train, _ = self.feature_extractor(train_dataset.get_train_data())
+        X_train, _ = self.feature_extractor.extract_features_in_dataset(train_dataset.get_train_data())
+        logging.info("Feature extractor has been trained")
         
         # scale features
         if(self.scaler):
             X_train = self.scaler.fit_transform(X_train)
+            logging.info("Features scaled")
         
         #dimension reduction
         if(self.feature_reduction):
             X_train = self.feature_reduction.fit_transform(X_train)
+            logging.info("Dimensions reduced")
         
         #train one class classification
         self.one_class.fit(X_train)
+        logging.info("One class classification training pipeline finished")
+        
     
     def save(self) -> None:
         """ Save all pipeline artefacts """
@@ -53,5 +59,5 @@ class OneClassClassificationTrain(Pipeline):
             FileHandler.saveSklearnModel(self.feature_reduction, 
                                          self.file_handler.get_file_path(PipelineStage.FeatureReduction, ArtifactType.SklearnModel))
         
-        FileHandler.saveModelHandler(self.one_class, 
+        FileHandler.saveSklearnModel(self.one_class, 
                                      self.file_handler.get_file_path(PipelineStage.OneClass, ArtifactType.SklearnModel))

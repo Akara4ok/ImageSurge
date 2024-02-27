@@ -8,8 +8,8 @@ from OneClassDataloader import OneClassDataloader
 class AnimalsOneClassDataloader(OneClassDataloader):
     """ Class for animal dataloading for one class tasks """
     
-    def __init__(self, base_folder_path: str, annotation_path: str, target_class: str):
-        super().__init__(base_folder_path, annotation_path)
+    def __init__(self, base_folder_path: str, target_class: str):
+        super().__init__(base_folder_path)
         self.target_class = target_class
         
     def get_train_images_paths(self) -> list[tuple[str, int]]:

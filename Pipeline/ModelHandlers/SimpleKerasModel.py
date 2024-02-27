@@ -26,7 +26,7 @@ class SimpleKerasModel(PreTrainedModel):
         self.model_type = model_type
         self.model: keras.Model = None
     
-    def preprocess(self, batch: tf.Tensor) -> tf.Tensor:
+    def preprocess(self, batch: tf.Tensor) -> tf.Tensor:        
         if(len(batch.shape) == 3):
             batch = tf.expand_dims(batch, axis=0)
         match self.model_type:
@@ -46,7 +46,7 @@ class SimpleKerasModel(PreTrainedModel):
         def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
             processed_x = self.preprocess(x)
             features = self.extract_features(processed_x)
-            return features, y
+            return features, tf.cast(y, tf.float32)
         
         feature_ds = dataset.map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
         

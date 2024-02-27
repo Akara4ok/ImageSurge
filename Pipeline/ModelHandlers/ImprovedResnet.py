@@ -52,7 +52,7 @@ class ImprovedResnet(ModelHandler):
         def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
             processed_x = self.preprocess(x)
             features = self.extract_features(processed_x)
-            return features, y
+            return features, tf.cast(y, tf.float32)
         
         feature_ds = dataset.map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
         
