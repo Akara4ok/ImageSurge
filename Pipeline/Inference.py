@@ -10,6 +10,9 @@ class Inference(Pipeline):
     
     def __init__(self, file_handler: FileHandler) -> None:
         super().__init__(file_handler)
+        self.is_train: bool = False
+        self.y_true: np.ndarray = None
+        self.cached_feauteres = None
     
     @abstractmethod
     def process(data: tf.data.Dataset) -> np.ndarray:
@@ -22,13 +25,11 @@ class Inference(Pipeline):
         self.feature_extractor =  FileHandler.loadModelHandler(self.file_handler.get_file_path(PipelineStage.FeatureExtractor, 
                                                                                                ArtifactType.ModelHandler))
         
-        if(self.scaler):
-            self.scaler = FileHandler.loadSklearnModel(self.file_handler.get_file_path(PipelineStage.Scaler, 
-                                                                         ArtifactType.SklearnModel))
+        self.scaler = FileHandler.loadSklearnModel(self.file_handler.get_file_path(PipelineStage.Scaler, 
+                                                                        ArtifactType.SklearnModel))
         
-        if(self.feature_reduction):
-            self.feature_reduction = FileHandler.loadSklearnModel(self.file_handler.get_file_path(PipelineStage.FeatureReduction, 
-                                                                                                  ArtifactType.SklearnModel))
+        self.feature_reduction = FileHandler.loadSklearnModel(self.file_handler.get_file_path(PipelineStage.FeatureReduction, 
+                                                                                                ArtifactType.SklearnModel))
         
         self.one_class = FileHandler.loadSklearnModel(self.file_handler.get_file_path(PipelineStage.OneClass, 
                                                                                       ArtifactType.SklearnModel))

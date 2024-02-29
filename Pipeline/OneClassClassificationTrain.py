@@ -6,6 +6,7 @@ import sys
 sys.path.append("Dataset")
 from TrainDataset import TrainDataset
 import logging
+import shutil
 
 class OneClassClassificationTrain(Pipeline):
     """ Class for training one class classification """
@@ -47,6 +48,7 @@ class OneClassClassificationTrain(Pipeline):
     
     def save(self) -> None:
         """ Save all pipeline artefacts """
+        shutil.rmtree(self.file_handler.get_file_path(PipelineStage.BaseFolder, ArtifactType.BaseFolder))
         
         FileHandler.saveModelHandler(self.feature_extractor, 
                                      self.file_handler.get_file_path(PipelineStage.FeatureExtractor, ArtifactType.ModelHandler))

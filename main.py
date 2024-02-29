@@ -31,6 +31,6 @@ dataset = TrainOneClassDataset(224, 224, 10, 42, dataloader_one_class, 300, 600,
 dataset.load()
 
 #training pipeline
-train_pipeline.configure(model, oc_svm_clf, ss, pca)
+train_pipeline.configure(model, oc_svm_clf)
 train_pipeline.train(dataset)
 train_pipeline.save()

@@ -15,14 +15,16 @@ from pathlib import Path
 from sklearn.base import BaseEstimator
 
 class ArtifactType(enum.Enum):
-    ModelHandler = 1
-    SklearnModel = 2
+    BaseFolder = 1
+    ModelHandler = 2
+    SklearnModel = 3
 
 class PipelineStage(enum.Enum):
-    FeatureExtractor = 1,
-    Scaler = 2
-    FeatureReduction = 3
-    OneClass = 4
+    BaseFolder = 1
+    FeatureExtractor = 2,
+    Scaler = 3
+    FeatureReduction = 4
+    OneClass = 5
 
 class FileHandler:
     """ Class for saving and loading files """
@@ -43,19 +45,30 @@ class FileHandler:
         pickle.dump(model, open(path, 'wb'))
         
     def loadModelHandler(path: str) -> ModelHandler:
-        return ModelLoader.load(path)
+        try:
+            return ModelLoader.load(path)
+        except:
+            return None
     
     def loadSklearnModel(path: str) -> SklearnInterface:
-        return pickle.load(open(path, 'rb'))
+        try:
+            return pickle.load(open(path, 'rb'))
+        except:
+            return None
     
-    def saveUndefinedModel(model, path: str):
-        return pickle.load(open(path, 'rb'))
+    def loadUndefinedModel(model, path: str):
+        try:
+            return pickle.load(open(path, 'rb'))
+        except:
+            return None
         
     def get_file_path(self, pipeline_stage: PipelineStage, artifact_type: ArtifactType) -> str:
         """ get file path for specific experiment and file """
         folder = f"{self.base_folder_dir}/{self.experiment_info.to_path()}"
         name = ""
         match pipeline_stage:
+            case PipelineStage.BaseFolder:
+                name = ""
             case PipelineStage.FeatureExtractor:
                 name = "feature_extractor" + model_path_suffix
             case PipelineStage.Scaler:
@@ -69,6 +82,8 @@ class FileHandler:
         
         ext = ""
         match artifact_type:
+            case ArtifactType.BaseFolder:
+                ext = ""
             case ArtifactType.ModelHandler:
                 ext = ".json"
             case ArtifactType.SklearnModel:

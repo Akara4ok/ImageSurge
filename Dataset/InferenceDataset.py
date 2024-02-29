@@ -8,8 +8,8 @@ sys.path.append("Dataloader/")
 class InferenceDataset(Dataset):
     """ Implementation of dataset for user requests """
 
-    def __init__(self, image_width: int, image_height: int, batch_size: int = None, dataloader: InferenceDataloader = None, random_seed: int = None):
-        super().__init__(image_width, image_height, batch_size, random_seed)
+    def __init__(self, image_width: int, image_height: int, batch_size: int = None, dataloader: InferenceDataloader = None):
+        super().__init__(image_width, image_height, batch_size)
         self.dataloader = dataloader
 
     def load(self) -> None:

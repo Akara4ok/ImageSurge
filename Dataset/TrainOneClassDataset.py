@@ -13,7 +13,8 @@ class TrainOneClassDataset(TrainDataset):
                  dataloader: OneClassDataloader = None, train_image_count: int = None,
                  test_image_count: int = None, target_image_percent: float = None
                  ):
-        super().__init__(image_width, image_height, batch_size, random_seed, dataloader, train_image_count, test_image_count, target_image_percent)
+        super().__init__(image_width, image_height, batch_size, random_seed, dataloader, train_image_count, 
+                         test_image_count, target_image_percent)
 
     def load(self) -> None:
         train_images_list = self.one_class_dataloader.get_train_images_paths()
@@ -31,12 +32,11 @@ class TrainOneClassDataset(TrainDataset):
         if(not self.test_image_count):
             self.test_image_count = len(all_test_images)
         test_images_not_target = list(filter(lambda x: x[1] == 0, all_test_images))
-        random.Random(self.random_seed).shuffle(test_images_not_target)
         test_images_target = list(filter(lambda x: x[1] == 1, all_test_images))
-        random.Random(self.random_seed).shuffle(test_images_target)
         test_images_target = test_images_target[:int(self.target_image_percent * self.test_image_count)]
         test_images_not_target = test_images_not_target[:int((1 - self.target_image_percent) * self.test_image_count)]
         test_images_list = test_images_target + test_images_not_target
+        random.Random(self.random_seed).shuffle(test_images_list)
         test_paths, test_labels = self.unzip_list(test_images_list)
         
         self.test_dataset = tf.data.Dataset.from_tensor_slices((test_paths, test_labels)).map(

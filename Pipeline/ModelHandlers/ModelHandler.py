@@ -30,8 +30,8 @@ class ModelHandler(ABC):
         pass
     
     @abstractmethod
-    def extract_features_in_dataset(self, dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarray]:
-        """ extract features from dataset """
+    def extract_features_in_dataset(self, dataset: tf.data.Dataset, is_train_ds: bool = True) -> tuple[np.ndarray, np.ndarray]:
+        """ extract features from dataset. Return feautres and its label if it has """
         pass
     
     @abstractmethod

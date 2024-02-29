@@ -6,7 +6,7 @@ import json
 import sys
 import numpy as np
 sys.path.append("utils")
-from functions import to_numpy_image_label
+from functions import to_numpy_image, to_numpy_image_label
 
 class ClipModel(PreTrainedModel):
     """ Class for pretrained keras models """
@@ -22,15 +22,21 @@ class ClipModel(PreTrainedModel):
     def extract_features(self, batch: tf.Tensor) -> tf.Tensor:
         return self.model.get_image_features(**batch)
     
-    def extract_features_in_dataset(self, dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarray]:
-        def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
+    def extract_features_in_dataset(self, dataset: tf.data.Dataset, is_train_ds: bool = True) -> tuple[np.ndarray, np.ndarray]:
+        def full_process_x(x: tf.Tensor) -> tf.Tensor:
             processed_x = self.preprocess(x.numpy())
             features = self.extract_features(processed_x)
-            return features, tf.cast(y, tf.float32)
+            return features
         
-        feature_ds = dataset.map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
+        def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
+            return full_process_x(x), tf.cast(y, tf.float32)
         
-        return to_numpy_image_label(feature_ds)
+        if(is_train_ds):
+            feature_ds = dataset.map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
+            return to_numpy_image_label(feature_ds)
+        
+        feature_ds = dataset.map(lambda x: tf.py_function(full_process_x, [x], tf.float32))
+        return (to_numpy_image(feature_ds), None)
     
     def save(self, save_path: str) -> None:
         object_info = {
