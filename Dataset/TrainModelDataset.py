@@ -1,5 +1,6 @@
 import sys
 import tensorflow as tf
+from Dataset import Dataset
 from TrainDataset import TrainDataset
 import logging
 sys.path.append("Dataloader/")
@@ -15,6 +16,7 @@ class TrainModelDataset(TrainDataset):
         super().__init__(image_width, image_height, batch_size, random_seed, dataloader, train_image_count, test_image_count, target_image_percent)
         self.train_model_dataset: tf.data.Dataset = None
 
+    @Dataset.need_load
     def get_train_model_data(self) -> tf.data.Dataset:
         """ Get train tf.Dataset """
         if(self.train_dataset == None):

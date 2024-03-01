@@ -43,3 +43,5 @@ class TrainOneClassDataset(TrainDataset):
             self.process_path, num_parallel_calls=tf.data.AUTOTUNE)
         if(self.batch_size):
             self.test_dataset = self.test_dataset.batch(self.batch_size)
+        
+        self.is_loaded = True

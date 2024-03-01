@@ -28,7 +28,6 @@ pca = PCA(n_components=128, whiten=True)
 #loading data to dataset instance
 dataloader_one_class = AnimalsOneClassDataloader("../Data/Animals/animals", "lion")
 dataset = TrainOneClassDataset(224, 224, 10, 42, dataloader_one_class, 300, 600, 0.3)
-dataset.load()
 
 #training pipeline
 train_pipeline.configure(model, oc_svm_clf)

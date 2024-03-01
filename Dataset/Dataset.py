@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import tensorflow as tf
+from typing import Callable
 
 class Dataset(ABC):
     """ Abstract class for dataset """
@@ -9,6 +10,15 @@ class Dataset(ABC):
         self.image_height = image_height
         self.batch_size = batch_size
         self.random_seed = random_seed
+        self.is_loaded: bool = False
+    
+    def need_load(func: Callable) -> Callable:
+        """ check is data loaded """
+        def load_decorator(self):
+            if(not self.is_loaded):
+                self.load(self)
+            return func(self)
+        return load_decorator
     
     @abstractmethod
     def load(self) -> None:

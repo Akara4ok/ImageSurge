@@ -20,16 +20,18 @@ class TrainDataset(Dataset):
         self.train_dataset: tf.data.Dataset = None
         self.test_dataset: tf.data.Dataset = None
 
+    @Dataset.need_load
     def get_train_data(self) -> tf.data.Dataset:
         """ Get train tf.Dataset """
         if(self.train_dataset == None):
-            logging.warning("Dataset is not loaded. Call 'load' function")
+            logging.warning("Dataset is loaded but empty")
         return self.train_dataset
 
+    @Dataset.need_load
     def get_test_data(self) -> tf.data.Dataset:
         """ Get test tf.Dataset """
         if(self.train_dataset == None):
-            logging.warning("Dataset is not loaded. Call 'load' function")
+            logging.warning("Dataset is loaded but empty")
         return self.test_dataset
     
     def process_path(self, path: str, label: int) -> tuple[tf.Tensor, int]:

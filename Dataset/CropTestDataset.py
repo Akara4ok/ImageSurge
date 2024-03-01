@@ -32,6 +32,8 @@ class CropTestDataset(Dataset):
 
         self.dataset = tf.data.Dataset.from_tensor_slices((test_paths, test_info)).map(
             self.process_cropped_info, num_parallel_calls=tf.data.AUTOTUNE)
+        
+        self.is_loaded = True
 
     def get_crop_data(self) -> tf.data.Dataset:
         """ Get tf.Dataset instance of dataloader  """

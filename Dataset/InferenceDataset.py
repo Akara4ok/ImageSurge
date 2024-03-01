@@ -18,7 +18,10 @@ class InferenceDataset(Dataset):
             self.process_image, num_parallel_calls=tf.data.AUTOTUNE)
         if(self.batch_size):
             self.dataset = self.dataset.batch(self.batch_size)
+            
+        self.is_loaded = True
 
+    @Dataset.need_load
     def get_data(self) -> tf.data.Dataset:
         """ Get tf.Dataset instance of dataloader  """
         return self.dataset
