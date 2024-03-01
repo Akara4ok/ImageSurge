@@ -1,7 +1,7 @@
 import logging
 import tensorflow as tf
-from Dataset.Dataset import Dataset
-from Dataset.TrainDataset import TrainDataset
+from .Dataset import Dataset
+from .TrainDataset import TrainDataset
 from Dataloader.OneClassDataloader import OneClassDataloader
 
 class TrainModelDataset(TrainDataset):
@@ -17,7 +17,7 @@ class TrainModelDataset(TrainDataset):
     @Dataset.need_load
     def get_train_model_data(self) -> tf.data.Dataset:
         """ Get train tf.Dataset """
-        if(self.train_dataset == None):
+        if(self.train_dataset is None):
             logging.warning("Dataset is not loaded. Call 'load' function")
         return self.train_model_dataset
     

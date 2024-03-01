@@ -26,7 +26,7 @@ class OneClassClassificationTrain(Pipeline):
         """ Train all pipeline stages """
         
         #train and extract features
-        if(not use_cache or not self.cached_feauteres):    
+        if(not use_cache or self.cached_feauteres is None):    
             self.feature_extractor.train(train_dataset, epochs)
             X_train, _ = self.feature_extractor.extract_features_in_dataset(train_dataset.get_train_data())
         else:

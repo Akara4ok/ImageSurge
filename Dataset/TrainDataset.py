@@ -1,6 +1,6 @@
 import logging
 import tensorflow as tf
-from Dataset.Dataset import Dataset
+from .Dataset import Dataset
 from Dataloader.OneClassDataloader import OneClassDataloader
 
 class TrainDataset(Dataset):
@@ -21,14 +21,14 @@ class TrainDataset(Dataset):
     @Dataset.need_load
     def get_train_data(self) -> tf.data.Dataset:
         """ Get train tf.Dataset """
-        if(self.train_dataset == None):
+        if(self.train_dataset is None):
             logging.warning("Dataset is loaded but empty")
         return self.train_dataset
 
     @Dataset.need_load
     def get_test_data(self) -> tf.data.Dataset:
         """ Get test tf.Dataset """
-        if(self.train_dataset == None):
+        if(self.train_dataset is None):
             logging.warning("Dataset is loaded but empty")
         return self.test_dataset
     

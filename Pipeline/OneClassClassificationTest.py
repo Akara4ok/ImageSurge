@@ -15,10 +15,10 @@ class OneClassClassificationTest(Testable):
         self.test_inference: OneClassClassificationInference = test_inference
         self.y_predicted: np.ndarray = None
         
-    def test(self, dataset: tf.data.Dataset, use_cache: bool = False) -> np.ndarray:
+    def test(self, dataset: tf.data.Dataset, use_cache: bool = False, **kwargs) -> np.ndarray:
         """ Testing inference """
         
-        self.y_predicted = self.test_inference.process(dataset, use_cache, True)
+        self.y_predicted = self.test_inference.process(dataset, use_cache, True, **kwargs)
         return self.y_predicted
         
         

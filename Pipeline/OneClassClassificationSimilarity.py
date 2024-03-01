@@ -2,17 +2,20 @@ import tensorflow as tf
 import numpy as np
 import logging
 from .Inference import Inference
+from .OneClassClassificationInference import OneClassClassificationInference
 from .utils.FileHandler import FileHandler
+from utils.functions import calculate_similarity, filter_similarity
+from sklearn.metrics.pairwise import cosine_similarity
 
-class OneClassClassificationInference(Inference):
-    """ Class for infernce one class classification """
+class OneClassClassificationSimilarity(OneClassClassificationInference):
+    """ Class for infernce one class classification using similarity """
     
     def __init__(self, file_handler: FileHandler) -> None:
         super().__init__(file_handler)
     
     @Inference.need_load
-    def process(self, dataset: tf.data.Dataset, 
-                use_cache: bool = False, is_test: bool = False) -> np.ndarray:
+    def process(self, dataset: tf.data.Dataset,
+                use_cache: bool = False, is_test: bool = False, threshold: float = None) -> np.ndarray:
         """ Train all pipeline stages """
         
         if(not self.feature_extractor or not self.one_class):
@@ -41,4 +44,11 @@ class OneClassClassificationInference(Inference):
         #train one class classification
         y_predicted = self.one_class.predict(x)
         y_predicted[y_predicted == -1] = 0
-        return y_predicted
+        
+        predicted_center = np.mean(x[y_predicted > 0], axis=0)
+        similarities = cosine_similarity(x, np.reshape(predicted_center, (1, -1))).flatten()
+        
+        if(not threshold):
+            threshold = calculate_similarity(similarities)
+        
+        return filter_similarity(similarities, threshold)
