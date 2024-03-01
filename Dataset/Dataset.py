@@ -10,13 +10,15 @@ class Dataset(ABC):
         self.image_height = image_height
         self.batch_size = batch_size
         self.random_seed = random_seed
-        self.is_loaded: bool = False
+        self.is_loaded = False
     
     def need_load(func: Callable) -> Callable:
         """ check is data loaded """
         def load_decorator(self):
             if(not self.is_loaded):
-                self.load(self)
+                self.load()
+                if(not self.is_loaded):
+                    raise Exception("Load failed")
             return func(self)
         return load_decorator
     

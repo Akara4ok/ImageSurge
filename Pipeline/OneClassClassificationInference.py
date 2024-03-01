@@ -12,7 +12,8 @@ class OneClassClassificationInference(Inference):
     
     def __init__(self, file_handler: FileHandler) -> None:
         super().__init__(file_handler)
-        
+    
+    @Inference.need_load
     def process(self, dataset: tf.data.Dataset, 
                 use_cache: bool = False, is_test: bool = False) -> np.ndarray:
         """ Train all pipeline stages """

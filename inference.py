@@ -19,8 +19,6 @@ inference_pipeline = OneClassClassificationInference(file_handler)
 #loading data to dataset instance
 dataloader = InferenceDataloader("../Data/Animals/animals/inf")
 dataset = InferenceDataset(224, 224, 10, dataloader)
-dataset.load()
 
 #inference
-inference_pipeline.load()
 print(inference_pipeline.process(dataset.get_data()))
