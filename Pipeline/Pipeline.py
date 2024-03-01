@@ -1,8 +1,9 @@
-from utils.FileHandler import FileHandler
-from utils.SklearnInterface import SklearnInterface
-from ModelHandlers.ModelHandler import ModelHandler
 import numpy as np
 import tensorflow as tf
+
+from .ModelHandlers.ModelHandler import ModelHandler
+from .utils.FileHandler import FileHandler
+from .utils.SklearnInterface import SklearnInterface
 
 class Pipeline:
     """ Abstract class for training, testing and inference pipeline """

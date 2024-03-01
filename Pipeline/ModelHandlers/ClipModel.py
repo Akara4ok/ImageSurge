@@ -1,12 +1,10 @@
-import tensorflow as tf
-from ModelHandler import Models
-from PreTrainedModel import PreTrainedModel
-from transformers import TFCLIPModel, AutoProcessor
 import json
-import sys
+import tensorflow as tf
 import numpy as np
-sys.path.append("utils")
-from functions import to_numpy_image, to_numpy_image_label
+from transformers import TFCLIPModel, AutoProcessor
+from .ModelHandler import Models
+from .PreTrainedModel import PreTrainedModel
+from utils.functions import to_numpy_image, to_numpy_image_label
 
 class ClipModel(PreTrainedModel):
     """ Class for pretrained keras models """

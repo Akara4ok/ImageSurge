@@ -1,13 +1,12 @@
 import numpy as np
-from utils.FileHandler import FileHandler
-from OneClassClassificationInference import OneClassClassificationInference
+import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sklearn.manifold import TSNE
-from Testable import Testable
-import tensorflow as tf
+from .Testable import Testable
+from .OneClassClassificationInference import OneClassClassificationInference
 
 class OneClassClassificationTest(Testable):
     """ Class for testing one class classification """

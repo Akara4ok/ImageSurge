@@ -1,11 +1,8 @@
 import tensorflow as tf
 import numpy as np
-from Inference import Inference
-from utils.FileHandler import FileHandler, PipelineStage, ArtifactType
-import sys
-sys.path.append("utils")
-from functions import to_numpy_image_label
 import logging
+from .Inference import Inference
+from .utils.FileHandler import FileHandler
 
 class OneClassClassificationInference(Inference):
     """ Class for infernce one class classification """

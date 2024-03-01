@@ -1,9 +1,8 @@
-import enum
 import json
-from SimpleKerasModel import SimpleKerasModel, KerasModels
-from ClipModel import ClipModel
-from ImprovedResnet import ImprovedResnet
-from ModelHandler import ModelHandler, Models
+from .SimpleKerasModel import SimpleKerasModel, KerasModels
+from .ClipModel import ClipModel
+from .ImprovedResnet import ImprovedResnet
+from .ModelHandler import ModelHandler, Models
 
 class ModelLoader:
     def load(load_path: str) -> ModelHandler:

@@ -1,10 +1,9 @@
-from Pipeline import Pipeline
-from utils.FileHandler import FileHandler, PipelineStage, ArtifactType
 from abc import abstractmethod
-import logging
+from typing import Callable
 import tensorflow as tf
 import numpy as np
-from typing import Callable
+from .Pipeline import Pipeline
+from .utils.FileHandler import FileHandler, PipelineStage, ArtifactType
 
 class Inference(Pipeline):
     """ Abstract inference class for different pipeline """

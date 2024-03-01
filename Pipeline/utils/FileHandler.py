@@ -1,18 +1,14 @@
 import enum
-import sys
+from pathlib import Path
 import pickle
+from sklearn.base import BaseEstimator
 
 model_path_suffix = "_metainfo"
 
-sys.path.append("utils")
-from ExperimentInfo import ExperimentInfo
-sys.path.append("Pipeline")
-from ModelHandlers.ModelHandler import ModelHandler
-from ModelHandlers.ModelLoader import ModelLoader
-from SklearnInterface import SklearnInterface
-from pathlib import Path
-
-from sklearn.base import BaseEstimator
+from .SklearnInterface import SklearnInterface
+from ..ModelHandlers.ModelHandler import ModelHandler
+from ..ModelHandlers.ModelLoader import ModelLoader
+from utils.ExperimentInfo import ExperimentInfo
 
 class ArtifactType(enum.Enum):
     BaseFolder = 1

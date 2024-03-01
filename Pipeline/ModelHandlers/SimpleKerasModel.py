@@ -1,16 +1,14 @@
+import enum
+import json
 import numpy as np
 import tensorflow as tf
-import enum
 import keras.applications.vgg16
 import keras.applications.resnet
 from keras.applications import ResNet50
 from keras.applications import VGG16
-from PreTrainedModel import PreTrainedModel
-from ModelHandler import Models
-import json
-import sys
-sys.path.append("utils")
-from functions import to_numpy_image, to_numpy_image_label
+from .PreTrainedModel import PreTrainedModel
+from .ModelHandler import Models
+from utils.functions import to_numpy_image, to_numpy_image_label
 
 class KerasModels(enum.Enum):
     VGG = 1

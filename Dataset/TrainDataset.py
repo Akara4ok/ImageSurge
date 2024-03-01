@@ -1,9 +1,7 @@
-import sys
-import tensorflow as tf
-from Dataset import Dataset
 import logging
-sys.path.append("Dataloader/")
-from OneClassDataloader import OneClassDataloader
+import tensorflow as tf
+from Dataset.Dataset import Dataset
+from Dataloader.OneClassDataloader import OneClassDataloader
 
 class TrainDataset(Dataset):
     """ Implementation of dataset for training and testing """

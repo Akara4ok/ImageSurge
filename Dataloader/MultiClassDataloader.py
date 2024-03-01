@@ -1,6 +1,5 @@
 import os
-from pathlib import Path
-from TrainDataloader import TrainDataloader
+from Dataloader.TrainDataloader import TrainDataloader
 
 class MultiClassDataloader(TrainDataloader):
     """ Abstract class for multiclass data loading """

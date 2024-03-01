@@ -1,17 +1,9 @@
-import sys
-sys.path.append("utils")
-sys.path.append("Pipeline")
-sys.path.append("Pipeline/ModelHandlers")
-sys.path.append("Pipeline/utils")
-sys.path.append('Dataloader/')
-sys.path.append('Dataset/')
-from ExperimentInfo import ExperimentInfo
-from utils.FileHandler import FileHandler
-from ModelHandlers.SimpleKerasModel import SimpleKerasModel, KerasModels
-from OneClassClassificationTest import OneClassClassificationTest
-from DataloaderImpl.AnimalsOneClassDataloader import AnimalsOneClassDataloader
-from OneClassClassificationInference import OneClassClassificationInference
-from TrainOneClassDataset import TrainOneClassDataset
+from utils.ExperimentInfo import ExperimentInfo
+from Pipeline.utils.FileHandler import FileHandler
+from Pipeline.OneClassClassificationTest import OneClassClassificationTest
+from Pipeline.OneClassClassificationInference import OneClassClassificationInference
+from Dataloader.DataloaderImpl.AnimalsOneClassDataloader import AnimalsOneClassDataloader
+from Dataset.TrainOneClassDataset import TrainOneClassDataset
 
 experiment = ExperimentInfo("vlad", "test", "1")
 file_handler = FileHandler("Artifacts/", experiment)

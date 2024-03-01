@@ -1,20 +1,16 @@
-import tensorflow as tf
-import numpy as np
+import json
 import keras
+import numpy as np
+import tensorflow as tf
 from keras.applications.resnet import preprocess_input
 from keras.applications import ResNet50
-import sys
-import json
-from ModelHandler import ModelHandler, Models
-from losses.ReferenceTrainingLosses import one_class_loss, multi_class_loss
-from models.ResnetTrainingModel import ResnetTrainingModel
-sys.path.append("Dataset")
-from TrainModelDataset import TrainModelDataset
-from TrainRefDataset import TrainRefDataset
-sys.path.append("Pipeline")
-from utils.FileHandler import model_path_suffix
-sys.path.append("utils")
-from functions import to_numpy_image, to_numpy_image_label
+from .ModelHandler import ModelHandler, Models
+from .losses.ReferenceTrainingLosses import one_class_loss, multi_class_loss
+from .models.ResnetTrainingModel import ResnetTrainingModel
+from ..utils.FileHandler import model_path_suffix
+from Dataset.TrainModelDataset import TrainModelDataset
+from Dataset.TrainRefDataset import TrainRefDataset
+from utils.functions import to_numpy_image, to_numpy_image_label
 
 class ImprovedResnet(ModelHandler):
     """ Class for training resnet with reference dataset """

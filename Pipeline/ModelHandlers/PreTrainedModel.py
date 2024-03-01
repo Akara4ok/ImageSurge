@@ -1,8 +1,5 @@
-import numpy as np
-from ModelHandler import ModelHandler
-import sys
-sys.path.append("Dataset")
-from TrainModelDataset import TrainModelDataset
+from .ModelHandler import ModelHandler
+from Dataset.TrainModelDataset import TrainModelDataset
 
 class PreTrainedModel(ModelHandler):
     """ Abstract class for pretrained models """

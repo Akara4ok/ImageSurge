@@ -1,4 +1,3 @@
-import tensorflow as tf
 from keras import Model
 from keras.applications import ResNet50
 from keras.layers import Dense, Input

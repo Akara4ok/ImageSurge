@@ -1,12 +1,10 @@
-from Pipeline import Pipeline
-from utils.FileHandler import FileHandler, PipelineStage, ArtifactType
-from utils.SklearnInterface import SklearnInterface
-from ModelHandlers.ModelHandler import ModelHandler
-import sys
-sys.path.append("Dataset")
-from TrainDataset import TrainDataset
 import logging
 import shutil
+from .Pipeline import Pipeline
+from .ModelHandlers.ModelHandler import ModelHandler
+from .utils.SklearnInterface import SklearnInterface
+from .utils.FileHandler import FileHandler, PipelineStage, ArtifactType
+from Dataset.TrainDataset import TrainDataset
 
 class OneClassClassificationTrain(Pipeline):
     """ Class for training one class classification """

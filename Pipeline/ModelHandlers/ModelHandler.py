@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
+import enum
 import numpy as np
 import tensorflow as tf
-import sys
-import enum
-sys.path.append("Dataset")
-from TrainModelDataset import TrainModelDataset
+from Dataset.TrainModelDataset import TrainModelDataset
 
 class Models(enum.Enum):
     SimpleKeras = 1

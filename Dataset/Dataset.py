@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-import tensorflow as tf
 from typing import Callable
+import tensorflow as tf
 
 class Dataset(ABC):
     """ Abstract class for dataset """

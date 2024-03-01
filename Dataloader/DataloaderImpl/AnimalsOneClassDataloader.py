@@ -1,9 +1,6 @@
-from abc import ABC, abstractmethod
 import glob
 import os
-import sys
-sys.path.append("Dataloader")
-from OneClassDataloader import OneClassDataloader
+from ..OneClassDataloader import OneClassDataloader
 
 class AnimalsOneClassDataloader(OneClassDataloader):
     """ Class for animal dataloading for one class tasks """

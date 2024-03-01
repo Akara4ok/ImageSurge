@@ -1,5 +1,5 @@
 from abc import  abstractmethod
-from ImageDataloader import ImageDataloader
+from .ImageDataloader import ImageDataloader
 
 class TrainDataloader(ImageDataloader):
     """ Abstract class for train data loading """

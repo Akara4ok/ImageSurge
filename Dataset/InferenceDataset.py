@@ -1,9 +1,6 @@
-from InferenceDataloader import InferenceDataloader
-import sys
 import tensorflow as tf
-from Dataset import Dataset
-sys.path.append("Dataloader/")
-
+from Dataset.Dataset import Dataset
+from Dataloader.InferenceDataloader import InferenceDataloader
 
 class InferenceDataset(Dataset):
     """ Implementation of dataset for user requests """

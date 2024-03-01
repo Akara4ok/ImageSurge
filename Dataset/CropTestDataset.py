@@ -1,11 +1,7 @@
-from CropDataloader import CropDataloader
-import sys
 import random
 import tensorflow as tf
-from Dataset import Dataset
-
-sys.path.append("Dataloader/")
-
+from .Dataset import Dataset
+from Dataloader.CropDataloader import CropDataloader
 
 class CropTestDataset(Dataset):
     """ Implementation of dataset for user requests """

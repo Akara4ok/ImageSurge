@@ -1,7 +1,5 @@
 import glob
-import sys
-sys.path.append("Dataloader")
-from MultiClassDataloader import MultiClassDataloader
+from ..MultiClassDataloader import MultiClassDataloader
 
 class NaturalMultiClassDataloader(MultiClassDataloader):
     """ Class for natural dataloading for ref """

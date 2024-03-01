@@ -1,9 +1,7 @@
-from OneClassDataloader import OneClassDataloader
-import sys
 import random
 import tensorflow as tf
-from TrainDataset import TrainDataset
-sys.path.append("Dataloader/")
+from Dataset.TrainDataset import TrainDataset
+from Dataloader.OneClassDataloader import OneClassDataloader
 
 
 class TrainOneClassDataset(TrainDataset):
