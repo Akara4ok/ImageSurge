@@ -25,6 +25,12 @@ def to_numpy_image_label(dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarr
     y = np.concatenate(np.asarray(y))
     return x, y
 
+def unzip_list(cur_list: list[tuple[str, int]]) -> tuple[list[str], list[int]]:
+    """ Unzip list of tuples """
+    
+    list_unzipped = [list(t) for t in zip(*cur_list)]
+    return list_unzipped[0], list_unzipped[1]
+
 def calculate_similarity(similarities: np.ndarray, min_std: float = 0.01, max_std: float = 0.3) -> float:
     """ Calculate suggested similarity """
     std = np.std(similarities)

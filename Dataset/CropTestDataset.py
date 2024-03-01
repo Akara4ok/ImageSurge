@@ -2,6 +2,7 @@ import random
 import tensorflow as tf
 from .Dataset import Dataset
 from Dataloader.CropDataloader import CropDataloader
+from utils.functions import unzip_list
 
 class CropTestDataset(Dataset):
     """ Implementation of dataset for user requests """
@@ -24,7 +25,7 @@ class CropTestDataset(Dataset):
             self.test_image_count = len(test_images_list)
         random.Random(self.random_seed).shuffle(test_images_list)
         test_images_list = test_images_list[:self.test_image_count]
-        test_paths, test_info = self.unzip_list(test_images_list)
+        test_paths, test_info = unzip_list(test_images_list)
 
         self.dataset = tf.data.Dataset.from_tensor_slices((test_paths, test_info)).map(
             self.process_cropped_info, num_parallel_calls=tf.data.AUTOTUNE)

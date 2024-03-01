@@ -2,7 +2,7 @@ import random
 import tensorflow as tf
 from Dataset.TrainDataset import TrainDataset
 from Dataloader.OneClassDataloader import OneClassDataloader
-
+from utils.functions import unzip_list
 
 class TrainOneClassDataset(TrainDataset):
     """ Implementation of dataset for simple one class classification """
@@ -20,7 +20,7 @@ class TrainOneClassDataset(TrainDataset):
         if(not self.train_image_count):
             self.train_image_count = len(train_images_list)
         train_images_list = train_images_list[:self.train_image_count]
-        train_paths, train_labels = self.unzip_list(train_images_list)
+        train_paths, train_labels = unzip_list(train_images_list)
         self.train_dataset = tf.data.Dataset.from_tensor_slices((train_paths, train_labels)).map(
             self.process_path, num_parallel_calls=tf.data.AUTOTUNE)
         if(self.batch_size):
@@ -35,7 +35,7 @@ class TrainOneClassDataset(TrainDataset):
         test_images_not_target = test_images_not_target[:int((1 - self.target_image_percent) * self.test_image_count)]
         test_images_list = test_images_target + test_images_not_target
         random.Random(self.random_seed).shuffle(test_images_list)
-        test_paths, test_labels = self.unzip_list(test_images_list)
+        test_paths, test_labels = unzip_list(test_images_list)
         
         self.test_dataset = tf.data.Dataset.from_tensor_slices((test_paths, test_labels)).map(
             self.process_path, num_parallel_calls=tf.data.AUTOTUNE)

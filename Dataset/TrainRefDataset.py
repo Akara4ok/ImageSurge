@@ -3,7 +3,7 @@ import tensorflow as tf
 from .TrainModelDataset import TrainModelDataset
 from Dataloader.OneClassDataloader import OneClassDataloader
 from Dataloader.MultiClassDataloader import MultiClassDataloader
-
+from utils.functions import unzip_list
 
 class TrainRefDataset(TrainModelDataset):
     """ Implementation of dataset for one class classification with multiclass reference dataset"""
@@ -33,7 +33,7 @@ class TrainRefDataset(TrainModelDataset):
             self.train_image_count = len(train_images_list)
         random.Random(self.random_seed).shuffle(train_images_list)
         train_images_list = train_images_list[:self.train_image_count]
-        train_paths, _ = self.unzip_list(train_images_list)
+        train_paths, _ = unzip_list(train_images_list)
         self.train_dataset = tf.data.Dataset.from_tensor_slices(train_paths).map(
             self.process_train_path, num_parallel_calls=tf.data.AUTOTUNE)
         if(self.batch_size):
@@ -43,7 +43,7 @@ class TrainRefDataset(TrainModelDataset):
         train_ref_images_list = self.multi_class_dataloader.get_train_images_paths()
         random.Random(self.random_seed).shuffle(train_ref_images_list)
         train_ref_images_list = train_ref_images_list[:self.train_image_count]
-        train_ref_paths, train_ref_labels = self.unzip_list(train_ref_images_list)
+        train_ref_paths, train_ref_labels = unzip_list(train_ref_images_list)
         train_ref_dataset = tf.data.Dataset.from_tensor_slices((train_ref_paths, train_ref_labels)).map(
             self.process_path, num_parallel_calls=tf.data.AUTOTUNE)
         if(self.batch_size):
@@ -61,7 +61,7 @@ class TrainRefDataset(TrainModelDataset):
         test_images_target = test_images_target[:int(self.target_image_percent * self.test_image_count)]
         test_images_not_target = test_images_not_target[:int((1 - self.target_image_percent) * self.test_image_count)]
         test_images_list = test_images_target + test_images_not_target
-        test_paths, test_labels = self.unzip_list(test_images_list)
+        test_paths, test_labels = unzip_list(test_images_list)
         
         self.test_dataset = tf.data.Dataset.from_tensor_slices((test_paths, test_labels)).map(
             self.process_path, num_parallel_calls=tf.data.AUTOTUNE)

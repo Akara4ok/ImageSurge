@@ -34,9 +34,3 @@ class Dataset(ABC):
         img = tf.reverse(img, axis=[-1])
         img = tf.image.resize(img, [self.image_height, self.image_width])
         return tf.cast(img, tf.uint8)
-    
-    def unzip_list(self, cur_list: list[tuple[str, int]]) -> tuple[list[str], list[int]]:
-        """ Unzip list of tuples """
-        
-        list_unzipped = [list(t) for t in zip(*cur_list)]
-        return list_unzipped[0], list_unzipped[1]

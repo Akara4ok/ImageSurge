@@ -19,8 +19,7 @@ class OneClassClassificationTest(Testable):
         """ Testing inference """
         
         self.y_predicted = self.test_inference.process(dataset, use_cache, True, **kwargs)
-        return self.y_predicted
-        
+        return self.y_predicted 
         
     def get_metrics(self) -> dict[str, float]:
         y_true = self.test_inference.get_cache_data()[1]
