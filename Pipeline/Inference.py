@@ -10,9 +10,6 @@ class Inference(Pipeline):
     
     def __init__(self, file_handler: FileHandler) -> None:
         super().__init__(file_handler)
-        self.is_train: bool = False
-        self.y_true: np.ndarray = None
-        self.cached_feauteres = None
     
     @abstractmethod
     def process(data: tf.data.Dataset) -> np.ndarray:

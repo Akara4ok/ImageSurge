@@ -10,6 +10,6 @@ class Testable(ABC):
         pass
     
     @abstractmethod
-    def viualize(self, y_predicted: np.ndarray) -> None:
+    def visualize(self, y_predicted: np.ndarray) -> None:
         """ Visualize metrics for pipeline """
         pass

@@ -23,12 +23,20 @@ class OneClassClassificationTrain(Pipeline):
         self.scaler = scaler
         self.feature_reduction = feature_reduction
         
-    def train(self, train_dataset: TrainDataset, epochs = None) -> None:
+    def train(self, train_dataset: TrainDataset, epochs: int = None, 
+              use_cache: bool = False, save_cache: bool = False) -> None:
         """ Train all pipeline stages """
         
         #train and extract features
-        self.feature_extractor.train(train_dataset, epochs)
-        X_train, _ = self.feature_extractor.extract_features_in_dataset(train_dataset.get_train_data())
+        if(not use_cache or not self.cached_feauteres):    
+            self.feature_extractor.train(train_dataset, epochs)
+            X_train, _ = self.feature_extractor.extract_features_in_dataset(train_dataset.get_train_data())
+        else:
+            X_train = self.cached_feauteres
+        
+        if(save_cache):
+            self.cache_features(X_train, None)
+            
         logging.info("Feature extractor has been trained")
         
         # scale features
