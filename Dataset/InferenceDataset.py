@@ -1,5 +1,5 @@
 import tensorflow as tf
-from Dataset.Dataset import Dataset
+from .Dataset import Dataset
 from Dataloader.InferenceDataloader import InferenceDataloader
 
 class InferenceDataset(Dataset):

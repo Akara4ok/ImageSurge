@@ -13,7 +13,7 @@ class CropTestDataset(Dataset):
         self.test_image_count = test_image_count
         self.dataset: tf.data.Dataset = None
 
-    def process_cropped_info(self, path: str, info: tuple[int, int, int, int]):
+    def process_cropped_info(self, path: str, info: tuple[int, int, int, int, int, int]):
         """ Function to map tf.data """
         return self.process_image(path), info
 

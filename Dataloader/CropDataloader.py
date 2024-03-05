@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from Dataloader.ImageDataloader import ImageDataloader
+from .ImageDataloader import ImageDataloader
 
 class CropDataloader(ImageDataloader):
     """ Class for testing crop operation """

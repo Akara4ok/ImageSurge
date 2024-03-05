@@ -31,7 +31,7 @@ class Inference(Pipeline):
         """ Load models """
         
         self.feature_extractor =  FileHandler.loadModelHandler(self.file_handler.get_file_path(PipelineStage.FeatureExtractor, 
-                                                                                               ArtifactType.ModelHandler))
+                                                                                            ArtifactType.ModelHandler))
         
         self.scaler = FileHandler.loadSklearnModel(self.file_handler.get_file_path(PipelineStage.Scaler, 
                                                                         ArtifactType.SklearnModel))
@@ -41,5 +41,8 @@ class Inference(Pipeline):
         
         self.one_class = FileHandler.loadSklearnModel(self.file_handler.get_file_path(PipelineStage.OneClass, 
                                                                                       ArtifactType.SklearnModel))
+        
+        self.cluster_center = FileHandler.loadNumpyArray(self.file_handler.get_file_path(PipelineStage.ClusterCenter, 
+                                                                                      ArtifactType.NumpyArray))
         
         self.is_loaded = True

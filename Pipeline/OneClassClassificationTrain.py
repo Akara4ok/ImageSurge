@@ -1,5 +1,6 @@
 import logging
 import shutil
+import numpy as np
 from .Pipeline import Pipeline
 from .ModelHandlers.ModelHandler import ModelHandler
 from .utils.SklearnInterface import SklearnInterface
@@ -42,6 +43,8 @@ class OneClassClassificationTrain(Pipeline):
             X_train = self.scaler.fit_transform(X_train)
             logging.info("Features scaled")
         
+        X_train_scaled = np.copy(X_train)
+        
         #dimension reduction
         if(self.feature_reduction):
             X_train = self.feature_reduction.fit_transform(X_train)
@@ -50,6 +53,13 @@ class OneClassClassificationTrain(Pipeline):
         #train one class classification
         self.one_class.fit(X_train)
         logging.info("One class classification training pipeline finished")
+        
+        #save cluster center
+        y_predicted = self.one_class.predict(X_train)
+        y_predicted[y_predicted == -1] = 0
+        
+        self.cluster_center = np.mean(X_train_scaled[y_predicted > 0], axis=0)
+        self.cluster_center = np.reshape(self.cluster_center, (1, -1))
         
     
     def save(self) -> None:
@@ -69,3 +79,6 @@ class OneClassClassificationTrain(Pipeline):
         
         FileHandler.saveSklearnModel(self.one_class, 
                                      self.file_handler.get_file_path(PipelineStage.OneClass, ArtifactType.SklearnModel))
+        
+        FileHandler.saveNumpyArray(self.cluster_center, self.file_handler.get_file_path(PipelineStage.ClusterCenter, 
+                                                                                        ArtifactType.NumpyArray))

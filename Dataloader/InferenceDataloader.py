@@ -1,5 +1,5 @@
 import glob
-from Dataloader.ImageDataloader import ImageDataloader
+from .ImageDataloader import ImageDataloader
 
 class InferenceDataloader(ImageDataloader):
     """ Implementation of dataloader for user requests """

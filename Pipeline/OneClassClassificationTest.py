@@ -18,7 +18,7 @@ class OneClassClassificationTest(Testable):
     def test(self, dataset: tf.data.Dataset, use_cache: bool = False, **kwargs) -> np.ndarray:
         """ Testing inference """
         
-        self.y_predicted = self.test_inference.process(dataset, use_cache, True, **kwargs)
+        self.y_predicted = self.test_inference.process(dataset, use_cache, True, True, **kwargs)
         return self.y_predicted 
         
     def get_metrics(self) -> dict[str, float]:

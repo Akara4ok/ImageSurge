@@ -13,6 +13,7 @@ class Pipeline:
         self.scaler: SklearnInterface = None
         self.feature_reduction: SklearnInterface = None
         self.one_class: SklearnInterface = None
+        self.cluster_center: np.ndarray = None
         
         self.cached_feauteres: np.ndarray = None
         self.cached_labels: np.ndarray = None

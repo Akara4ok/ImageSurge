@@ -1,6 +1,9 @@
 """ Some usefull functions """
 import tensorflow as tf
 import numpy as  np
+from sklearn.base import ClusterMixin
+from sklearn.metrics.pairwise import cosine_similarity
+from kneed import KneeLocator
 
 def to_numpy_image(dataset: tf.data.Dataset) -> np.ndarray:
     """ Converts to numpy dataset contains images with processing """
@@ -45,3 +48,42 @@ def filter_similarity(similarities: np.ndarray, threshold: float) -> np.ndarray:
     
     result = similarities > threshold
     return result.astype(int)
+
+def get_cluster_label(features: np.ndarray, cluster_labels: np.ndarray, cluster_center: np.ndarray) -> int:
+    """ Get a label of true class from clustering"""
+    
+    n_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0)
+    cluster_centers = []
+    for i in range(n_clusters):
+        cluster_centers.append(np.mean(features[cluster_labels == i], axis=0))
+    cluster_centers = np.asarray(cluster_centers)
+    sim = cosine_similarity(cluster_centers, cluster_center).flatten()
+    return np.argmax(sim)
+
+def get_cluster_num(cluster_engine: ClusterMixin, cropped_features: np.ndarray, max_kernels: int) -> int:
+    """ Get cluster num """
+    sse = []
+    for k in range(1, max_kernels + 1):
+        clustering = cluster_engine(n_clusters=k)
+        clustering.fit(cropped_features)
+        sse.append(clustering.inertia_)
+    return KneeLocator(range(1, 11), sse, curve="convex", direction="decreasing").elbow
+
+
+def get_square(tl: tuple[int, int], br: tuple[int, int]) -> int:
+        """ Get square of rectangle """
+        return abs((tl[0] - br[0]) * (tl[1] - br[1]))
+
+def overlap_square(tl: tuple[int, int], br: tuple[int, int], tl_ref: tuple[int, int], br_ref: tuple[int, int]) -> int:
+    """ Overlap square of 2 rectangles """
+    x_overlap = max(0, min(br[0], br_ref[0]) - max(tl[0], tl_ref[0]))
+    y_overlap = max(0, min(br[1], br_ref[1]) - max(tl[1], tl_ref[1]))
+    overlapArea = x_overlap * y_overlap
+    return overlapArea
+
+def union_square(tl: tuple[int, int], br: tuple[int, int], tl_ref: tuple[int, int], br_ref: tuple[int, int]) -> int:
+    """ union square of 2 rectangles """
+    sample_square = get_square(tl, br)
+    ref_square = get_square(tl_ref, br_ref)
+    overlap = overlap_square(tl, br, tl_ref, br_ref)
+    return sample_square + ref_square - overlap

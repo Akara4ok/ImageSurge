@@ -2,6 +2,7 @@ import enum
 from pathlib import Path
 import pickle
 from sklearn.base import BaseEstimator
+import numpy as np
 
 model_path_suffix = "_metainfo"
 
@@ -14,6 +15,7 @@ class ArtifactType(enum.Enum):
     BaseFolder = 1
     ModelHandler = 2
     SklearnModel = 3
+    NumpyArray = 4
 
 class PipelineStage(enum.Enum):
     BaseFolder = 1
@@ -21,6 +23,7 @@ class PipelineStage(enum.Enum):
     Scaler = 3
     FeatureReduction = 4
     OneClass = 5
+    ClusterCenter = 6
 
 class FileHandler:
     """ Class for saving and loading files """
@@ -35,6 +38,10 @@ class FileHandler:
     def saveSklearnModel(model: BaseEstimator, path: str) -> None:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         pickle.dump(model, open(path, 'wb'))
+        
+    def saveNumpyArray(array: np.ndarray, path: str) -> None:
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        np.save(path, array)
     
     def saveUndefinedModel(model, path: str) -> None:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -49,6 +56,12 @@ class FileHandler:
     def loadSklearnModel(path: str) -> SklearnInterface:
         try:
             return pickle.load(open(path, 'rb'))
+        except:
+            return None
+        
+    def loadNumpyArray(array: np.ndarray, path: str) -> np.ndarray:
+        try:
+            return np.load(path)
         except:
             return None
     
@@ -73,6 +86,8 @@ class FileHandler:
                 name = "feature_reduction"
             case PipelineStage.OneClass:
                 name = "one_class_model"
+            case PipelineStage.ClusterCenter:
+                name = "cluster_center"
             case _:
                 raise Exception(f"Undefined stage {pipeline_stage}")
         
@@ -84,6 +99,8 @@ class FileHandler:
                 ext = ".json"
             case ArtifactType.SklearnModel:
                 ext = ".sklearn"
+            case ArtifactType.NumpyArray:
+                ext = ".npy"
             case _:
                 ext = ".model"
             

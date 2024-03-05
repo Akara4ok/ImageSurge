@@ -14,9 +14,8 @@ class OneClassClassificationSimilarity(OneClassClassificationInference):
         super().__init__(file_handler)
     
     @Inference.need_load
-    def process(self, dataset: tf.data.Dataset,
-                use_cache: bool = False, is_test: bool = False, threshold: float = None) -> np.ndarray:
-        """ Train all pipeline stages """
+    def process(self, dataset: tf.data.Dataset, use_cache: bool = False,
+                save_cache: bool = False, is_test: bool = False, threshold: float = None) -> np.ndarray:
         
         if(not self.feature_extractor or not self.one_class):
             raise Exception("Inference not loaded models")
@@ -26,7 +25,7 @@ class OneClassClassificationSimilarity(OneClassClassificationInference):
         else:
             x = self.cached_feauteres
         
-        if(is_test):
+        if(save_cache):
             self.cache_features(x, self.cached_labels)
             
         logging.info("Feature extractor has been trained")
@@ -36,17 +35,7 @@ class OneClassClassificationSimilarity(OneClassClassificationInference):
             x = self.scaler.transform(x)
             logging.info("Features scaled")
         
-        #dimension reduction
-        if(self.feature_reduction):
-            x = self.feature_reduction.transform(x)
-            logging.info("Dimensions reduced")
-        
-        #train one class classification
-        y_predicted = self.one_class.predict(x)
-        y_predicted[y_predicted == -1] = 0
-        
-        predicted_center = np.mean(x[y_predicted > 0], axis=0)
-        similarities = cosine_similarity(x, np.reshape(predicted_center, (1, -1))).flatten()
+        similarities = cosine_similarity(x, self.cluster_center).flatten()
         
         if(not threshold):
             threshold = calculate_similarity(similarities)
