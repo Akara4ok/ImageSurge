@@ -1,5 +1,6 @@
 import logging
 import shutil
+import os
 import numpy as np
 from .Pipeline import Pipeline
 from .ModelHandlers.ModelHandler import ModelHandler
@@ -64,7 +65,9 @@ class OneClassClassificationTrain(Pipeline):
     
     def save(self) -> None:
         """ Save all pipeline artefacts """
-        shutil.rmtree(self.file_handler.get_file_path(PipelineStage.BaseFolder, ArtifactType.BaseFolder))
+        base_folder = self.file_handler.get_file_path(PipelineStage.BaseFolder, ArtifactType.BaseFolder)
+        if(os.path.isdir(base_folder)):
+            shutil.rmtree(base_folder)
         
         FileHandler.saveModelHandler(self.feature_extractor, 
                                      self.file_handler.get_file_path(PipelineStage.FeatureExtractor, ArtifactType.ModelHandler))

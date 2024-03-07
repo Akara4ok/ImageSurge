@@ -7,7 +7,7 @@ from .ModelHandler import ModelHandler, Models
 class ModelLoader:
     def load(load_path: str) -> ModelHandler:
         """ Load model from file """
-        
+        load_path += "_metainfo.json"
         file = open(load_path)
         data = json.load(file)
         model_type = Models(data["class"])

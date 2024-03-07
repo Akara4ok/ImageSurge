@@ -12,6 +12,7 @@ class OneClassClassificationSimilarity(OneClassClassificationInference):
     
     def __init__(self, file_handler: FileHandler) -> None:
         super().__init__(file_handler)
+        self.threshold: float = 0
     
     @Inference.need_load
     def process(self, dataset: tf.data.Dataset, use_cache: bool = False,
@@ -38,6 +39,12 @@ class OneClassClassificationSimilarity(OneClassClassificationInference):
         similarities = cosine_similarity(x, self.cluster_center).flatten()
         
         if(not threshold):
-            threshold = calculate_similarity(similarities)
+            self.threshold = calculate_similarity(similarities)
+        else:
+            self.threshold = threshold
         
-        return filter_similarity(similarities, threshold)
+        return filter_similarity(similarities, self.threshold)
+    
+    def get_threshold(self) -> float:
+        """ Get threshold for similarities """
+        return self.threshold

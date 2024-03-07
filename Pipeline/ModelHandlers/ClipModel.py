@@ -37,6 +37,7 @@ class ClipModel(PreTrainedModel):
         return (to_numpy_image(feature_ds), None)
     
     def save(self, save_path: str) -> None:
+        save_path += "_metainfo.json"
         object_info = {
             "class": Models.Clip.value,
         }

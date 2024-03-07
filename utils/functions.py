@@ -10,9 +10,9 @@ def to_numpy_image(dataset: tf.data.Dataset) -> np.ndarray:
     x = []
     
     for img in dataset:
-        x.append(img.numpy())
+        x += img.numpy().tolist()
     
-    x = np.concatenate(np.asarray(x))
+    x = np.asarray(x)
     return x
 
 def to_numpy_image_label(dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarray]:
@@ -21,11 +21,11 @@ def to_numpy_image_label(dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarr
     y = []
     
     for img, label in dataset:
-        x.append(img.numpy())
-        y.append(label.numpy())
+        x += img.numpy().tolist()
+        y += label.numpy().tolist()
     
-    x = np.concatenate(np.asarray(x))
-    y = np.concatenate(np.asarray(y))
+    x = np.asarray(x)
+    y = np.asarray(y)
     return x, y
 
 def unzip_list(cur_list: list[tuple[str, int]]) -> tuple[list[str], list[int]]:

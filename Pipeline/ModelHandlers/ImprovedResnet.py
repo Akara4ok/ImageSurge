@@ -7,7 +7,6 @@ from keras.applications import ResNet50
 from .ModelHandler import ModelHandler, Models
 from .losses.ReferenceTrainingLosses import one_class_loss, multi_class_loss
 from .models.ResnetTrainingModel import ResnetTrainingModel
-from ..utils.FileHandler import model_path_suffix
 from Dataset.TrainModelDataset import TrainModelDataset
 from Dataset.TrainRefDataset import TrainRefDataset
 from utils.functions import to_numpy_image, to_numpy_image_label
@@ -28,18 +27,26 @@ class ImprovedResnet(ModelHandler):
         return batch
     
     def train(self, dataset: TrainModelDataset, epochs: int) -> None:
+        def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
+            return tf.cast(self.preprocess(x), tf.float32), tf.cast(y, tf.float32)
+        
         if(not isinstance(dataset, TrainRefDataset)):
             raise Exception("This dataset is not suitable for training this model")
         
         self.model = ResnetTrainingModel((self.image_width, self.image_height, 3), dataset.get_labels_count())
 
         losses = {
-            'resnet50': multi_class_loss,
-            'resnet_ref_dense': one_class_loss
+            'resnet50': one_class_loss,
+            'resnet_ref_dense': multi_class_loss
         }
         
         self.model.compile(loss=losses, optimizer=tf.keras.optimizers.SGD(learning_rate=0.0001))
-        self.model.fit(dataset.get_train_model_data(), epochs = epochs)
+        preproc_dataset = dataset.get_train_model_data().map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
+        self.model.fit(preproc_dataset, epochs = epochs)
+        
+        inference_model = ResNet50(input_shape=(224, 224, 3), weights=None, include_top=False, pooling='avg')
+        inference_model.set_weights(self.model.get_layer('resnet50').get_weights())
+        self.model = inference_model
     
     def extract_features(self, batch: tf.Tensor) -> tf.Tensor:
         return self.model(batch)
@@ -61,12 +68,9 @@ class ImprovedResnet(ModelHandler):
         return (to_numpy_image(feature_ds), None)
     
     def save(self, save_path: str) -> None:
-        inference_model = ResNet50(input_shape=(224, 224, 3), weights=None, include_top=False, pooling='avg')
-        inference_model.set_weights(self.model.get_layer('resnet50').get_weights())
-        inference_model.save(save_path)
+        model_path = save_path + "_model.keras"
+        self.model.save(model_path)
         
-        model_path = "".join(save_path.split[:-1])
-        model_path = model_path.replace(model_path_suffix, "_model")
         object_info = {
             "class": Models.ImprovedResnet.value,
             "image_width": self.image_width,
@@ -76,6 +80,7 @@ class ImprovedResnet(ModelHandler):
         
         json_object = json.dumps(object_info, indent=4)
         
+        save_path += "_metainfo.json"
         with open(save_path, "w") as f:
             f.write(json_object)
     

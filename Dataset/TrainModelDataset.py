@@ -17,7 +17,7 @@ class TrainModelDataset(TrainDataset):
     @Dataset.need_load
     def get_train_model_data(self) -> tf.data.Dataset:
         """ Get train tf.Dataset """
-        if(self.train_dataset is None):
+        if(self.train_model_dataset is None):
             logging.warning("Dataset is not loaded. Call 'load' function")
         return self.train_model_dataset
     

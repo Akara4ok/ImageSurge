@@ -3,9 +3,6 @@ from pathlib import Path
 import pickle
 from sklearn.base import BaseEstimator
 import numpy as np
-
-model_path_suffix = "_metainfo"
-
 from .SklearnInterface import SklearnInterface
 from ..ModelHandlers.ModelHandler import ModelHandler
 from ..ModelHandlers.ModelLoader import ModelLoader
@@ -59,7 +56,7 @@ class FileHandler:
         except:
             return None
         
-    def loadNumpyArray(array: np.ndarray, path: str) -> np.ndarray:
+    def loadNumpyArray(path: str) -> np.ndarray:
         try:
             return np.load(path)
         except:
@@ -79,7 +76,7 @@ class FileHandler:
             case PipelineStage.BaseFolder:
                 name = ""
             case PipelineStage.FeatureExtractor:
-                name = "feature_extractor" + model_path_suffix
+                name = "feature_extractor"
             case PipelineStage.Scaler:
                 name = "scaler"
             case PipelineStage.FeatureReduction:
@@ -96,7 +93,7 @@ class FileHandler:
             case ArtifactType.BaseFolder:
                 ext = ""
             case ArtifactType.ModelHandler:
-                ext = ".json"
+                ext = ""
             case ArtifactType.SklearnModel:
                 ext = ".sklearn"
             case ArtifactType.NumpyArray:
