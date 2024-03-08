@@ -18,7 +18,7 @@ class OneClassClassificationSimilarity(OneClassClassificationInference):
     def process(self, dataset: tf.data.Dataset, use_cache: bool = False,
                 save_cache: bool = False, is_test: bool = False, threshold: float = None) -> np.ndarray:
         
-        if(not self.feature_extractor or not self.one_class):
+        if(self.feature_extractor is None or self.one_class is None):
             raise Exception("Inference not loaded models")
         
         if(not use_cache or self.cached_feauteres is None):

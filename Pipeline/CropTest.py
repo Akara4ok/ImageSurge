@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from .Testable import Testable
 from .CropInference import CropInference
 from .ImageTable import ImageTableAlgo
-from utils.functions import get_square, union_square, overlap_square
+from utils.functions import get_square, union_square, overlap_square, recrop
 
 class CropTest(Testable):
     """ Class for testing cropping """
@@ -14,14 +14,18 @@ class CropTest(Testable):
         self.test_inference: CropInference = test_inference
         self.y_predicted: np.ndarray = None
         
-    def test(self, dataset: tf.data.Dataset, algo: ImageTableAlgo = ImageTableAlgo.Similarity, level: int = 15, **kwargs) -> np.ndarray:
+    def test(self, dataset: tf.data.Dataset, algo: ImageTableAlgo = ImageTableAlgo.Similarity, 
+             level: int = 15, use_cache: bool = False, **kwargs) -> np.ndarray:
         """ Testing inference """
         
-        self.y_predicted = self.test_inference.process(dataset, algo, level, True, **kwargs)
+        self.y_predicted = self.test_inference.process(dataset, algo, level, use_cache, True, True, **kwargs)
         return self.y_predicted 
     
     def get_metrics(self) -> dict[str, float]:
         y_true = self.test_inference.get_cache_data()[1]
+        width = y_true[0][4]
+        height = y_true[0][5]
+        y_true = recrop(y_true[:, :4], width, height, self.test_inference.image_width, self.test_inference.image_height)
         precision = 0
         recall = 0
         accuracy = 0
@@ -32,18 +36,15 @@ class CropTest(Testable):
             br = (self.y_predicted[row][2], self.y_predicted[row][3])
             
             tl_ref = (y_true[row][0], y_true[row][1])
-            br_ref = (y_true[row][0], y_true[row][1])
-            
-            width = y_true[row][4]
-            height = y_true[row][5]
+            br_ref = (y_true[row][2], y_true[row][3])
             
             sample_square = get_square(tl, br)
             ref_square = get_square(tl_ref, br_ref)
             
             tp = overlap_square(tl, br, tl_ref, br_ref)
-            tn = width * height - union_square(tl, br, tl_ref, br_ref)
-            fp = sample_square - tp
-            fn = ref_square - tp
+            tn = max(width * height - union_square(tl, br, tl_ref, br_ref), 0)
+            fp = max(sample_square - tp, 0)
+            fn = max(ref_square - tp, 0)
             
             precision += tp / (tp + fp)
             recall += tp / (tp + fn)
@@ -68,25 +69,27 @@ class CropTest(Testable):
         size = y_true.shape[0]
         
         numpy_images = []
-        for batch, _ in dataset:
-            for i, img in enumerate(batch):
-                numpy_images.append(img.numpy())
-            break
+        for i, (img, _) in enumerate(dataset):
+            numpy_images.append(img.numpy())
         numpy_images = np.asarray(numpy_images)
         indexes = np.linspace(0, size, size, dtype=int) 
         np.random.seed(random_seed)
-        indexes = np.random.shuffle(indexes)[:image_num]
+        np.random.shuffle(indexes)
+        indexes = indexes[:image_num]
         
-        fig = plt.figure(figsize=(10, 100)) 
-        fig.add_subplot(len(indexes), 2, 2 * i)
-        plt.imshow(img)
-        fig.add_subplot(len(indexes), 2, 2 * i + 1)
-        
-        img_copy = self.image.copy()
-        img_copy = cv2.rectangle(img_copy, (self.y_predicted[0], self.y_predicted[1]), (self.y_predicted[2], self.y_predicted[3]), (0, 255, 0), 2)
-        img_copy = cv2.rectangle(img_copy, (y_true[0], y_true[1]), (y_true[2], y_true[3]), (255, 0, 0), 2)
-        
-        plt.imshow(img_copy)
+        for i, ind in enumerate(indexes):
+            img = numpy_images[ind]
+            fig = plt.figure(figsize=(10, 100)) 
+            fig.add_subplot(len(indexes), 2, 2 * i + 1)
+            plt.imshow(img)
+            fig.add_subplot(len(indexes), 2, 2 * i + 2)
+            
+            img_copy = np.copy(img)
+            img_copy = cv2.rectangle(img_copy, (self.y_predicted[ind][0], self.y_predicted[ind][1]), 
+                                     (self.y_predicted[ind][2], self.y_predicted[ind][3]), (0, 255, 0), 2)
+            img_copy = cv2.rectangle(img_copy, (y_true[ind][0], y_true[ind][1]), (y_true[ind][2], y_true[ind][3]), (255, 0, 0), 2)
+            
+            plt.imshow(img_copy)
         
         
         

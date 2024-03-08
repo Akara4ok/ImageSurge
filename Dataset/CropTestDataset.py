@@ -32,6 +32,7 @@ class CropTestDataset(Dataset):
         
         self.is_loaded = True
 
+    @Dataset.need_load
     def get_crop_data(self) -> tf.data.Dataset:
         """ Get tf.Dataset instance of dataloader  """
         return self.dataset

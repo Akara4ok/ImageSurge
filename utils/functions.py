@@ -87,3 +87,13 @@ def union_square(tl: tuple[int, int], br: tuple[int, int], tl_ref: tuple[int, in
     ref_square = get_square(tl_ref, br_ref)
     overlap = overlap_square(tl, br, tl_ref, br_ref)
     return sample_square + ref_square - overlap
+
+def recrop(x: np.ndarray, width: int, height: int, ref_width: int, ref_height):
+    """ Recrop bbox from one size to ref size """
+    
+    arr_copy = np.copy(x)
+    arr_copy[:, 0] = (arr_copy[:, 0] / width) * ref_width
+    arr_copy[:, 1] = (arr_copy[:, 1] / height) * ref_height
+    arr_copy[:, 2] = (arr_copy[:, 2] / width) * ref_width
+    arr_copy[:, 3] = (arr_copy[:, 3] / height) * ref_height
+    return arr_copy

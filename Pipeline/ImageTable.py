@@ -84,6 +84,8 @@ class ImageTable:
         
         self.cells: list[list[Cell]] = self.build_small_cells()
         self.big_boxes: list[BigBox] = self.build_big_boxes()
+        
+        self.calc_similarity: float = None
     
     def build_small_cells(self) -> list[list[Cell]]:
         """ Cut image to small cells """
@@ -118,7 +120,7 @@ class ImageTable:
             
     def build_big_boxes(self) -> list[BigBox]:
         """ Create big boxes from cells """
-        big_boxes: list[BigBox] = big_boxes
+        big_boxes: list[BigBox] = []
         for y in range(len(self.cells) + 1 - self.small_box_in_big):
             for x in range(len(self.cells[y]) + 1 - self.small_box_in_big):
                 bix_box_cells = []
@@ -149,6 +151,7 @@ class ImageTable:
         similarities = cosine_similarity(cropped_features, self.cluster_center).flatten()
         if(similarity is None):
             similarity = calculate_similarity(similarities)
+            self.calc_similarity = similarity
         for i, box in enumerate(self.big_boxes):
             if(similarities[i] > similarity):
                 box.check_recognized()
@@ -207,4 +210,9 @@ class ImageTable:
             for box in row:
                 if(box.recognized_count >= level):
                     tl_x, tl_y, br_x, br_y = box.union(tl_x, tl_y, br_x, br_y)
+                    
+        tl_x = max(tl_x, 0)
+        tl_y = max(tl_y, 0)
+        br_x = br_x if br_x != -1 else self.width
+        br_y = br_y if br_y != -1 else self.height
         return tl_x, tl_y, br_x, br_y
