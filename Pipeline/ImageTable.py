@@ -166,8 +166,8 @@ class ImageTable:
         
         if(cluster_num is None):
             cluster_num = get_cluster_num(cluster_engine.__class__, cropped_features, 10)
-        
-        cluster_engine = cluster_engine.__class__(n_clusters = cluster_num)
+            cluster_engine = cluster_engine.__class__(n_clusters = cluster_num)
+            
         clustering = cluster_engine.fit(cropped_features)
         label = get_cluster_label(cropped_features, clustering.labels_, self.cluster_center)
         for i, box in enumerate(self.big_boxes):

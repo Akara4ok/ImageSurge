@@ -53,6 +53,8 @@ def get_cluster_label(features: np.ndarray, cluster_labels: np.ndarray, cluster_
     """ Get a label of true class from clustering"""
     
     n_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0)
+    if(n_clusters == 0):
+        return -1
     cluster_centers = []
     for i in range(n_clusters):
         cluster_centers.append(np.mean(features[cluster_labels == i], axis=0))
@@ -88,7 +90,7 @@ def union_square(tl: tuple[int, int], br: tuple[int, int], tl_ref: tuple[int, in
     overlap = overlap_square(tl, br, tl_ref, br_ref)
     return sample_square + ref_square - overlap
 
-def recrop(x: np.ndarray, width: int, height: int, ref_width: int, ref_height):
+def recrop(x: np.ndarray, width: int, height: int, ref_width: int, ref_height) -> np.ndarray:
     """ Recrop bbox from one size to ref size """
     
     arr_copy = np.copy(x)
