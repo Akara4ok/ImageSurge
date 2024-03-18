@@ -31,8 +31,8 @@ class TrainOneClassDataset(TrainDataset):
             self.test_image_count = len(all_test_images)
         test_images_not_target = list(filter(lambda x: x[1] == 0, all_test_images))
         test_images_target = list(filter(lambda x: x[1] == 1, all_test_images))
-        test_images_target = test_images_target[:int(self.target_image_percent * self.test_image_count)]
-        test_images_not_target = test_images_not_target[:int((1 - self.target_image_percent) * self.test_image_count)]
+        len_non_target = int(len(test_images_target) * (1 - self.target_image_percent) / self.target_image_percent)
+        test_images_not_target = test_images_not_target[:len_non_target]
         test_images_list = test_images_target + test_images_not_target
         random.Random(self.random_seed).shuffle(test_images_list)
         test_paths, test_labels = unzip_list(test_images_list)

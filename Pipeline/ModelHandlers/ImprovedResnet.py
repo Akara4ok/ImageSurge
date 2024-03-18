@@ -5,7 +5,7 @@ import tensorflow as tf
 from keras.applications.resnet import preprocess_input
 from keras.applications import ResNet50
 from .ModelHandler import ModelHandler, Models
-from .losses.ReferenceTrainingLosses import one_class_loss, multi_class_loss
+from .losses.ReferenceTrainingLosses import OneClassLoss
 from .models.ResnetTrainingModel import ResnetTrainingModel
 from Dataset.TrainModelDataset import TrainModelDataset
 from Dataset.TrainRefDataset import TrainRefDataset
@@ -14,10 +14,12 @@ from utils.functions import to_numpy_image, to_numpy_image_label
 class ImprovedResnet(ModelHandler):
     """ Class for training resnet with reference dataset """
     
-    def __init__(self, image_width: int, image_height: int) -> None:
+    def __init__(self, image_width: int, image_height: int, learning_rate: float = 0.001, alpha: float = 0.1) -> None:
         super().__init__()
         self.image_width = image_width
         self.image_height = image_height
+        self.learning_rate = learning_rate
+        self.alpha = alpha
         self.model: keras.Model = None
     
     def preprocess(self, batch: tf.Tensor) -> tf.Tensor:
@@ -26,22 +28,19 @@ class ImprovedResnet(ModelHandler):
         batch = preprocess_input(batch)
         return batch
     
-    def train(self, dataset: TrainModelDataset, epochs: int) -> None:
-        def full_process(x: tf.Tensor, y: tf.Tensor) -> tf.Tensor:
-            return tf.cast(self.preprocess(x), tf.float32), tf.cast(y, tf.float32)
-        
+    def train(self, dataset: TrainModelDataset, epochs: int) -> None:       
         if(not isinstance(dataset, TrainRefDataset)):
             raise Exception("This dataset is not suitable for training this model")
         
         self.model = ResnetTrainingModel((self.image_width, self.image_height, 3), dataset.get_labels_count())
 
         losses = {
-            'resnet50': one_class_loss,
-            'resnet_ref_dense': multi_class_loss
+            'one_class': OneClassLoss(self.alpha),
+            'resnet_ref_dense': tf.keras.losses.SparseCategoricalCrossentropy()
         }
         
-        self.model.compile(loss=losses, optimizer=tf.keras.optimizers.SGD(learning_rate=0.0001))
-        preproc_dataset = dataset.get_train_model_data().map(lambda x, y: tf.py_function(full_process, [x, y], [tf.float32, tf.float32]))
+        self.model.compile(loss=losses, optimizer=tf.keras.optimizers.SGD(learning_rate=self.learning_rate))
+        preproc_dataset = dataset.get_train_model_data()
         self.model.fit(preproc_dataset, epochs = epochs)
         
         inference_model = ResNet50(input_shape=(224, 224, 3), weights=None, include_top=False, pooling='avg')
