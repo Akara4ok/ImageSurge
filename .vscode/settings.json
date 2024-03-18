@@ -1,8 +1,5 @@
 {
     "python.analysis.extraPaths": [
-        "./Dataloader",
-        "./Dataset",
-        "./utils",
-        "./Pipeline"
+        "./OneClassML"
     ]
 }

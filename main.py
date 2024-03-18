@@ -1,6 +1,8 @@
 from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+import sys
+sys.path.append("OneClassML")
 from utils.ExperimentInfo import ExperimentInfo
 from Pipeline.utils.FileHandler import FileHandler
 from Pipeline.ModelHandlers.SimpleKerasModel import SimpleKerasModel, KerasModels

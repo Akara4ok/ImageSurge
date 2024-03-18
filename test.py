@@ -1,3 +1,5 @@
+import sys
+sys.path.append("OneClassML")
 from utils.ExperimentInfo import ExperimentInfo
 from Pipeline.utils.FileHandler import FileHandler
 from Pipeline.OneClassClassificationTest import OneClassClassificationTest

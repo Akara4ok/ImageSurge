@@ -1,3 +1,5 @@
+import sys
+sys.path.append("OneClassML")
 from Dataloader.DataloaderImpl.GeneralMultiClassDataloader import GeneralMultiClassDataloader
 
 loader_natural = GeneralMultiClassDataloader("../Data/natural-images/natural_images")
