@@ -8,6 +8,7 @@ class Models(enum.Enum):
     SimpleKeras = 1
     Clip = 2
     ImprovedResnet = 3
+    KServe = 4
 
 class ModelHandler(ABC):
     """ Abstract class for model handler """

@@ -6,12 +6,13 @@ from .OneClassClassificationInference import OneClassClassificationInference
 from .utils.FileHandler import FileHandler
 from utils.functions import calculate_similarity, filter_similarity
 from sklearn.metrics.pairwise import cosine_similarity
+from .ModelHandlers.KServeModel import KServeModel
 
 class OneClassClassificationSimilarity(OneClassClassificationInference):
     """ Class for infernce one class classification using similarity """
     
-    def __init__(self, file_handler: FileHandler) -> None:
-        super().__init__(file_handler)
+    def __init__(self, file_handler: FileHandler, kserve_model: KServeModel = None) -> None:
+        super().__init__(file_handler, kserve_model)
         self.threshold: float = 0
     
     @Inference.need_load

@@ -24,7 +24,11 @@ class SimpleKerasModel(PreTrainedModel):
         self.model_type = model_type
         self.model: keras.Model = None
     
-    def preprocess(self, batch: tf.Tensor) -> tf.Tensor:        
+    def preprocess(self, batch: tf.Tensor) -> tf.Tensor:
+        if(isinstance(batch, np.ndarray)):
+            batch = batch.astype(np.uint8)
+            batch = tf.constant(batch)
+            
         if(len(batch.shape) == 3):
             batch = tf.expand_dims(batch, axis=0)
         match self.model_type:
@@ -34,11 +38,10 @@ class SimpleKerasModel(PreTrainedModel):
                 batch = keras.applications.resnet.preprocess_input(batch)
             case _:
                 raise Exception(f"Undefined model type {self.model_type.name}")
-        
         return batch
     
     def extract_features(self, batch: tf.Tensor) -> tf.Tensor:
-        return self.model(batch)
+        return self.model.predict(batch, verbose = 0)
     
     def extract_features_in_dataset(self, dataset: tf.data.Dataset, is_train_ds: bool = True) -> tuple[np.ndarray, np.ndarray]:      
         def full_process_x(x: tf.Tensor) -> tf.Tensor:

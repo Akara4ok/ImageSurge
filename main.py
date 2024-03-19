@@ -3,6 +3,7 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import sys
 sys.path.append("OneClassML")
+from Pipeline.ModelHandlers.KServeModel import KServeModel
 from utils.ExperimentInfo import ExperimentInfo
 from Pipeline.utils.FileHandler import FileHandler
 from Pipeline.ModelHandlers.SimpleKerasModel import SimpleKerasModel, KerasModels
@@ -15,14 +16,15 @@ file_handler = FileHandler("Artifacts/", experiment)
 train_pipeline = OneClassClassificationTrain(file_handler)
 
 #configure
-model = SimpleKerasModel(224, 224, KerasModels.Resnet)
+# model = SimpleKerasModel(224, 224, KerasModels.Resnet)
+model = KServeModel("http://localhost:8080/v1/models/resnet50:predict", 1200)
 oc_svm_clf = svm.OneClassSVM(gamma=0.001, kernel='rbf', nu=0.08)
 ss = StandardScaler()
 pca = PCA(n_components=128, whiten=True)
 
 #loading data to dataset instance
 dataloader_one_class = AnimalsOneClassDataloader("../Data/Animals/animals", "lion")
-dataset = TrainOneClassDataset(224, 224, 10, 42, dataloader_one_class, 12, 12, 0.3)
+dataset = TrainOneClassDataset(224, 224, 10, 42, dataloader_one_class, target_image_percent=0.3)
 
 #training pipeline
 train_pipeline.configure(model, oc_svm_clf)

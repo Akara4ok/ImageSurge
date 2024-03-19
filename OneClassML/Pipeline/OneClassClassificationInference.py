@@ -3,12 +3,13 @@ import numpy as np
 import logging
 from .Inference import Inference
 from .utils.FileHandler import FileHandler
+from .ModelHandlers.KServeModel import KServeModel
 
 class OneClassClassificationInference(Inference):
     """ Class for infernce one class classification """
     
-    def __init__(self, file_handler: FileHandler) -> None:
-        super().__init__(file_handler)
+    def __init__(self, file_handler: FileHandler, kserve_model: KServeModel = None) -> None:
+        super().__init__(file_handler, kserve_model)
         self.cluster_center: np.ndarray = None
         
     @Inference.need_load

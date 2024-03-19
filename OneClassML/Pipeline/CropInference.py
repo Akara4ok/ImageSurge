@@ -3,12 +3,13 @@ import numpy as np
 from .Inference import Inference
 from .utils.FileHandler import FileHandler
 from .ImageTable import ImageTableAlgo, ImageTable
+from .ModelHandlers.KServeModel import KServeModel
 
 class CropInference(Inference):
     """ Class for infernce one class classification """
     
-    def __init__(self, file_handler: FileHandler, image_width, image_height,  small_box_count: int = 20, big_box_count: int = 5) -> None:
-        super().__init__(file_handler)
+    def __init__(self, file_handler: FileHandler, image_width, image_height,  small_box_count: int = 20, big_box_count: int = 5, kserve_model: KServeModel = None) -> None:
+        super().__init__(file_handler, kserve_model)
         self.small_box_count = small_box_count
         self.big_box_count = big_box_count
         self.image_width: int = image_width
