@@ -1,9 +1,11 @@
+import sys
+sys.path.append("OneClassML")
+
 from kserve import ModelServer
 from KServeModelHandler import KServeModelHandler
-# from config import KSERVE_BATCH
 import tensorflow as tf
 
-KSERVE_BATCH = 10
+KSERVE_BATCH = 32
 
 class ServeJob:
     """ Class for serving all kserve models """
@@ -23,7 +25,5 @@ class ServeJob:
         
         
 if __name__ == "__main__":
-
-
     serve_job = ServeJob(port = 8080)
-    serve_job.serve(["resnet50"], ["Artifacts/vlad/test/1/feature_extractor"])
+    serve_job.serve(["resnet50", "clip"], ["OneClassML/DefaultModels/resnet", "OneClassML/DefaultModels/clip"])

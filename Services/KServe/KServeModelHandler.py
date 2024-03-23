@@ -1,6 +1,3 @@
-import sys
-sys.path.append("OneClassML")
-
 import tensorflow as tf
 from typing import Dict, Union
 from PIL import Image

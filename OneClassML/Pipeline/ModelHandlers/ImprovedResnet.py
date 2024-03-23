@@ -35,7 +35,7 @@ class ImprovedResnet(ModelHandler):
         self.model = ResnetTrainingModel((self.image_width, self.image_height, 3), dataset.get_labels_count())
 
         losses = {
-            'one_class': OneClassLoss(self.alpha),
+            'resnet50': OneClassLoss(self.alpha),
             'resnet_ref_dense': tf.keras.losses.SparseCategoricalCrossentropy()
         }
         

@@ -31,13 +31,14 @@ class SimpleKerasModel(PreTrainedModel):
             
         if(len(batch.shape) == 3):
             batch = tf.expand_dims(batch, axis=0)
-        match self.model_type:
-            case KerasModels.VGG:
-                batch = keras.applications.vgg16.preprocess_input(batch)
-            case KerasModels.Resnet:
-                batch = keras.applications.resnet.preprocess_input(batch)
-            case _:
-                raise Exception(f"Undefined model type {self.model_type.name}")
+        # match self.model_type:
+        #     case KerasModels.VGG:
+        #         batch = keras.applications.vgg16.preprocess_input(batch)
+        #     case KerasModels.Resnet:
+        #         print("RESNET")
+        #         batch = keras.applications.resnet50.preprocess_input(batch)
+        #     case _:
+        #         raise Exception(f"Undefined model type {self.model_type.name}")
         return batch
     
     def extract_features(self, batch: tf.Tensor) -> tf.Tensor:
