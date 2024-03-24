@@ -8,10 +8,11 @@ from utils.functions import to_numpy_image, to_numpy_image_label
 class KServeModel(PreTrainedModel):
     """ Class for pretrained keras models """
     
-    def __init__(self, url: str, max_elements_to_send: int) -> None:
+    def __init__(self, url: str, token: str, max_elements_to_send: int) -> None:
         super().__init__()
         self.url = url
         self.max_elements_to_send = max_elements_to_send
+        self.token = token
     
     def preprocess(self, batch: tf.Tensor) -> tf.Tensor:
         if(len(batch.shape) == 3):
@@ -31,7 +32,16 @@ class KServeModel(PreTrainedModel):
         return {"instances": input_data}
     
     def send_request(self, data):
-        response = requests.post(self.url, json=data)
+        if(self.token is not None):
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.token}"
+            }
+            
+            response = requests.post(self.url, headers=headers, json=data)
+        else:
+            response = requests.post(self.url, json=data)
+            
         result = response.json()
         result = np.asarray(result["features"])
         return result

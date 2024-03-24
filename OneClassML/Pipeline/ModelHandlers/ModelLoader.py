@@ -3,7 +3,6 @@ from .SimpleKerasModel import SimpleKerasModel, KerasModels
 from .ClipModel import ClipModel
 from .ImprovedResnet import ImprovedResnet
 from .ModelHandler import ModelHandler, Models
-from .KServeModel import KServeModel
 
 class ModelLoader:
     def load(load_path: str) -> ModelHandler:

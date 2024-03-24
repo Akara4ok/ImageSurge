@@ -1,9 +1,14 @@
 """ Some usefull functions """
 import tensorflow as tf
+import os
+from dotenv import load_dotenv
 import numpy as  np
+import requests
 from sklearn.base import ClusterMixin
 from sklearn.metrics.pairwise import cosine_similarity
 from kneed import KneeLocator
+
+load_dotenv()
 
 def to_numpy_image(dataset: tf.data.Dataset) -> np.ndarray:
     """ Converts to numpy dataset contains images with processing """
@@ -99,3 +104,14 @@ def recrop(x: np.ndarray, width: int, height: int, ref_width: int, ref_height) -
     arr_copy[:, 2] = (arr_copy[:, 2] / width) * ref_width
     arr_copy[:, 3] = (arr_copy[:, 3] / height) * ref_height
     return arr_copy
+
+def get_access_token() -> str:
+    token_data = {
+        "client_id": os.getenv('CLIENT_ID'),
+        "client_secret": os.getenv('CLIENT_SECRET'),
+        "username": os.getenv('CLOUD_USERNAME'),
+        "password": os.getenv('CLOUD_PASSWORD'),
+        "grant_type": os.getenv('GRANT_TYPE')
+    }
+    response = requests.post(os.getenv('TOKEN_URL'), data=token_data)
+    return response.json().get("access_token")

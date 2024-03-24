@@ -2,6 +2,7 @@ from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import sys
+import os
 sys.path.append("OneClassML")
 from Pipeline.ModelHandlers.KServeModel import KServeModel
 from utils.ExperimentInfo import ExperimentInfo
@@ -17,7 +18,8 @@ train_pipeline = OneClassClassificationTrain(file_handler)
 
 #configure
 # model = SimpleKerasModel(224, 224, KerasModels.Resnet)
-model = KServeModel("http://localhost:8080/v1/models/resnet50:predict", 1200)
+# model = KServeModel("http://localhost:8080/v1/models/resnet50:predict", None, 1200)
+model = KServeModel(os.getenv("CLOUD_HIST")+"/v1/models/clip:predict", None, 1200)
 oc_svm_clf = svm.OneClassSVM(gamma=0.001, kernel='rbf', nu=0.08)
 ss = StandardScaler()
 pca = PCA(n_components=128, whiten=True)
