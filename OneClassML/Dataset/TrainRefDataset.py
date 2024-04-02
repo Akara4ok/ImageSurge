@@ -60,21 +60,22 @@ class TrainRefDataset(TrainModelDataset):
         self.train_model_dataset = self.combine_ds(train_ref_paths, train_ref_labels, train_paths, self.min_ref_images)
         
         all_test_images = self.one_class_dataloader.get_test_images_paths()
-        if(not self.test_image_count):
-            self.test_image_count = len(all_test_images)
-        test_images_not_target = list(filter(lambda x: x[1] == 0, all_test_images))
-        random.Random(self.random_seed).shuffle(test_images_not_target)
-        test_images_target = list(filter(lambda x: x[1] == 1, all_test_images))
-        random.Random(self.random_seed).shuffle(test_images_target)    
-        len_non_target = int(len(test_images_target) * (1 - self.target_image_percent) / self.target_image_percent)
-        test_images_not_target = test_images_not_target[:len_non_target]
-        test_images_list = test_images_target + test_images_not_target
-        test_paths, test_labels = unzip_list(test_images_list)
-        
-        self.test_dataset = tf.data.Dataset.from_tensor_slices((test_paths, test_labels)).map(
-            self.process_path, num_parallel_calls=tf.data.AUTOTUNE)
-        if(self.batch_size):
-            self.test_dataset = self.test_dataset.batch(self.batch_size)
+        if(len(all_test_images) != 0):
+            if(not self.test_image_count):
+                self.test_image_count = len(all_test_images)
+            test_images_not_target = list(filter(lambda x: x[1] == 0, all_test_images))
+            random.Random(self.random_seed).shuffle(test_images_not_target)
+            test_images_target = list(filter(lambda x: x[1] == 1, all_test_images))
+            random.Random(self.random_seed).shuffle(test_images_target)    
+            len_non_target = int(len(test_images_target) * (1 - self.target_image_percent) / self.target_image_percent)
+            test_images_not_target = test_images_not_target[:len_non_target]
+            test_images_list = test_images_target + test_images_not_target
+            test_paths, test_labels = unzip_list(test_images_list)
+            
+            self.test_dataset = tf.data.Dataset.from_tensor_slices((test_paths, test_labels)).map(
+                self.process_path, num_parallel_calls=tf.data.AUTOTUNE)
+            if(self.batch_size):
+                self.test_dataset = self.test_dataset.batch(self.batch_size)
         
         self.is_loaded = True
     

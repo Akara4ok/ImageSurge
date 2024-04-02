@@ -26,7 +26,8 @@ class OneClassClassificationTest(Testable):
         return classification_report(y_true, self.y_predicted, output_dict=True)
     
     def visualize(self) -> None:
-        cached_feauteres, y_true = self.test_inference.get_cache_data()
+        y_true = self.test_inference.get_cache_data()[1]
+        cached_feauteres = self.test_inference.get_final_processed_features()
         print(classification_report(y_true, self.y_predicted))
         matrix = confusion_matrix(y_true, self.y_predicted)
         sns.heatmap(matrix, annot=True,fmt='2.0f')

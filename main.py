@@ -1,34 +1,46 @@
-from sklearn import svm
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-import sys
+""" Web API """
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
-sys.path.append("OneClassML")
-from Pipeline.ModelHandlers.KServeModel import KServeModel
-from utils.ExperimentInfo import ExperimentInfo
-from Pipeline.utils.FileHandler import FileHandler
-from Pipeline.ModelHandlers.SimpleKerasModel import SimpleKerasModel, KerasModels
-from Pipeline.OneClassClassificationTrain import OneClassClassificationTrain
-from Dataloader.DataloaderImpl.AnimalsOneClassDataloader import AnimalsOneClassDataloader
-from Dataset.TrainOneClassDataset import TrainOneClassDataset
+from flask import Flask, request
+from flask_cors import CORS
+import sys
+sys.path.append("Services/")
+from TrainService import TrainService
+import config
 
-experiment = ExperimentInfo("vlad", "test", "1")
-file_handler = FileHandler("Artifacts/", experiment)
-train_pipeline = OneClassClassificationTrain(file_handler)
+app = Flask(__name__)
+CORS(app)
 
-#configure
-# model = SimpleKerasModel(224, 224, KerasModels.Resnet)
-# model = KServeModel("http://localhost:8080/v1/models/resnet50:predict", None, 1200)
-model = KServeModel(os.getenv("CLOUD_HIST")+"/v1/models/clip:predict", None, 1200)
-oc_svm_clf = svm.OneClassSVM(gamma=0.001, kernel='rbf', nu=0.08)
-ss = StandardScaler()
-pca = PCA(n_components=128, whiten=True)
+trainService = TrainService(config.DATA_DIR, config.IMAGE_NAME, config.TRAIN_MEMORY_LIMIT)
 
-#loading data to dataset instance
-dataloader_one_class = AnimalsOneClassDataloader("../Data/Animals/animals", "lion")
-dataset = TrainOneClassDataset(224, 224, 10, 42, dataloader_one_class, target_image_percent=0.3)
+@app.route('/train', methods=['POST'])
+def train_endpoint():
+    content = request.get_json()
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    model_name = content["model_name"]
+    cropping = content["cropping"]
+    data_path = content["data-path"]
+    dataset_names = content["dataset-names"]
+    sources = content["sources"]
+    
+    category = content["category"] if "category" in content else None
+    kserve_path = content["kserve-path"] if "kserve-path" in content else None
+    local_kserve = content["local-kserve"] if "local-kserve" in content else None
+    
+    result = trainService.train(user, project, experiment_str, model_name, cropping, data_path, dataset_names, sources, category, kserve_path, local_kserve)
+    if(result['StatusCode'] == 0):
+        return {
+                "message": "Successfully trained"
+            }, 200
 
-#training pipeline
-train_pipeline.configure(model, oc_svm_clf)
-train_pipeline.train(dataset, use_cache=True, save_cache=True)
-train_pipeline.save()
+    return {
+                "message": "Internal server error"
+            }, 500
+
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

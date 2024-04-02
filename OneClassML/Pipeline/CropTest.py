@@ -79,6 +79,7 @@ class CropTest(Testable):
         
         for i, ind in enumerate(indexes):
             img = numpy_images[ind]
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) 
             fig = plt.figure(figsize=(10, 100)) 
             fig.add_subplot(len(indexes), 2, 2 * i + 1)
             plt.imshow(img)

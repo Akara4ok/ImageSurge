@@ -1,14 +1,11 @@
 """ Some usefull functions """
 import tensorflow as tf
 import os
-from dotenv import load_dotenv
 import numpy as  np
 import requests
 from sklearn.base import ClusterMixin
 from sklearn.metrics.pairwise import cosine_similarity
 from kneed import KneeLocator
-
-load_dotenv()
 
 def to_numpy_image(dataset: tf.data.Dataset) -> np.ndarray:
     """ Converts to numpy dataset contains images with processing """
@@ -35,6 +32,9 @@ def to_numpy_image_label(dataset: tf.data.Dataset) -> tuple[np.ndarray, np.ndarr
 
 def unzip_list(cur_list: list[tuple[str, int]]) -> tuple[list[str], list[int]]:
     """ Unzip list of tuples """
+    
+    if(len(cur_list) == 0):
+        return ([], [])
     
     list_unzipped = [list(t) for t in zip(*cur_list)]
     return list_unzipped[0], list_unzipped[1]

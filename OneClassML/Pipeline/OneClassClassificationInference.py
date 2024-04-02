@@ -11,6 +11,7 @@ class OneClassClassificationInference(Inference):
     def __init__(self, file_handler: FileHandler, kserve_model: KServeModel = None) -> None:
         super().__init__(file_handler, kserve_model)
         self.cluster_center: np.ndarray = None
+        self.final_processed_features: np.ndarray = None
         
     @Inference.need_load
     def process(self, dataset: tf.data.Dataset, use_cache: bool = False,
@@ -39,7 +40,13 @@ class OneClassClassificationInference(Inference):
             x = self.feature_reduction.transform(x)
             logging.info("Dimensions reduced")
         
+        if(is_test):
+            self.final_processed_features = x
+        
         #train one class classification
         y_predicted = self.one_class.predict(x)
         y_predicted[y_predicted == -1] = 0
         return y_predicted
+    
+    def get_final_processed_features(self):
+        return self.final_processed_features

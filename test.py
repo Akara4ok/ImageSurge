@@ -15,11 +15,11 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
-experiment = ExperimentInfo("vlad", "test", "1")
+experiment = ExperimentInfo("1", "1", "1")
 file_handler = FileHandler("Artifacts/", experiment)
 # kserve_model = KServeModel("http://localhost:8080/v1/models/resnet50:predict", None, 1200)
-kserve_model = KServeModel(os.getenv("CLOUD_HOST")+"/v1/models/resnet50:predict", get_access_token(), 1200)
-pipeline = OneClassClassificationInference(file_handler, kserve_model)
+# kserve_model = KServeModel(os.getenv("CLOUD_HOST")+"/v1/models/resnet50:predict", get_access_token(), 1200)
+pipeline = OneClassClassificationInference(file_handler)
 
 #loading data to dataset instance
 dataloader = AnimalsOneClassDataloader("../Data/Animals/animals", "lion")

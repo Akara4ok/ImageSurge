@@ -36,6 +36,9 @@ class OneClassClassificationSimilarity(OneClassClassificationInference):
         if(self.scaler):
             x = self.scaler.transform(x)
             logging.info("Features scaled")
+            
+        if(is_test):
+            self.final_processed_features = x
         
         similarities = cosine_similarity(x, self.cluster_center).flatten()
         
