@@ -1,6 +1,6 @@
 import tensorflow as tf
 from .Dataset import Dataset
-from Dataloader.InferenceDataloader import InferenceDataloader
+from Dataloader.DataloaderImpl.InferenceDataloader import InferenceDataloader
 
 class InferenceDataset(Dataset):
     """ Implementation of dataset for user requests """

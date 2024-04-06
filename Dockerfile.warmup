@@ -1,0 +1,11 @@
+# Use base image with GPU support.
+FROM ubuntu:latest
+
+RUN apt-get update -y && apt-get install python3 python3-pip -y
+RUN pip3 install requests
+
+WORKDIR /app
+
+COPY Services/warmup.py Services/warmup.py
+
+ENTRYPOINT python3 Services/warmup.py --main-service http://127.0.0.1:5000 --data-path Data/ --source 2 --local-kserve False --sleep 1

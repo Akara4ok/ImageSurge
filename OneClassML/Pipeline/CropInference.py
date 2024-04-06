@@ -8,12 +8,10 @@ from .ModelHandlers.KServeModel import KServeModel
 class CropInference(Inference):
     """ Class for infernce one class classification """
     
-    def __init__(self, file_handler: FileHandler, image_width, image_height,  small_box_count: int = 20, big_box_count: int = 5, kserve_model: KServeModel = None) -> None:
+    def __init__(self, file_handler: FileHandler,  small_box_count: int = 20, big_box_count: int = 5, kserve_model: KServeModel = None) -> None:
         super().__init__(file_handler, kserve_model)
         self.small_box_count = small_box_count
         self.big_box_count = big_box_count
-        self.image_width: int = image_width
-        self.image_height: int = image_height
         self.cached_img_tables: list[ImageTable] = []
         self.calc_similarity = 0
         
@@ -22,7 +20,7 @@ class CropInference(Inference):
         return self.calc_similarity
     
     @Inference.need_load
-    def process(self, dataset: tf.data.Dataset, algo: ImageTableAlgo = ImageTableAlgo.Similarity, 
+    def process(self, dataset: tf.data.Dataset, result_classification: list = None, algo: ImageTableAlgo = ImageTableAlgo.Similarity, 
                 level: int = 15, use_cache: bool = False, save_cache: bool = False, is_test: bool = False, **kwargs) -> np.ndarray:
         
         if(self.feature_extractor is None or self.cluster_center is None):
@@ -32,7 +30,9 @@ class CropInference(Inference):
         features: list[np.ndarray] = []
         true_labels: list[np.ndarray] = []
         if(not use_cache or self.cached_feauteres is None):
-            for data in dataset:
+            for i, data in enumerate(dataset):
+                if(result_classification is not None and result_classification[i] == 0):
+                    return
                 if(is_test):
                     image = data[0]
                 else:

@@ -18,14 +18,15 @@ from Dataset.TrainOneClassDataset import TrainOneClassDataset
 from Dataset.TrainRefDataset import TrainRefDataset
 
 def train(user: str, project: str, experiment_str: str, model_name: str, cropping: bool, data_path: list[str], ref_data_path: str = "",
-          kserve_path: str = None, token: str = None, save_path: str = "Artifacts/"):
+          kserve_path_classification: str = None, kserve_path_crop: str = None, 
+          token: str = None, save_path: str = "Artifacts/"):
     """ full pipeline training """
     experiment = ExperimentInfo(user, project, experiment_str)
     file_handler = FileHandler(save_path, experiment)
     train_pipeline = OneClassClassificationTrain(file_handler)
 
     #configure
-    model = ModelFactory.create_model(model_name, kserve_path, token)
+    model = ModelFactory.create_model(model_name, kserve_path_classification, token)
     oc_svm_clf = svm.OneClassSVM(kernel='rbf', nu=0.08)
     ss = StandardScaler()
 
@@ -51,7 +52,7 @@ def train(user: str, project: str, experiment_str: str, model_name: str, croppin
     file_handler_crop = FileHandler(save_path, experiment_crop)
     train_pipeline_crop = OneClassClassificationTrain(file_handler_crop)
     
-    model_crop = ModelFactory.create_model("Resnet", kserve_path, token)
+    model_crop = ModelFactory.create_model("Resnet", kserve_path_crop, token)
     oc_svm_crop = svm.OneClassSVM(kernel='rbf', nu=0.08)
     
     train_pipeline_crop.configure(model_crop, oc_svm_crop)
@@ -77,7 +78,9 @@ if __name__ == "__main__":
     parser.add_argument("--data-path", "-d", default=os.getenv('DATA_PATH'), help="Data path(separated by comma)", type=str)
     parser.add_argument("--ref-data-path", "-r", default=os.getenv('REF_DATA_PATH'), help="Reference datapath if needed", type=str)
     
-    parser.add_argument("--kserve-path", "-k", default=os.getenv('KSERVE_PATH'), help="Kserve path if needed", type=str)
+    parser.add_argument("--kserve-path-classification", "-k", default=os.getenv('KSERVE_PATH_CLASSIFICATION'), 
+                        help="Kserve path for classifiaction if needed", type=str)
+    parser.add_argument("--kserve-path-crop", default=os.getenv('KSERVE_PATH_CROP'), help="Kserve path for cropping if needed", type=str)
     parser.add_argument("--token", "-t", default=os.getenv('TOKEN'), help="token for kserve", type=str)
 
     parser.add_argument("--save-folder", "-s", default=os.getenv('SAVE_FOLDER'), help="Save folder path", type=str)
@@ -106,8 +109,9 @@ if __name__ == "__main__":
             args['cropping'],
             [x for x in args['data_path'].split(',')],
             args['ref_data_path'],
-            args['kserve_path'],
-            args['token'],
+            args['kserve_path_classification'],
+            args['kserve_path_crop'],
+            args['token'],            
             args['save_folder'],
             )
     except:

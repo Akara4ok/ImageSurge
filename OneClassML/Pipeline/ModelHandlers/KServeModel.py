@@ -8,7 +8,7 @@ from utils.functions import to_numpy_image, to_numpy_image_label
 class KServeModel(PreTrainedModel):
     """ Class for pretrained keras models """
     
-    def __init__(self, url: str, token: str, max_elements_to_send: int) -> None:
+    def __init__(self, url: str, token: str, max_elements_to_send: int = 1200) -> None:
         super().__init__()
         self.url = url
         self.max_elements_to_send = max_elements_to_send

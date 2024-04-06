@@ -5,7 +5,7 @@ from utils.ExperimentInfo import ExperimentInfo
 from utils.functions import get_access_token
 from Pipeline.utils.FileHandler import FileHandler
 from Pipeline.OneClassClassificationInference import OneClassClassificationInference
-from Dataloader.InferenceDataloader import InferenceDataloader
+from Dataloader.DataloaderImpl.InferenceDataloader import InferenceDataloader
 from Dataset.InferenceDataset import InferenceDataset
 from Pipeline.ModelHandlers.KServeModel import KServeModel
 

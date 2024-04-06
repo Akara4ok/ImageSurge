@@ -18,7 +18,8 @@ class CropTest(Testable):
              level: int = 15, use_cache: bool = False, **kwargs) -> np.ndarray:
         """ Testing inference """
         
-        self.y_predicted = self.test_inference.process(dataset, algo, level, use_cache, True, True, **kwargs)
+        self.y_predicted = self.test_inference.process(dataset, algo = algo, level = level, use_cache = use_cache,
+                                                       save_cache=True, is_test=True, **kwargs)
         return self.y_predicted 
     
     def get_metrics(self) -> dict[str, float]:

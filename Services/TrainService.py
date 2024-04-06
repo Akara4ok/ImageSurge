@@ -127,7 +127,14 @@ class TrainService:
                 return self.default_folder + "multiclass_faces"
             case _:
                 return self.default_folder + "natural_images"
-            
+
+    def enough_kserve_memory(self):
+        kserve_training = 0
+        for _, device in self.device_map.items():
+            if(device == "kserve"):
+                kserve_training += 1
+        return kserve_training <= config.KSERVE_LIMIT // config.KSERVE_BATCH_SIZE
+    
     def theretical_free_memory(self):
         total_used_memory = 0
         for _, device in self.device_map.items():
@@ -145,8 +152,9 @@ class TrainService:
             
     def train(self, user: str, project: str, experiment_str: str, model_name: str, 
               cropping: bool, data_path: list[str], dataset_names: list[str],
-              sources: list[str], category: str = None, kserve_path: str = None, 
-              local_kserve: bool = True, save_path: str = "Artifacts/") -> None:
+              sources: list[str], category: str = None, kserve_path_classification: str = None, 
+              kserve_path_crop: str = None, local_kserve: bool = True, 
+              save_path: str = "Artifacts/") -> None:
         
         downloaded_paths: list[str] = []
         for i, path in enumerate(data_path):
@@ -158,12 +166,7 @@ class TrainService:
                         "--model-name", model_name, "--cropping", str(cropping), "--data-path", ",".join(downloaded_paths)]
         
         if(category is not None):
-            command_args +=  ["--ref-data-path", self.get_ref_path(category)]
-        
-        if(kserve_path):
-            command_args +=  ["--kserve-path", kserve_path]
-            if(not local_kserve):
-                command_args += ["--token", get_access_token()]
+            command_args +=  ["--ref-data-path", self.get_ref_path(category)]        
         
         command_args += ["--save-folder", save_path]
 
@@ -173,13 +176,29 @@ class TrainService:
         volumes.append(f"{os.path.abspath(save_path)}:{self.working_dir +save_path}")
         
         free_memory = self.get_free_video_memory()
-        
-        command_args = " ".join(command_args)
-        
+                
         self.update_device_map()
         theoretical_free_memory = self.theretical_free_memory()
         
-        if(free_memory > self.memory_limit and theoretical_free_memory > self.memory_limit):
+        token = None
+        if(not local_kserve):
+            token = get_access_token()
+            
+        kserve_but_not_enough = (kserve_path_classification is not None or kserve_path_crop is not None) and self.enough_kserve_memory()
+            
+        if(kserve_path_classification and self.enough_kserve_memory()):
+            command_args +=  ["--kserve-path-classification", kserve_path_classification]
+            if(not local_kserve):
+                command_args += ["--token", token]
+            
+        if(kserve_path_crop and self.enough_kserve_memory()):
+            command_args +=  ["--kserve-path-crop", kserve_path_classification]
+            if(kserve_path_classification is None and not local_kserve):
+                command_args += ["--token", token]
+            
+        command_args = " ".join(command_args)
+        
+        if(free_memory > self.memory_limit and theoretical_free_memory > self.memory_limit and not kserve_but_not_enough):
             command_args += f" --memory-limit {self.memory_limit - config.MEMORY_SAFE_RESERVE}"
             container = self.client.containers.run(self.image_name, command_args, 
                                               device_requests=[docker.types.DeviceRequest(count=-1, capabilities=[['gpu']])], 
@@ -187,9 +206,13 @@ class TrainService:
             self.device_map[container.id] = "gpu"
         else:
             container = self.client.containers.run(self.image_name, command_args, volumes=volumes, 
-                                                   working_dir = self.working_dir, detach = True, auto_remove = True)
-            self.device_map[container.id] = "cpu"
-        
+                                                   working_dir = self.working_dir, detach = True,  auto_remove = True)
+            
+            if(kserve_but_not_enough):
+                self.device_map[container.id] = "kserve"
+            else:
+                self.device_map[container.id] = "cpu"
+                
         try:
             return container.wait(timeout=self.time_limit)
         except:
