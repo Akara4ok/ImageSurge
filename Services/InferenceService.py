@@ -6,6 +6,7 @@ sys.path.append("OneClassML")
 from utils.functions import get_access_token
 import config
 from multiprocessing.pool import ThreadPool
+from threading import Lock
 
 class InferenceService:
     """ Class for sending request to inference microservice """
@@ -15,6 +16,7 @@ class InferenceService:
         self.gpu_requests = 0
         self.pool = ThreadPool(processes=8)
         self.device_map = {}
+        self.lock = Lock()
     
     def getKey(self, user: str, project: str, experiment_str: str, device: str):
         return hashlib.sha256((user + project + experiment_str + device).encode('utf-8')).hexdigest()
@@ -137,11 +139,17 @@ class InferenceService:
         
         cpu_key = self.getKey(user, project, experiment_str, "cpu")
         gpu_key = self.getKey(user, project, experiment_str, "gpu")
-        if(gpu_key not in self.device_map.keys() or not self.check_gpu() or self.device_map[cpu_key] == True):
-            response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
+        
+        self.lock.acquire(True)
+        if(gpu_key in self.device_map.keys() and self.check_gpu() and self.device_map[cpu_key] != True):
+            self.gpu_requests += 1
+            self.lock.acquire(False)
+            response = requests.post(self.gpu_url + "/process", files=multipart_form_data)
+            self.gpu_requests -= 1
             return response.json(), response.status_code
         
-        self.gpu_requests += 1
-        response = requests.post(self.gpu_url + "/process", files=multipart_form_data)
-        self.gpu_requests -= 1
+        if(self.lock.locked()):
+            self.lock.acquire(False)
+        
+        response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
         return response.json(), response.status_code

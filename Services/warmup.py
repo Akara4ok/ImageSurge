@@ -2,11 +2,17 @@ import requests
 import os
 import argparse
 import time
+from websocket import create_connection
 
 def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: str, 
           kserve_path: str = None, local_kserve: bool = True, sleep_time: int = 120) -> None:
     """ gpu warmup """
     time.sleep(sleep_time)
+    
+    ws_url = main_service_url.replace("http", "ws")
+    ws_url = ws_url.replace("https", "wss")
+    ws = create_connection(ws_url + "/train_ws")
+
     user = "default"
     project = "default"
     experiment = "default"
@@ -24,7 +30,9 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
         "local-kserve": local_kserve
     }
     result = requests.post(main_service_url + "/train", json=train_data)
-    print("Training res", result.status_code, result.json())
+    print("Training start res", result.status_code, result.json())
+    print("Training end res", ws.recv())
+    ws.close()
     load_data = {
         "user": user,
         "project": project,

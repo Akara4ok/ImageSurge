@@ -11,6 +11,7 @@ import docker
 import pynvml
 import config
 from multiprocessing.pool import ThreadPool
+from threading import Lock
 
 class DatasetSource(enum.Enum):
     LocalZip = 1
@@ -32,6 +33,7 @@ class TrainService:
         self.pool = ThreadPool(processes=8)
         self.subscriptions: dict = {}
         self.connections: list = []
+        self.lock = Lock()
         
         try:
             pynvml.nvmlInit()
@@ -194,43 +196,44 @@ class TrainService:
             volumes.append(f"{os.path.abspath(path)}:{self.working_dir + path}")
         volumes.append(f"{os.path.abspath(save_path)}:{self.working_dir +save_path}")
         
-        free_memory = self.get_free_video_memory()
-                
-        self.update_device_map()
-        theoretical_free_memory = self.theretical_free_memory()
-        
-        token = None
-        if(not local_kserve):
-            token = get_access_token()
+        with self.lock:
+            free_memory = self.get_free_video_memory()
+                    
+            self.update_device_map()
+            theoretical_free_memory = self.theretical_free_memory()
             
-        kserve_but_not_enough = (kserve_path_classification is not None or kserve_path_crop is not None) and self.enough_kserve_memory()
-            
-        if(kserve_path_classification and self.enough_kserve_memory()):
-            command_args +=  ["--kserve-path-classification", kserve_path_classification]
+            token = None
             if(not local_kserve):
-                command_args += ["--token", token]
-            
-        if(kserve_path_crop and self.enough_kserve_memory()):
-            command_args +=  ["--kserve-path-crop", kserve_path_classification]
-            if(kserve_path_classification is None and not local_kserve):
-                command_args += ["--token", token]
-            
-        command_args = " ".join(command_args)
-        
-        if(free_memory > self.memory_limit and theoretical_free_memory > self.memory_limit and not kserve_but_not_enough):
-            command_args += f" --memory-limit {self.memory_limit - config.MEMORY_SAFE_RESERVE}"
-            container = self.client.containers.run(self.image_name, command_args, 
-                                              device_requests=[docker.types.DeviceRequest(count=-1, capabilities=[['gpu']])], 
-                                              volumes=volumes, working_dir = self.working_dir, detach = True, auto_remove = True)
-            self.device_map[container.id] = "gpu"
-        else:
-            container = self.client.containers.run(self.image_name, command_args, volumes=volumes, 
-                                                   working_dir = self.working_dir, detach = True,  auto_remove = True)
-            
-            if(kserve_but_not_enough):
-                self.device_map[container.id] = "kserve"
-            else:
-                self.device_map[container.id] = "cpu"
+                token = get_access_token()
                 
-        self.pool.apply_async(self.send_result_ws, (container,))
-        return 0
+            kserve_but_not_enough = (kserve_path_classification is not None or kserve_path_crop is not None) and self.enough_kserve_memory()
+                
+            if(kserve_path_classification and self.enough_kserve_memory()):
+                command_args +=  ["--kserve-path-classification", kserve_path_classification]
+                if(not local_kserve):
+                    command_args += ["--token", token]
+                
+            if(kserve_path_crop and self.enough_kserve_memory()):
+                command_args +=  ["--kserve-path-crop", kserve_path_classification]
+                if(kserve_path_classification is None and not local_kserve):
+                    command_args += ["--token", token]
+                
+            command_args = " ".join(command_args)
+            
+            if(free_memory > self.memory_limit and theoretical_free_memory > self.memory_limit and not kserve_but_not_enough):
+                command_args += f" --memory-limit {self.memory_limit - config.MEMORY_SAFE_RESERVE}"
+                container = self.client.containers.run(self.image_name, command_args, 
+                                                device_requests=[docker.types.DeviceRequest(count=-1, capabilities=[['gpu']])], 
+                                                volumes=volumes, working_dir = self.working_dir, detach = True, auto_remove = True)
+                self.device_map[container.id] = "gpu"
+            else:
+                container = self.client.containers.run(self.image_name, command_args, volumes=volumes, 
+                                                    working_dir = self.working_dir, detach = True,  auto_remove = True)
+                
+                if(kserve_but_not_enough):
+                    self.device_map[container.id] = "kserve"
+                else:
+                    self.device_map[container.id] = "cpu"
+                    
+            self.pool.apply_async(self.send_result_ws, (container,))
+            return 0
