@@ -5,6 +5,7 @@ load_dotenv()
 import os
 from flask import Flask, request
 from flask_cors import CORS
+from flask_sock import Sock
 import sys
 sys.path.append("Services/")
 from TrainService import TrainService
@@ -13,6 +14,7 @@ import config
 
 app = Flask(__name__)
 CORS(app)
+sock = Sock(app)
 
 trainService = TrainService(config.DATA_DIR, config.IMAGE_NAME, config.TRAIN_MEMORY_LIMIT)
 ifnferenceService = InferenceService(config.INFERENCE_HOST, config.CPU_PORT, config.GPU_PORT)
@@ -36,9 +38,9 @@ def train_endpoint():
     
     result = trainService.train(user, project, experiment_str, model_name, cropping, data_path, dataset_names, sources, category, 
                                 kserve_path_classification, kserve_path_crop, local_kserve)
-    if(result['StatusCode'] == 0):
+    if(result == 0):
         return {
-                "message": "Successfully trained"
+                "message": "Training successfully started"
             }, 200
 
     return {
@@ -82,6 +84,12 @@ def process_endpoint():
     
     return ifnferenceService.process(images, user, project, experiment_str, cropping, level, similarity)
 
+@sock.route('/train_ws')
+def echo(ws):
+    trainService.add_socket(ws)
+    while True:
+        data = ws.receive()
+    
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))

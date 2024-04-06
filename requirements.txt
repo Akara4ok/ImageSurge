@@ -1,6 +1,7 @@
 docker_py==1.10.6
 Flask==3.0.2
 Flask_Cors==4.0.0
+flask_sock==0.7.0
 gdown==5.1.0
 keras==2.11.0
 kneed==0.8.5

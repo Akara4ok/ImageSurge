@@ -10,6 +10,7 @@ from utils.functions import get_access_token
 import docker
 import pynvml
 import config
+from multiprocessing.pool import ThreadPool
 
 class DatasetSource(enum.Enum):
     LocalZip = 1
@@ -28,12 +29,18 @@ class TrainService:
         self.nvmlInited = False
         self.working_dir = config.WORKDIR
         self.device_map: dict[str, str] = {}
+        self.pool = ThreadPool(processes=8)
+        self.subscriptions: dict = {}
+        self.connections: list = []
         
         try:
             pynvml.nvmlInit()
             self.nvmlInited = True
         except:
             pass
+        
+    def add_socket(self, ws):
+        self.connections.append(ws)
     
     def get_free_video_memory(self):
         if(not self.nvmlInited):
@@ -149,6 +156,18 @@ class TrainService:
             if(container.id in self.device_map):
                 new_map[container.id] = self.device_map[container.id]
         self.device_map = new_map
+        
+    def wait_task(self, container):
+        try:
+            return container.wait(timeout=self.time_limit)
+        except:
+            container.kill()
+            return {"Status code": 139}
+        
+    def send_result_ws(self, container):
+        result = self.wait_task(container)
+        for conn in self.connections:
+            conn.send(result)
             
     def train(self, user: str, project: str, experiment_str: str, model_name: str, 
               cropping: bool, data_path: list[str], dataset_names: list[str],
@@ -213,8 +232,5 @@ class TrainService:
             else:
                 self.device_map[container.id] = "cpu"
                 
-        try:
-            return container.wait(timeout=self.time_limit)
-        except:
-            container.kill()
-            return {"Status code": 139}
+        self.pool.apply_async(self.send_result_ws, (container,))
+        return 0
