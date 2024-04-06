@@ -4,7 +4,7 @@ import requests
 import sys
 sys.path.append("OneClassML")
 from utils.functions import get_access_token
-import config
+from GpuMemory import GpuMemory
 from multiprocessing.pool import ThreadPool
 from threading import Lock
 
@@ -13,16 +13,12 @@ class InferenceService:
     def __init__(self, host: str, cpu_port: int, gpu_port: int) -> None:
         self.cpu_url = host + ":" + str(cpu_port)
         self.gpu_url = host + ":" + str(gpu_port)
-        self.gpu_requests = 0
         self.pool = ThreadPool(processes=8)
         self.device_map = {}
         self.lock = Lock()
     
     def getKey(self, user: str, project: str, experiment_str: str, device: str):
         return hashlib.sha256((user + project + experiment_str + device).encode('utf-8')).hexdigest()
-    
-    def check_gpu(self):
-        return self.gpu_requests * config.LOCAL_BATCH_SIZE < config.LOCAL_LIMIT
     
     def load_task(self, url: str, data: dict):
         response = requests.post(url + "/load", json=data)
@@ -141,15 +137,25 @@ class InferenceService:
         gpu_key = self.getKey(user, project, experiment_str, "gpu")
         
         self.lock.acquire(True)
-        if(gpu_key in self.device_map.keys() and self.check_gpu() and self.device_map[cpu_key] != True):
-            self.gpu_requests += 1
-            self.lock.acquire(False)
+        if(cpu_key in self.device_map.keys() and GpuMemory().enough_kserve_memory() and self.device_map[cpu_key] == True):
+            GpuMemory().new_inference_request("kserve")
+            self.lock.release()
+            response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
+            GpuMemory().inference_request_end("kserve")
+            return response.json(), response.status_code
+        
+        if(not self.lock.locked()):
+            self.lock.acquire(True)
+            
+        if(gpu_key in self.device_map.keys() and GpuMemory().enough_gpu_inference_memory()):
+            GpuMemory().new_inference_request("gpu")
+            self.lock.release()
             response = requests.post(self.gpu_url + "/process", files=multipart_form_data)
-            self.gpu_requests -= 1
+            GpuMemory().inference_request_end("gpu")
             return response.json(), response.status_code
         
         if(self.lock.locked()):
-            self.lock.acquire(False)
+            self.lock.release()
         
         response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
         return response.json(), response.status_code

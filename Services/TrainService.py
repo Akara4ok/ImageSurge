@@ -12,6 +12,7 @@ import pynvml
 import config
 from multiprocessing.pool import ThreadPool
 from threading import Lock
+from GpuMemory import GpuMemory
 
 class DatasetSource(enum.Enum):
     LocalZip = 1
@@ -21,13 +22,11 @@ class DatasetSource(enum.Enum):
 
 class TrainService:
     """ Service for creating training pipelines """
-    def __init__(self, default_folder: str, image_name: str, memory_limit: int, time_limit: int = 3600) -> None:
+    def __init__(self, default_folder: str, image_name: str, time_limit: int = 3600) -> None:
         self.default_folder = default_folder
         self.client = docker.from_env()
         self.image_name = image_name
-        self.memory_limit = memory_limit + config.MEMORY_SAFE_RESERVE
         self.time_limit = time_limit
-        self.nvmlInited = False
         self.working_dir = config.WORKDIR
         self.device_map: dict[str, str] = {}
         self.pool = ThreadPool(processes=8)
@@ -35,44 +34,8 @@ class TrainService:
         self.connections: list = []
         self.lock = Lock()
         
-        try:
-            pynvml.nvmlInit()
-            self.nvmlInited = True
-        except:
-            pass
-        
     def add_socket(self, ws):
         self.connections.append(ws)
-    
-    def get_free_video_memory(self):
-        if(not self.nvmlInited):
-            return 0
-        
-        try:
-            device_count = pynvml.nvmlDeviceGetCount()
-            free_memory = 0
-            for i in range(device_count):
-                handle = pynvml.nvmlDeviceGetHandleByIndex(i)
-                memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
-                free_memory += memory_info.free
-            return free_memory / 1024 / 1024
-        except pynvml.NVMLError as e:
-            return 0
-        
-    def get_total_video_memory(self):
-        if(not self.nvmlInited):
-            return 0
-        
-        try:
-            device_count = pynvml.nvmlDeviceGetCount()
-            free_memory = 0
-            for i in range(device_count):
-                handle = pynvml.nvmlDeviceGetHandleByIndex(i)
-                memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
-                free_memory += memory_info.total
-            return free_memory / 1024 / 1024
-        except pynvml.NVMLError as e:
-            return 0
     
     def download(self, path: str, dataset_name: str = "", source: int = 1) -> str:
         folder_res = self.default_folder + dataset_name
@@ -136,28 +99,6 @@ class TrainService:
                 return self.default_folder + "multiclass_faces"
             case _:
                 return self.default_folder + "natural_images"
-
-    def enough_kserve_memory(self):
-        kserve_training = 0
-        for _, device in self.device_map.items():
-            if(device == "kserve"):
-                kserve_training += 1
-        return kserve_training <= config.KSERVE_LIMIT // config.KSERVE_BATCH_SIZE
-    
-    def theretical_free_memory(self):
-        total_used_memory = 0
-        for _, device in self.device_map.items():
-            if(device == "gpu"):
-                total_used_memory += self.memory_limit
-        return self.get_total_video_memory() - total_used_memory
-        
-    def update_device_map(self):
-        containers = self.client.containers.list()
-        new_map = {}
-        for container in containers:
-            if(container.id in self.device_map):
-                new_map[container.id] = self.device_map[container.id]
-        self.device_map = new_map
         
     def wait_task(self, container):
         try:
@@ -197,43 +138,44 @@ class TrainService:
         volumes.append(f"{os.path.abspath(save_path)}:{self.working_dir +save_path}")
         
         with self.lock:
-            free_memory = self.get_free_video_memory()
+            free_memory = GpuMemory().get_free_video_memory()
                     
-            self.update_device_map()
-            theoretical_free_memory = self.theretical_free_memory()
+            GpuMemory().update_train_devices(self.client.containers.list())
+            theoretical_free_memory = GpuMemory().theretical_train_free_memory()
             
             token = None
             if(not local_kserve):
                 token = get_access_token()
                 
-            kserve_but_not_enough = (kserve_path_classification is not None or kserve_path_crop is not None) and self.enough_kserve_memory()
+            kserve_but_not_enough = (kserve_path_classification is not None or kserve_path_crop is not None) and GpuMemory().enough_kserve_memory()
                 
-            if(kserve_path_classification and self.enough_kserve_memory()):
+            if(kserve_path_classification and GpuMemory().enough_kserve_memory()):
                 command_args +=  ["--kserve-path-classification", kserve_path_classification]
                 if(not local_kserve):
                     command_args += ["--token", token]
                 
-            if(kserve_path_crop and self.enough_kserve_memory()):
+            if(kserve_path_crop and GpuMemory().enough_kserve_memory()):
                 command_args +=  ["--kserve-path-crop", kserve_path_classification]
                 if(kserve_path_classification is None and not local_kserve):
                     command_args += ["--token", token]
                 
             command_args = " ".join(command_args)
             
-            if(free_memory > self.memory_limit and theoretical_free_memory > self.memory_limit and not kserve_but_not_enough):
-                command_args += f" --memory-limit {self.memory_limit - config.MEMORY_SAFE_RESERVE}"
+            if(free_memory > GpuMemory().train_container_limit and theoretical_free_memory > GpuMemory().train_container_limit 
+               and not kserve_but_not_enough):
+                command_args += f" --memory-limit {GpuMemory().train_container_limit - config.MEMORY_SAFE_RESERVE}"
                 container = self.client.containers.run(self.image_name, command_args, 
                                                 device_requests=[docker.types.DeviceRequest(count=-1, capabilities=[['gpu']])], 
                                                 volumes=volumes, working_dir = self.working_dir, detach = True, auto_remove = True)
-                self.device_map[container.id] = "gpu"
+                GpuMemory().add_new_train_request(container.id, "gpu")
             else:
                 container = self.client.containers.run(self.image_name, command_args, volumes=volumes, 
                                                     working_dir = self.working_dir, detach = True,  auto_remove = True)
                 
                 if(kserve_but_not_enough):
-                    self.device_map[container.id] = "kserve"
+                    GpuMemory().add_new_train_request(container.id, "kserve")
                 else:
-                    self.device_map[container.id] = "cpu"
+                    GpuMemory().add_new_train_request(container.id, "cpu")
                     
-            self.pool.apply_async(self.send_result_ws, (container,))
-            return 0
+        self.pool.apply_async(self.send_result_ws, (container,))
+        return 0

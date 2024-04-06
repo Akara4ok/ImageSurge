@@ -10,14 +10,16 @@ import sys
 sys.path.append("Services/")
 from TrainService import TrainService
 from InferenceService import InferenceService
+from GpuMemory import GpuMemory
 import config
-
 app = Flask(__name__)
 CORS(app)
 sock = Sock(app)
 
-trainService = TrainService(config.DATA_DIR, config.IMAGE_NAME, config.TRAIN_MEMORY_LIMIT)
+trainService = TrainService(config.DATA_DIR, config.IMAGE_NAME)
 ifnferenceService = InferenceService(config.INFERENCE_HOST, config.CPU_PORT, config.GPU_PORT)
+GpuMemory().set_train_container_limit(config.TRAIN_MEMORY_LIMIT)
+GpuMemory().set_inference_limit(config.INFERENCE_MEMORY_LIMIT)
 
 @app.route('/train', methods=['POST'])
 def train_endpoint():
