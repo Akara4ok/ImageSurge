@@ -58,8 +58,17 @@ def train(user: str, project: str, experiment_str: str, model_name: str, croppin
     train_pipeline_crop.configure(model_crop, oc_svm_crop)
     
     if(model_name == "Resnet" or model_name == "VGG"):
+        print("!!!!!!!!!!!!")
+        print(model_name)
+        print("!!!!!!!!!!!!")
         cache = train_pipeline.get_cache_data()
         train_pipeline_crop.cache_features(cache[0], cache[1])
+    
+    print("!!!!!!!!!!!!")
+    print(kserve_path_crop)
+    print(model_crop.url)
+    print(train_pipeline_crop.feature_extractor.url)
+    print("!!!!!!!!!!!!")
     
     train_pipeline_crop.train(dataset, use_cache=True)
     train_pipeline_crop.save()

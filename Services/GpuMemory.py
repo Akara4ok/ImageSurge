@@ -1,4 +1,4 @@
-from threading import Lock, Thread
+from threading import Lock
 from docker.models.containers import Container
 import pynvml
 import config
@@ -105,4 +105,4 @@ class GpuMemory(metaclass=GpuMemoryMeta):
         return kserve_training * config.KSERVE_BATCH_SIZE < config.KSERVE_LIMIT
     
     def enough_gpu_inference_memory(self):
-        self.device_inference_map["gpu"] * config.LOCAL_BATCH_SIZE < config.LOCAL_LIMIT
+        return self.device_inference_map["gpu"] * config.LOCAL_BATCH_SIZE < config.LOCAL_LIMIT

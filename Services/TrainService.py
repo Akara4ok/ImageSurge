@@ -8,7 +8,6 @@ import zipfile
 sys.path.append("OneClassML")
 from utils.functions import get_access_token
 import docker
-import pynvml
 import config
 from multiprocessing.pool import ThreadPool
 from threading import Lock
@@ -155,7 +154,7 @@ class TrainService:
                     command_args += ["--token", token]
                 
             if(kserve_path_crop and GpuMemory().enough_kserve_memory()):
-                command_args +=  ["--kserve-path-crop", kserve_path_classification]
+                command_args +=  ["--kserve-path-crop", kserve_path_crop]
                 if(kserve_path_classification is None and not local_kserve):
                     command_args += ["--token", token]
                 

@@ -1,5 +1,4 @@
 import hashlib
-import numpy as np 
 import requests
 import sys
 sys.path.append("OneClassML")
@@ -146,7 +145,7 @@ class InferenceService:
         
         if(not self.lock.locked()):
             self.lock.acquire(True)
-            
+        
         if(gpu_key in self.device_map.keys() and GpuMemory().enough_gpu_inference_memory()):
             GpuMemory().new_inference_request("gpu")
             self.lock.release()
