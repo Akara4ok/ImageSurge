@@ -2,7 +2,7 @@ import hashlib
 import requests
 import sys
 sys.path.append("OneClassML")
-from utils.functions import get_access_token
+from utils.non_tf_functions import get_access_token
 from GpuMemory import GpuMemory
 from multiprocessing.pool import ThreadPool
 from threading import Lock

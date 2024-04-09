@@ -47,7 +47,6 @@ class KServeModelHandler(Model):
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         
-        print("Current Time =", current_time)
         if isinstance(payload, Dict) and "instances" in payload:
             headers["request-type"] = "v1"
             for instance in payload["instances"]:

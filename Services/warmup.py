@@ -25,10 +25,12 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
         "data-path": [data_path],
         "dataset-names": [dataset_names],
         "sources": [sources],
-        "kserve-path-classification": kserve_path,
-        "kserve-path-crop": kserve_path,
         "local-kserve": local_kserve
     }
+    if(kserve_path):
+        train_data["kserve-path-classification"] = kserve_path
+        train_data["kserve-path-crop"] = kserve_path
+        
     result = requests.post(main_service_url + "/train", json=train_data)
     print("Training start res", result.status_code, result.json())
     print("Training end res", ws.recv())
@@ -38,10 +40,12 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
         "project": project,
         "experiment": experiment,
         "cropping": True,
-        "kserve-path-classification": kserve_path,
-        "kserve-path-crop": kserve_path,
         "local-kserve": local_kserve
     }
+    if(kserve_path):
+        load_data["kserve-path-classification"] = kserve_path
+        load_data["kserve-path-crop"] = kserve_path
+        
     result = requests.post(main_service_url + "/load", json=load_data)
     print("Loading res", result.status_code, result.json())
     

@@ -83,7 +83,6 @@ class GpuMemory(metaclass=GpuMemoryMeta):
             if(container.id in self.device_train_map):
                 new_map[container.id] = self.device_train_map[container.id]
         self.device_train_map = new_map
-        print(self.device_train_map)
         
     def add_new_train_request(self, container_id, device):
         self.device_train_map[container_id] = device

@@ -103,7 +103,6 @@ if __name__ == "__main__":
     memory_limit = args['memory_limit']
     if (len(gpus) > 0 and memory_limit is not None):
         try:
-            print("memory limit", memory_limit)
             tf.config.experimental.set_virtual_device_configuration(gpus[0], 
                                                                     [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=memory_limit)])
         except RuntimeError as e:

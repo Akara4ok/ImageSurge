@@ -1,6 +1,7 @@
 import os
 
 DATA_DIR = "Data/"
+ABS_PATH = "/home/vlad/KPI/Dyplom/ImageSurge"
 ARTIFACTS_DIR = "Artifacts/"
 WORKDIR = "/app/"
 IMAGE_NAME = "akara4ok/train-image"

@@ -9,4 +9,4 @@ WORKDIR /app
 
 COPY Services/warmup.py Services/warmup.py
 
-ENTRYPOINT python3 Services/warmup.py --main-service http://127.0.0.1:5000 --data-path Data/ --source 2 --local-kserve False --sleep 1
+# ENTRYPOINT python3 Services/warmup.py --main-service http://127.0.0.1:5000 --data-path Data/ --source 2 --local-kserve False --sleep 1

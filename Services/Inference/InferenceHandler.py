@@ -41,7 +41,6 @@ class InferenceHandler:
         kserve_classification = None
         if(kserve_classification_path is not None):
             kserve_classification = KServeModel(kserve_classification_path, token)
-            print(kserve_classification_path, token)
         inference = OneClassClassificationInference(file_handler, kserve_classification)
         inference.load()
         

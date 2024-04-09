@@ -16,7 +16,7 @@ app = Flask(__name__)
 CORS(app)
 sock = Sock(app)
 
-trainService = TrainService(config.DATA_DIR, config.IMAGE_NAME)
+trainService = TrainService(config.DATA_DIR, config.ABS_PATH, config.IMAGE_NAME)
 ifnferenceService = InferenceService(config.INFERENCE_HOST, config.CPU_PORT, config.GPU_PORT)
 GpuMemory().set_train_container_limit(config.TRAIN_MEMORY_LIMIT)
 GpuMemory().set_inference_limit(config.INFERENCE_MEMORY_LIMIT)

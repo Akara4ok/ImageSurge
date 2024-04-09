@@ -6,7 +6,7 @@ import gdown
 import subprocess
 import zipfile
 sys.path.append("OneClassML")
-from utils.functions import get_access_token
+from utils.non_tf_functions import get_access_token
 import docker
 import config
 from multiprocessing.pool import ThreadPool
@@ -21,8 +21,9 @@ class DatasetSource(enum.Enum):
 
 class TrainService:
     """ Service for creating training pipelines """
-    def __init__(self, default_folder: str, image_name: str, time_limit: int = 3600) -> None:
+    def __init__(self, default_folder: str, abs_path: str, image_name: str, time_limit: int = 3600) -> None:
         self.default_folder = default_folder
+        self.abs_path = abs_path
         self.client = docker.from_env()
         self.image_name = image_name
         self.time_limit = time_limit
@@ -116,13 +117,12 @@ class TrainService:
               sources: list[str], category: str = None, kserve_path_classification: str = None, 
               kserve_path_crop: str = None, local_kserve: bool = True, 
               save_path: str = "Artifacts/") -> None:
-        
         downloaded_paths: list[str] = []
         for i, path in enumerate(data_path):
             downloaded = self.download(path, dataset_names[i], sources[i])
             downloaded_paths.append(downloaded)
             self.unzip(downloaded, dataset_names[i])
-            
+        
         command_args = ["python3", "Services/train.py", "--user", user, "--project", project, "--experiment", experiment_str, 
                         "--model-name", model_name, "--cropping", str(cropping), "--data-path", ",".join(downloaded_paths)]
         
@@ -133,8 +133,8 @@ class TrainService:
 
         volumes = []
         for path in downloaded_paths:
-            volumes.append(f"{os.path.abspath(path)}:{self.working_dir + path}")
-        volumes.append(f"{os.path.abspath(save_path)}:{self.working_dir +save_path}")
+            volumes.append(f"{self.abs_path + '/' +path}:{self.working_dir + path}")
+        volumes.append(f"{self.abs_path + '/' + save_path}:{self.working_dir + save_path}")
         
         with self.lock:
             free_memory = GpuMemory().get_free_video_memory()
@@ -163,7 +163,7 @@ class TrainService:
             if(free_memory > GpuMemory().train_container_limit and theoretical_free_memory > GpuMemory().train_container_limit 
                and not kserve_but_not_enough):
                 command_args += f" --memory-limit {GpuMemory().train_container_limit - config.MEMORY_SAFE_RESERVE}"
-                container = self.client.containers.run(self.image_name, command_args, 
+                container = self.client.containers.run(self.image_name, command_args, runtime="nvidia",
                                                 device_requests=[docker.types.DeviceRequest(count=-1, capabilities=[['gpu']])], 
                                                 volumes=volumes, working_dir = self.working_dir, detach = True, auto_remove = True)
                 GpuMemory().add_new_train_request(container.id, "gpu")
