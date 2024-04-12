@@ -14,6 +14,16 @@ services:
       main_network:
 
 
+  validation:
+    image: akara4ok/validation:latest
+    container_name: validation
+    build:
+      dockerfile: ./Dockerfile.validation
+    ports:
+      - 5005:5000
+    volumes:
+      - ./Data:/app/Data
+
   inference_gpu:
     image: akara4ok/inference-image:latest
     container_name: inference-gpu

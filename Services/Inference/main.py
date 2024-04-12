@@ -81,10 +81,11 @@ def process_endpoint():
                 "message": "Internal server error"
             }, 500
     
-    (result_classification, result_crop) = result
+    (result_classification, quality, result_crop) = result
     
     data = {
-        "result_classification": result_classification.tolist()
+        "result_classification": result_classification.tolist(),
+        "quality": quality.tolist()
     }
     if(result_crop is not None):
         data["result_crop"] = result_crop.tolist()

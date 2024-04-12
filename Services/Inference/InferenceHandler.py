@@ -1,7 +1,8 @@
 import hashlib
 import numpy as np 
-
+import tensorflow as tf
 import sys
+import cv2
 sys.path.append("OneClassML")
 from Pipeline.Inference import Inference
 from Pipeline.OneClassClassificationInference import OneClassClassificationInference
@@ -16,10 +17,11 @@ IMAGE_WIDTH = 224
 
 class InferenceHandler:
     """ Class for saving loaded inference and processing pipeline """
-    def __init__(self, default_folder: str, batch_size: int = 10) -> None:
+    def __init__(self, default_folder: str, batch_size: int = 10, validation_folder: str = "Services/Validation") -> None:
         self.default_folder = default_folder
         self.iference_map: dict[str, Inference] = {}
         self.batch_size = batch_size
+        self.validation_folder = validation_folder
         
     def getKey(self, user: str, project: str, experiment_str: str, cropping: bool):
         if(cropping):
@@ -80,9 +82,18 @@ class InferenceHandler:
         
         self.iference_map.pop(key)  
         return True
+    
+    def validate(self, images: tf.data.Dataset) -> list[float]:
+        result = []
+        for image in images:
+            image = image.numpy()
+            score = cv2.quality.QualityBRISQUE_compute(image, self.validation_folder + "/brisque_model_live.yml", 
+                                                       self.validation_folder + "/brisque_range_live.yml")
+            result.append(score[0])
+        return np.asarray(result)
 
     def process(self, images: list[np.ndarray], user: str, project: str, experiment_str: str, cropping: bool,
-                level: int = 15, similarity: int = None) -> tuple[np.ndarray, np.ndarray]:
+                level: int = 15, similarity: int = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         
         inference_key = self.getKey(user, project, experiment_str, False)
         if(not(inference_key in self.iference_map)):
@@ -98,6 +109,8 @@ class InferenceHandler:
         dataset = InferenceImageDataset(IMAGE_HEIGHT, IMAGE_WIDTH)
         dataset.load(images)
         
+        quality = self.validate(dataset.get_data())
+        
         inference = self.iference_map[inference_key]
         result = inference.process(dataset.get_data().batch(self.batch_size))
         
@@ -107,4 +120,4 @@ class InferenceHandler:
             result_crop = inference_crop.process(dataset.get_data(), result_classification = result.tolist(), 
                                                  level = level, similarity = similarity)
         
-        return (result, result_crop)
+        return (result, quality, result_crop)

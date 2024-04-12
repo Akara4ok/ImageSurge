@@ -11,6 +11,7 @@ matplotlib==3.7.1
 numpy==1.24.2
 nvidia_ml_py==12.535.133
 opencv_python==4.7.0.72
+opencv-contrib-python==4.9.0.80
 Pillow==10.3.0
 pynvml==11.5.0
 python-dotenv==1.0.1
