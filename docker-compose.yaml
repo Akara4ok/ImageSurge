@@ -1,9 +1,22 @@
 name: "image_surge"
 services:
+  validation:
+    image: akara4ok/validation:latest
+    container_name: validation
+    build:
+      context: ./MLServices
+      dockerfile: ./Dockerfile.validation
+    ports:
+      - 5005:5000
+    volumes:
+      - ./Data:/app/Data
+
+      
   inference_cpu:
     image: akara4ok/inference-image:latest
     container_name: inference-cpu
     build:
+      context: ./MLServices
       dockerfile: ./Dockerfile.inference
     ports:
       - 5001:5000
@@ -14,20 +27,11 @@ services:
       main_network:
 
 
-  validation:
-    image: akara4ok/validation:latest
-    container_name: validation
-    build:
-      dockerfile: ./Dockerfile.validation
-    ports:
-      - 5005:5000
-    volumes:
-      - ./Data:/app/Data
-
   inference_gpu:
     image: akara4ok/inference-image:latest
     container_name: inference-gpu
     build:
+      context: ./MLServices
       dockerfile: ./Dockerfile.inference
     volumes:
       - ./Artifacts:/app/Artifacts
@@ -48,6 +52,7 @@ services:
     container_name: main-service
     network_mode: "host"
     build:
+      context: ./MLServices
       dockerfile: ./Dockerfile
     volumes:
       - ./Artifacts:/app/Artifacts
@@ -66,11 +71,13 @@ services:
           devices:
             - capabilities: [gpu]
 
+
   warmup:
     image: akara4ok/warmup:latest
     container_name: warmup
     network_mode: "host"
     build:
+      context: ./MLServices
       dockerfile: ./Dockerfile.warmup
     volumes:
       - ./Data:/app/Data
@@ -81,6 +88,7 @@ services:
       - inference_cpu
       - inference_gpu
     command: python3 Services/warmup.py --main-service http://127.0.0.1:5000 --data-path Data/ --source 2 --local-kserve False --sleep 10
+
 
 networks:
   main_network:
