@@ -1,0 +1,94 @@
+name: "image_surge"
+services:
+  validation:
+    image: akara4ok/validation:latest
+    container_name: validation
+    build:
+      context: ./MLServices
+      dockerfile: ./Dockerfile.validation
+    ports:
+      - 5005:5000
+    volumes:
+      - ./Data:/app/Data
+
+      
+  inference_cpu:
+    image: akara4ok/inference-image:latest
+    container_name: inference-cpu
+    build:
+      context: ./MLServices
+      dockerfile: ./Dockerfile.inference
+    ports:
+      - 5001:5000
+    volumes:
+      - ./Artifacts:/app/Artifacts
+      - ./Data:/app/Data
+    networks:
+      main_network:
+
+
+  inference_gpu:
+    image: akara4ok/inference-image:latest
+    container_name: inference-gpu
+    build:
+      context: ./MLServices
+      dockerfile: ./Dockerfile.inference
+    volumes:
+      - ./Artifacts:/app/Artifacts
+      - ./Data:/app/Data
+    ports:
+      - 5002:5000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    networks:
+      main_network:
+
+
+  main_service:
+    image: akara4ok/main-service:latest
+    container_name: main-service
+    network_mode: "host"
+    build:
+      context: ./MLServices
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./Artifacts:/app/Artifacts
+      - ./Data:/app/Data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - ABS_PATH=${ABS_PATH}
+    ports:
+      - 5000:5000
+    depends_on:
+      - inference_cpu
+      - inference_gpu
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+
+  warmup:
+    image: akara4ok/warmup:latest
+    container_name: warmup
+    network_mode: "host"
+    build:
+      context: ./MLServices
+      dockerfile: ./Dockerfile.warmup
+    volumes:
+      - ./Data:/app/Data
+    environment:
+      - KSERVE_PATH=${DEFAULT_KSERVE_URL}
+    depends_on:
+      - main_service
+      - inference_cpu
+      - inference_gpu
+    command: python3 Services/warmup.py --main-service http://127.0.0.1:5000 --data-path Data/ --source 2 --local-kserve False --sleep 10
+
+
+networks:
+  main_network:

@@ -1,0 +1,10 @@
+FROM akara4ok/base-image
+
+WORKDIR /app
+
+COPY ./requirements.txt /app
+RUN python3 -m pip install -r requirements.txt
+
+COPY . .
+
+# ENTRYPOINT python3 Services/train.py

@@ -1,0 +1,18 @@
+# Use base image with GPU support.
+FROM ubuntu:22.04
+
+RUN apt-get update -y && apt-get install python3 python3-pip -y
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+RUN pip3 install opencv_python==4.7.0.72
+RUN pip3 install opencv-contrib-python==4.9.0.80
+RUN pip3 install Flask==3.0.2
+RUN pip3 install Flask_Cors==4.0.0
+
+COPY Services/Validation Services/Validation
+COPY OneClassML/Dataloader OneClassML/Dataloader
+COPY .env .env
+
+ENTRYPOINT python3 Services/Validation/main.py
