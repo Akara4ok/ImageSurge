@@ -1,0 +1,51 @@
+@import '../../../global/global.scss';
+
+.signup-page{
+    .login-signup{
+        display: flex;
+        font-size: 20px;
+        font-family: 'SourceSansPro';
+        gap: 10px;
+        justify-content: flex-end;
+        margin: 20px;
+        margin-bottom: 0px;
+        a{
+            text-decoration: none;
+            color: inherit;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+        .signup-link{
+            color: $inactive-link;
+        }
+    }
+}
+
+.form-container{
+    display: flex;
+    justify-content: center;
+}
+
+.signup-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 800px;
+    h1{
+        margin-bottom: 20px;
+    }
+    .single-line{
+        display: flex;
+        flex-direction: row;
+    }
+}
+
+@media (max-width: 800px) {
+    .signup-form{
+        .single-line{
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}
