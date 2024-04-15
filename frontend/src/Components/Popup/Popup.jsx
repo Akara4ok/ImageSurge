@@ -1,7 +1,7 @@
 import React from 'react';
 import './Popup.scss';
 
-function Popup({ message, buttonMsg, onClose }) {
+const Popup = ({ message, buttonMsg, onClose }) => {
     return (
         <div className="popup-background" onClick={onClose}>
             <div className="popup-content" onClick={e => e.stopPropagation()}>

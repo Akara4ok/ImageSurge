@@ -1,0 +1,71 @@
+@import '../../../global/global.scss';
+
+.main-page{
+    display: flex;
+    height: 100%;
+
+    nav{
+        display: flex;
+        flex-direction: column;
+        background-color: $nav-background;
+        color: $nav-color;
+        width: 300px;
+        padding-top: 40px;
+        padding-bottom: 60px;
+        padding-right: 20px;
+
+        .logo{
+            width: 100px;
+            align-self: center;
+        }
+        .nav-link{
+            font-size: 25px;
+            text-decoration: none;
+            color: inherit;
+            font-family: 'Lexend Deca';
+        }
+        ul{
+            list-style-type: none;
+            margin-left: 60px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            height: 100%;
+            li{
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                height: 50px;
+                .bold{
+                    font-weight: bold;
+                }
+            }
+            .separator{
+                height: 100%;
+            }
+        }
+    }
+    .main-content{
+        flex-direction: column;
+        display: flex;
+        width: 100%;
+        height: 100%;
+    }
+
+    @media (max-width: 500px) {
+        nav {
+            position: fixed;
+            gap: 20px;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            z-index: 998;
+            width: 100%;
+        }
+        .displayNone{
+            display: none;
+        }
+    }
+}

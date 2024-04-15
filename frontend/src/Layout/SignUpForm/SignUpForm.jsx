@@ -7,7 +7,7 @@ import CountrySelector from '../../Components/CountrySelector/CountrySelector';
 const SignUpForm = () => {
     return (
         <div className="signup-page">
-            <div className="header">
+            <div>
                 <div className="login-signup">
                     <a href="/login" className="login-link">Log In</a> |
                     <a href="/signup" className="signup-link">Sign Up</a>

@@ -21,7 +21,7 @@ const LogInForm = () => {
 
     return (
         <div className="login-page">
-            <div className="header">
+            <div>
                 <div className="login-signup">
                     <a href="/login" className="login-link">Log In</a> |
                     <a href="/signup" className="signup-link">Sign Up</a>

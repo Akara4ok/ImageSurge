@@ -1,0 +1,14 @@
+@import '../../../../global/global.scss';
+
+.projects-wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.projects-content{
+    background-color: $main-background;
+    width: 100%;
+    height: 100%;
+}

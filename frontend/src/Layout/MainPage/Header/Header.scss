@@ -1,0 +1,25 @@
+@import '../../../../global/global.scss';
+
+.header{
+    height: 60px;
+    background-color: $header-background;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    gap: 20px;
+    padding-right: 30px;
+
+    p{
+        font-size: 30px;
+        color: $header-color;
+        font-family: 'Lexend Deca';
+    }
+    a{
+        text-decoration: none;
+        color: black;
+    }
+    .separator{
+        width: 100%;
+    }
+}

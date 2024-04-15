@@ -1,0 +1,64 @@
+.notification-bell {
+    position: relative;
+    display: inline-block;
+  
+    .bell-icon {
+      position: relative;
+      background: white;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      padding: 5px;
+      border-radius: 50%;
+      color: black;
+  
+      &.open {
+        background: rgb(202, 202, 202);
+        color: rgb(65, 65, 65);
+      }
+  
+      .notification-count {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 0 6px;
+        font-size: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  
+    .dropdown {
+      position: absolute;
+      background-color: white;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      width: 200px;
+      padding: 10px;
+      top: 30px;
+      right: 0;
+      z-index: 1000;
+      border: 1px solid black;
+      list-style-type: none;
+  
+      li {
+        padding: 8px 10px;
+        border-bottom: 1px solid #a5a5a5;
+  
+        &:last-child {
+          border-bottom: none;
+        }
+  
+        &.clear {
+          cursor: pointer;
+          color: red;
+          text-align: center;
+        }
+      }
+    }
+  }
