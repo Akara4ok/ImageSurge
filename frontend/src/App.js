@@ -6,6 +6,8 @@ import MainPage from './Layout/MainPage/MainPage';
 import Home from './Layout/MainPage/Home/Home';
 import "./App.css"
 import Projects from './Layout/MainPage/Projects/Projects';
+import Datasets from './Layout/MainPage/Datasets/Datasets';
+import Settings from './Layout/MainPage/Settings/Settings';
 
 
 function App() {
@@ -22,8 +24,8 @@ function App() {
           <Route path="/" element={<MainPage active={active} isMenuOpen={isMenuOpen} toggleMenu={()=>setMenuOpen(false)}><Outlet /></MainPage>}>
             <Route index element={<Home setActiveCallback={(text) => { setActive(text) }} toggleMenu={()=>setMenuOpen(true)}/>} />
             <Route path="projects" element={<Projects setActiveCallback={(text) => { setActive(text) }} toggleMenu={()=>setMenuOpen(true)} />} />
-            <Route path="datasets" element={<Home setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
-            <Route path="settings" element={<Home setActiveCallback={(text) => { setActive(text) }} toggleMenu={()=>setMenuOpen(true)} />} />
+            <Route path="datasets" element={<Datasets setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
+            <Route path="settings" element={<Settings setActiveCallback={(text) => { setActive(text) }} toggleMenu={()=>setMenuOpen(true)} />} />
           </Route>
         </Routes>
       </div>

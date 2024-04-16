@@ -1,7 +1,7 @@
 import React from 'react';
 import './Input.scss';
 
-const Input = ({ label, type, placeholder, options, ...props }) => {
+const Input = ({ label, type, placeholder, defaultValue, options, ...props }) => {
   let inputField;
 
   switch (type) {
@@ -20,7 +20,7 @@ const Input = ({ label, type, placeholder, options, ...props }) => {
       inputField = <input type={type} {...props} />;
       break;
     default:
-      inputField = <input type={type} placeholder={placeholder} {...props} />;
+      inputField = <input type={type} placeholder={placeholder} {...props} defaultValue={defaultValue} />;
   }
 
   return (

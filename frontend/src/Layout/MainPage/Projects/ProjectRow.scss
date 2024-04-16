@@ -1,0 +1,62 @@
+@import '../../../../global/global.scss';
+
+.project-table-row-wrapper{
+    border-bottom: 1px solid $border-items-color;
+
+    .table-row {
+        padding: 10px;
+
+        display: grid;
+        grid-template-columns: 150px 1fr 1fr 1fr 1fr;
+        font-size: 20px;
+        font-family: 'Source Sans Pro';
+
+        border: 1px solid $border-color;
+        margin: 20px;
+        
+        span{
+            display: flex;
+            align-items: center;
+        }
+
+        .status-icon {
+            text-align: center;
+        }
+
+        .action-button{
+            border: none;
+            cursor: pointer;
+            background-color: transparent;
+        }
+
+        .delete-btn {
+            padding: 5px 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #d32f2f;
+            }
+        }
+
+        .action-span{
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: space-around;
+        }
+    }
+
+    @media (max-width: 800px) {
+        .table-row {
+            display: flex;
+            flex-wrap: wrap;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            justify-content: space-around;
+            font-size: 15px;
+        }
+    }
+}

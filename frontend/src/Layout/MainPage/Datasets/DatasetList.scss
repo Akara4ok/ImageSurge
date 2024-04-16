@@ -1,0 +1,43 @@
+@import '../../../../global/global.scss';
+
+.dataset-list {
+    position: absolute;
+    top: 81px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    .table-body{
+        overflow: auto;
+        position: absolute;
+        top: 70px;
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+    }
+    .table-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        align-items: center;
+        border-bottom: 1px solid $border-items-color;
+        height: 70px;
+        font-size: 25px;
+        font-family: 'Source Sans Pro';
+        padding-left: 60px;
+        padding-right: 60px;
+    }
+
+    .center-span{
+        display: flex;
+        justify-content: center;
+    }
+
+    @media (max-width: 800px) {
+        .table-header {
+            display: flex;
+            flex-wrap: wrap;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            justify-content: space-around;
+            font-size: 15px;
+        }
+    }
+}

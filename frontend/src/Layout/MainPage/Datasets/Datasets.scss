@@ -1,6 +1,6 @@
 @import '../../../../global/global.scss';
 
-.projects-wrapper{
+.datasets-wrapper{
     width: 100%;
     height: 100%;
     display: flex;
@@ -8,7 +8,7 @@
     background-color: $main-background;
 }
 
-.projects-content{
+.datasets-content{
     background-color: $secondary-main-background;
     height: 100%;
     margin: 20px;

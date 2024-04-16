@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import Select from 'react-select'
 import countryList from 'react-select-country-list'
 import './CountrySelector.scss'
@@ -23,11 +23,21 @@ const customStyles = {
   };
   
 
-function CountrySelector() {
+const CountrySelector = ({defaultValue}) => {
   const [value, setValue] = useState('')
   const options = useMemo(() => countryList().getData(), [])
 
+  useEffect(() => {
+    if(!defaultValue){
+      return
+    }
+    const key = countryList().getValue(defaultValue)
+    setValue({value: key, label: defaultValue})
+  }, []);
+
   const changeHandler = value => {
+    console.log(value)
+    
     setValue(value)
   }
 
