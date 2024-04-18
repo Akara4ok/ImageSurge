@@ -3,6 +3,7 @@ import './Projects.scss';
 import Header from '../Header/Header';
 import ProjectList from './ProjectList';
 import SearchBar from '../../../Components/SearchBar/SearchBar';
+import { Link } from 'react-router-dom';
 
 const Projects = ({ setActiveCallback, toggleMenu }) => {
     const [searchValue, setSearchValue] = useState('');
@@ -22,7 +23,7 @@ const Projects = ({ setActiveCallback, toggleMenu }) => {
             <div className='projects-content'>
                 <div className="project-header">
                     <SearchBar onChange={handleSearchChange} />
-                    <button className="new-project-btn">+ New Project</button>
+                    <Link to="/createproject"><button className="new-project-btn">+ New Project</button></Link>
                 </div>
                 <ProjectList nameFilter={searchValue} />
             </div>

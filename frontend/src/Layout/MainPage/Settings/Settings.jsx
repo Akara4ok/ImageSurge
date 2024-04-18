@@ -24,7 +24,7 @@ const Settings = ({ setActiveCallback, toggleMenu }) => {
                 </div>
                 <div className="single-line">
                     <CountrySelector defaultValue="Ukraine"/>
-                    <Input type="text" defaultValue="Second Name" />
+                    <Input type="tel" defaultValue="066161616" />
                 </div>
                 <div className="single-line">
                     <Input type="password" placeholder="Old password" />

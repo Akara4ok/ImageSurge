@@ -1,0 +1,59 @@
+@import '../../../../global/global.scss';
+
+.home-wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.datasets-create-wrapper{
+    background-color: $main-background;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    .datasets-create-content{
+        background-color: $secondary-main-background;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+
+        .datasets-create-header{
+            margin: 0px 0px 0px 30px;
+            font-size: 30px;
+            font-family: 'Lexend Deca';
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+            color: $header-color;
+            height: 60px;
+
+            .links{
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                color: inherit;
+            }
+        }
+        form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .input-component-2{ 
+                margin: 5px;
+            }
+        }
+        
+    }
+
+    @media (max-width: 1100px) {
+    }
+}
+
+@media (max-width: 1100px) {
+}

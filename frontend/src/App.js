@@ -8,6 +8,8 @@ import "./App.css"
 import Projects from './Layout/MainPage/Projects/Projects';
 import Datasets from './Layout/MainPage/Datasets/Datasets';
 import Settings from './Layout/MainPage/Settings/Settings';
+import NewDataset from './Layout/MainPage/NewDataset/NewDataset';
+import NewProject from './Layout/MainPage/NewProject/NewProject';
 
 
 function App() {
@@ -25,6 +27,8 @@ function App() {
             <Route index element={<Home setActiveCallback={(text) => { setActive(text) }} toggleMenu={()=>setMenuOpen(true)}/>} />
             <Route path="projects" element={<Projects setActiveCallback={(text) => { setActive(text) }} toggleMenu={()=>setMenuOpen(true)} />} />
             <Route path="datasets" element={<Datasets setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
+            <Route path="createdataset" element={<NewDataset setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
+            <Route path="createproject" element={<NewProject setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
             <Route path="settings" element={<Settings setActiveCallback={(text) => { setActive(text) }} toggleMenu={()=>setMenuOpen(true)} />} />
           </Route>
         </Routes>

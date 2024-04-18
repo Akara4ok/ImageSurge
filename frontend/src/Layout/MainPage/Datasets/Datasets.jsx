@@ -3,6 +3,7 @@ import './Datasets.scss';
 import Header from '../Header/Header';
 import ProjectList from './DatasetList';
 import SearchBar from '../../../Components/SearchBar/SearchBar';
+import { Link } from 'react-router-dom';
 
 const Datasets = ({ setActiveCallback, toggleMenu }) => {
     const [searchValue, setSearchValue] = useState('');
@@ -22,7 +23,7 @@ const Datasets = ({ setActiveCallback, toggleMenu }) => {
             <div className='datasets-content'>
                 <div className="project-header">
                     <SearchBar onChange={handleSearchChange} />
-                    <button className="new-project-btn">+ New Project</button>
+                    <Link to="/createdataset"><button className="new-project-btn">+ New Dataset</button></Link>
                 </div>
                 <ProjectList nameFilter={searchValue} />
             </div>
