@@ -1,0 +1,12 @@
+@import '../../../../global/global.scss';
+
+.overview-wrapper{
+    padding: 0px;
+    ul, ol{
+        font-size: 23px;
+        font-family: 'Source Sans Pro';
+        font-weight: normal;
+        margin: 18px;
+        padding-left: 15px;
+    }
+}

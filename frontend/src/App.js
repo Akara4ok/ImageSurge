@@ -10,6 +10,7 @@ import Datasets from './Layout/MainPage/Datasets/Datasets';
 import Settings from './Layout/MainPage/Settings/Settings';
 import NewDataset from './Layout/MainPage/NewDataset/NewDataset';
 import NewProject from './Layout/MainPage/NewProject/NewProject';
+import Inference from './Layout/MainPage/Inference/Inference';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
             <Route path="datasets" element={<Datasets setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
             <Route path="createdataset" element={<NewDataset setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
             <Route path="createproject" element={<NewProject setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
+            <Route path="project" element={<Inference setActiveCallback={(text) => { setActive(text) }}  toggleMenu={()=>setMenuOpen(true)} />} />
             <Route path="settings" element={<Settings setActiveCallback={(text) => { setActive(text) }} toggleMenu={()=>setMenuOpen(true)} />} />
           </Route>
         </Routes>

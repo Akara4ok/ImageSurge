@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import './Home.scss';
 import Header from '../Header/Header';
 import FAQAccordion from '../../../Components/FAQAccordion/FAQAccordion';
+import { Link } from 'react-router-dom';
 
 const Home = ({ setActiveCallback, toggleMenu }) => {
     useEffect(() => {
@@ -28,8 +29,8 @@ const Home = ({ setActiveCallback, toggleMenu }) => {
             <Header text="Home" toggleMenu={toggleMenu}/>
             <div className='home-content'>
                 <div className='button-wrapper'>
-                    <button>+ New Dataset</button>
-                    <button>+ New Project</button>
+                    <Link to="/createdataset"><button>+ New Dataset</button></Link>
+                    <Link to="/createproject"><button>+ New Project</button></Link>
                 </div>
                 <FAQAccordion faqs={faqs} />
             </div>
