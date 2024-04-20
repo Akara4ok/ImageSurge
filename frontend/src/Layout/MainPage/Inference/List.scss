@@ -1,0 +1,49 @@
+@import '../../../../global/global.scss';
+
+.list-wrapper{
+    padding: 0px;
+    width: 100%;
+}
+
+.list-list{
+    text-decoration: none;
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+    container-type: inline-size;
+
+    p{
+        font-size: 23px;
+        margin: 18px;
+        font-family: 'Source Sans Pro';
+        font-weight: normal;
+    }
+    .list-option{
+        display: grid;
+        grid-template-columns: 1fr 4fr;
+        border-bottom: 1px solid $border-items-color;
+        align-items: center;
+    }
+
+    @container (max-width: 960px) {
+        .list-option {
+            grid-template-columns: 1fr 3fr;
+        }
+    }
+    @container (max-width: 750px) {
+        .list-option {
+            grid-template-columns: 1fr 2fr;
+        }
+    }
+    @container (max-width: 600px) {
+        .list-option {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @container (max-width: 320px) {
+        .list-option {
+            display: flex;
+            gap: 30px;
+        }
+    }
+}

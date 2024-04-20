@@ -1,0 +1,54 @@
+@import '../../../../global/global.scss';
+
+.projects-wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: $main-background;
+}
+
+.projects-content{
+    background-color: $secondary-main-background;
+    height: 100%;
+    margin: 20px;
+    border-radius: 5px;
+    position: relative;
+
+    .project-header{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 50px;
+        gap: 60px;
+        border-bottom: 1px solid $border-items-color;
+    
+        .new-project-btn {
+            border: 1px solid $border-color;
+            border-radius: 5px;
+            font-size: 24px;
+            font-family: 'Source Sans Pro';
+            width: 340px;
+            height: 60px;
+            background-color: $secondary-main-background;
+            cursor: pointer;
+            &:hover{
+                background-color: rgb(194, 194, 194);
+            }
+        }
+        @media (max-width: 800px) {
+            .new-project-btn {
+                width: 100%;
+            }
+        }
+      }
+      @media (max-width: 800px) {
+          .new-project-btn {
+              width: 100%;
+          }
+          .project-header{
+            padding: 10px;
+            gap: 10px
+          }
+      }
+}

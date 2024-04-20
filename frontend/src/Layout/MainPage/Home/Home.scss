@@ -1,0 +1,53 @@
+@import '../../../../global/global.scss';
+
+.home-wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-content{
+    background-color: $main-background;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    overflow: auto;
+    .button-wrapper{
+        display: flex;
+        flex-direction: column;
+        gap: 60px;
+        padding: 40px;
+        flex-grow: 1;
+        button{
+            border: 1px solid $border-color;
+            border-radius: 10px;
+            font-size: 35px;
+            font-family: 'Source Sans Pro';
+            height: 110px;
+            background-color: $secondary-main-background;
+            width: 100%;
+            cursor: pointer;
+            &:hover{
+                background-color: rgb(194, 194, 194);
+            }
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .button-wrapper{
+            width: 80%;
+            margin: 20px;
+            button{
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 1100px) {
+    .home-content{
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,86 @@
+@import '../../../global/global.scss';
+.login-page{
+    .login-signup{
+        display: flex;
+        font-size: 20px;
+        font-family: 'SourceSansPro';
+        gap: 10px;
+        justify-content: flex-end;
+        margin: 20px;
+        margin-bottom: 0px;
+        a{
+            text-decoration: none;
+            color: inherit;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+        .login-link{
+            color: $inactive-link;
+        }
+    }
+}
+
+.form-container{
+    display: flex;
+    justify-content: center;
+}
+
+.login-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    h1{
+        margin-bottom: 20px;
+    }
+    .single-line{
+        display: flex;
+        flex-direction: row;
+    }
+    .forgot-password {
+        text-align: right;
+        margin-bottom: 2rem;
+        align-self: flex-end;
+  
+        a {
+          text-decoration: none;
+          color: #000;
+          font-family: 'Lato';
+          user-select: none;
+
+          &:hover {
+            text-decoration: underline;
+            cursor: pointer;
+          }
+        }
+      }
+    
+    padding: 30px 100px 30px 100px;
+    border: 1px solid #c4c4cb;
+}
+
+.forgotEmail{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .input-component{
+        margin-right: 0px;
+        input{
+            height: 50px;
+        }
+    }
+    div{
+        display: flex;
+        flex-direction: row;
+        gap: 10px
+    }
+}
+
+@media (max-width: 800px) {
+    .signup-form{
+        .single-line{
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}

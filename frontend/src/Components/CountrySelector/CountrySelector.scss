@@ -1,0 +1,18 @@
+@import '../../../global/global.scss';
+
+.selector-component {
+    margin: 20px;
+    width: 750px;
+}
+
+@media (max-width: 800px) {
+    .selector-component {
+        width: 350px;
+    }
+}
+
+@media (max-width: 380px) {
+    .selector-component {
+        width: 180px;
+    }
+}

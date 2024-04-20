@@ -1,0 +1,122 @@
+@import '../../../global/global.scss';
+
+.multi-select {
+    position: relative;
+    font-size: 16px;
+    user-select: none;
+    width: 100%;
+
+    .selected-items {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        background-color: #f8f8f8;
+        margin-top: 5px;
+        border: 1px solid #c4c4cb;
+
+        .selected-item {
+            margin: 0.5rem;
+            padding: 0.5rem;
+            font-size: 16px;
+            font-family: 'Lato';
+            border: 1px solid #2963ff;
+            border-radius: 5px;
+            background-color: #ebf0ff;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+
+            .remove-button {
+                background-color: transparent;
+                border: none;
+                margin-left: 0.5rem;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .select-display {
+        padding: 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+
+        .select-input {
+            border: none;
+            padding: 8px 12px;
+            flex-grow: 1;
+            outline: none;
+
+            &:read-only {
+                cursor: pointer;
+            }
+        }
+
+        .arrow {
+            padding: 8px;
+            cursor: pointer;
+        }
+    }
+
+    .select-options {
+        position: absolute;
+        width: 100%;
+        border: 1px solid #ccc;
+
+        z-index: 10;
+        background-color: #f8f8f8;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border-radius: 0 0 4px 4px;
+        max-height: 200px;
+
+
+        li {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Tooltip text */
+        .tooltiptext {
+            display: none;
+            background-color: #fff;
+            border: 1px solid $border-items-color;
+            padding: 5px;
+            border-radius: 1px;
+
+            /* Position the tooltip text - see examples below! */
+            position: absolute;
+            right: 0px;
+            transform: translateX(50%) translateY(calc(50% + 20px));
+            z-index: 1;
+        }
+
+        /* Show the tooltip text when you mouse over the tooltip container */
+        .tooltip:hover+.tooltiptext {
+            display: block;
+        }
+
+        .no-options {
+            padding: 8px 12px;
+            color: #888;
+        }
+    }
+    .add-top-border{
+        border-top: 1px solid #ccc;
+    }
+    .delete-top-border{
+        border-top: 0px;
+    }
+    .add-bottom-border{
+        border-bottom: 1px solid #ccc;
+    }
+    .delete-bottom-border{
+        border-bottom: 0px;
+    }
+}
