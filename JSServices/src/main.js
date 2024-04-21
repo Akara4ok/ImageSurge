@@ -24,6 +24,8 @@ const main = async () => {
 
     const routes = initRoutes(controllers);
 
+    console.log(controllers)
+
     const app = express();
 
     app.use(cors())
