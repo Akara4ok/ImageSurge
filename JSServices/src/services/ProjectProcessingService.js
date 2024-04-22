@@ -21,7 +21,7 @@ class ProjectProcessingService {
         const id = crypto.randomUUID();
         const projectProcessing = await this.ProjectProcessingRepository.create({
             Id: id,
-            ProjectId, Processing, Value
+            Processing, Value, Project: { connect: { Id: ProjectId } }
         });
         return projectProcessing;
     }
@@ -37,7 +37,7 @@ class ProjectProcessingService {
     ) {
         const projectProcessing = await this.ProjectProcessingRepository.update({
             Id: id,
-            ProjectId, Processing, Value
+            Processing, Value, Project: { connect: { Id: ProjectId } }
         });
         return projectProcessing;
     }

@@ -21,7 +21,7 @@ class LogService {
         const id = crypto.randomUUID();
         const log = await this.LogRepository.create({
             Id: id,
-            ProjectId, Value
+            Value, Project: { connect: { Id: ProjectId } }
         });
         return log;
     }
@@ -37,7 +37,7 @@ class LogService {
     ) {
         const log = await this.LogRepository.update({
             Id: id,
-            ProjectId, Value
+            Value, Project: { connect: { Id: ProjectId } }
         });
         return log;
     }

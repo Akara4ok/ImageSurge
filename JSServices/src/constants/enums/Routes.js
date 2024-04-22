@@ -26,4 +26,52 @@ const ProjectProcessingRoutes = Object.freeze({
     UPDATE_PROJECTPROCESSING: '/projectprocessing/:id',
 });
 
-export {UserRoutes, RequestRoutes, LogRoutes, ProjectProcessingRoutes}
+const CategoryRoutes = Object.freeze({
+    GET_CATEGORY: '/category/:id',
+    CREATE_CATEGORY: '/category/',
+    DELETE_CATEGORY: '/category/:id',
+    UPDATE_CATEGORY: '/category/:id',
+});
+
+const ModelRoutes = Object.freeze({
+    GET_MODEL: '/model/:id',
+    CREATE_MODEL: '/model/',
+    DELETE_MODEL: '/model/:id',
+    UPDATE_MODEL: '/model/:id',
+});
+
+const KServeUrlRoutes = Object.freeze({
+    GET_KSERVEURL: '/kserveurl/:id',
+    CREATE_KSERVEURL: '/kserveurl/',
+    DELETE_KSERVEURL: '/kserveurl/:id',
+    UPDATE_KSERVEURL: '/kserveurl/:id',
+});
+
+const NeuralNetworkRoutes = Object.freeze({
+    GET_NEURALNETWORK: '/neuralnetwork/:id',
+    CREATE_NEURALNETWORK: '/neuralnetwork/',
+    DELETE_NEURALNETWORK: '/neuralnetwork/:id',
+    UPDATE_NEURALNETWORK: '/neuralnetwork/:id',
+});
+
+const DatasetRoutes = Object.freeze({
+    GET_DATASETS: '/dataset/',
+    GET_DATASET: '/dataset/:id',
+    CREATE_DATASET: '/dataset/',
+    DELETE_DATASET: '/dataset/:id',
+    UPDATE_DATASET: '/dataset/:id',
+});
+
+const ProjectRoutes = Object.freeze({
+    GET_PROJECT: '/project/:id',
+    CREATE_PROJECT: '/project/',
+    DELETE_PROJECT: '/project/:id',
+    UPDATE_PROJECT: '/project/:id',
+});
+
+export {
+    UserRoutes, RequestRoutes, LogRoutes, 
+    ProjectProcessingRoutes, CategoryRoutes, 
+    ModelRoutes, KServeUrlRoutes, NeuralNetworkRoutes,
+    ProjectRoutes, DatasetRoutes
+}

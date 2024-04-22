@@ -1,12 +1,20 @@
 import { wrap } from '../helpers/requests.js';
 import { Router } from 'express';
-import { UserRoutes, LogRoutes, ProjectProcessingRoutes, RequestRoutes } from '../constants/enums/Routes.js';
+import { UserRoutes, LogRoutes, ProjectProcessingRoutes, RequestRoutes, 
+    KServeUrlRoutes, CategoryRoutes, ModelRoutes, NeuralNetworkRoutes,
+    DatasetRoutes, ProjectRoutes } from '../constants/enums/Routes.js';
 
 const initRoutes = ({
     userController,
     logController,
     projectProcessingController,
     requestController,
+    categoryController,
+    modelController,
+    kserveUrlController,
+    neuralNetworkController,
+    datasetController,
+    projectController,
 }) => {
     const routes = Router();
 
@@ -92,6 +100,137 @@ const initRoutes = ({
     routes.put(
         ProjectProcessingRoutes.UPDATE_PROJECTPROCESSING,
         wrap(projectProcessingController.update.bind(projectProcessingController)),
+    );
+
+    //category
+    routes.get(
+        CategoryRoutes.GET_CATEGORY,
+        wrap(categoryController.getById.bind(categoryController)),
+    );
+
+    routes.post(
+        CategoryRoutes.CREATE_CATEGORY,
+        wrap(categoryController.create.bind(categoryController)),
+    );
+
+    routes.delete(
+        CategoryRoutes.DELETE_CATEGORY,
+        wrap(categoryController.delete.bind(categoryController)),
+    );
+
+    routes.put(
+        CategoryRoutes.UPDATE_CATEGORY,
+        wrap(categoryController.update.bind(categoryController)),
+    );
+
+    //models
+    routes.get(
+        ModelRoutes.GET_MODEL,
+        wrap(modelController.getById.bind(modelController)),
+    );
+
+    routes.post(
+        ModelRoutes.CREATE_MODEL,
+        wrap(modelController.create.bind(modelController)),
+    );
+
+    routes.delete(
+        ModelRoutes.DELETE_MODEL,
+        wrap(modelController.delete.bind(modelController)),
+    );
+
+    routes.put(
+        ModelRoutes.UPDATE_MODEL,
+        wrap(modelController.update.bind(modelController)),
+    );
+
+    //neuralNetwork
+    routes.get(
+        NeuralNetworkRoutes.GET_NEURALNETWORK,
+        wrap(neuralNetworkController.getById.bind(neuralNetworkController)),
+    );
+
+    routes.post(
+        NeuralNetworkRoutes.CREATE_NEURALNETWORK,
+        wrap(neuralNetworkController.create.bind(neuralNetworkController)),
+    );
+
+    routes.delete(
+        NeuralNetworkRoutes.DELETE_NEURALNETWORK,
+        wrap(neuralNetworkController.delete.bind(neuralNetworkController)),
+    );
+
+    routes.put(
+        NeuralNetworkRoutes.UPDATE_NEURALNETWORK,
+        wrap(neuralNetworkController.update.bind(neuralNetworkController)),
+    );
+
+    //kserveurl
+    routes.get(
+        KServeUrlRoutes.GET_KSERVEURL,
+        wrap(kserveUrlController.getById.bind(kserveUrlController)),
+    );
+
+    routes.post(
+        KServeUrlRoutes.CREATE_KSERVEURL,
+        wrap(kserveUrlController.create.bind(kserveUrlController)),
+    );
+
+    routes.delete(
+        KServeUrlRoutes.DELETE_KSERVEURL,
+        wrap(kserveUrlController.delete.bind(kserveUrlController)),
+    );
+
+    routes.put(
+        KServeUrlRoutes.UPDATE_KSERVEURL,
+        wrap(kserveUrlController.update.bind(kserveUrlController)),
+    );
+
+    //dataset
+    routes.get(
+        DatasetRoutes.GET_DATASETS,
+        wrap(datasetController.getAll.bind(datasetController)),
+    );
+
+    routes.get(
+        DatasetRoutes.GET_DATASET,
+        wrap(datasetController.getById.bind(datasetController)),
+    );
+
+    routes.post(
+        DatasetRoutes.CREATE_DATASET,
+        wrap(datasetController.create.bind(datasetController)),
+    );
+
+    routes.delete(
+        DatasetRoutes.DELETE_DATASET,
+        wrap(datasetController.delete.bind(datasetController)),
+    );
+
+    routes.put(
+        DatasetRoutes.UPDATE_DATASET,
+        wrap(datasetController.update.bind(datasetController)),
+    );
+
+    //project
+    routes.get(
+        ProjectRoutes.GET_PROJECT,
+        wrap(projectController.getById.bind(projectController)),
+    );
+
+    routes.post(
+        ProjectRoutes.CREATE_PROJECT,
+        wrap(projectController.create.bind(projectController)),
+    );
+
+    routes.delete(
+        ProjectRoutes.DELETE_PROJECT,
+        wrap(projectController.delete.bind(projectController)),
+    );
+
+    routes.put(
+        ProjectRoutes.UPDATE_PROJECT,
+        wrap(projectController.update.bind(projectController)),
     );
 
     return routes

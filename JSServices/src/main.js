@@ -22,9 +22,10 @@ const main = async () => {
 
     const controllers = initControllers(services);
 
+    // console.log(controllers)
+
     const routes = initRoutes(controllers);
 
-    console.log(controllers)
 
     const app = express();
 

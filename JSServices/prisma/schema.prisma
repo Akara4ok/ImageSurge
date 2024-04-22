@@ -79,6 +79,7 @@ model Dataset {
     CreatedAt    DateTime
     ParentFolder String
     Source       Int
+    @@map("Dataset")
 }
 
 model NeuralNetwork {

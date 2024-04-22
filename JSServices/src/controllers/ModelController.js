@@ -1,53 +1,52 @@
 import { HttpStatusCode } from '../constants/enums/StatusCodes.js';
 
-class LogController {
-    constructor(LogService) {
-        this.LogService = LogService;
+class ModelController {
+    constructor(ModelService) {
+        this.ModelService = ModelService;
     }
 
     async getById(req, res) {
         const { id } = req.params;
-        const log = await this.LogService.getById(id);
+        const model = await this.ModelService.getById(id);
         return res.status(HttpStatusCode.OK).json({
-            log,
+            model,
         });
     }
 
     async create(req, res) {
-        const { ProjectId, Value } = req.body;
+        const { Name } = req.body;
 
-        const log = await this.LogService.create(
-            ProjectId, Value
+        const model = await this.ModelService.create(
+            Name
         );
 
         return res.status(HttpStatusCode.CREATED).json({
-            log
+            model
         });
     }
 
     async delete(req, res) {
         const { id } = req.params;
 
-        const log = await this.LogService.delete(id);
+        const model = await this.ModelService.delete(id);
 
         return res.status(HttpStatusCode.OK).json({
-            log,
+            model,
         });
     }
 
     async update(req, res) {
         const { id } = req.params;
-        const { ProjectId, Value } = req.body;
+        const { Name } = req.body;
 
-        const log = await this.LogService.update(
-            id,
-            ProjectId, Value
+        const model = await this.ModelService.update(
+            id, Name
         );
 
         return res.status(HttpStatusCode.OK).json({
-            log,
+            model,
         });
     }
 }
 
-export { LogController };
+export { ModelController };

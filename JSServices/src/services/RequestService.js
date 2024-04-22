@@ -27,13 +27,13 @@ class RequestService {
         const id = crypto.randomUUID();
         const request = await this.RequestRepository.create({
             Id: id,
-            ProjectId,
             Images,
             ProcessingTime,
             ValidationTime,
             ClassificationTime,
             CroppingTime,
-            Quality
+            Quality,
+            Project: { connect: { Id: ProjectId } }
         });
         return request;
     }
@@ -55,13 +55,13 @@ class RequestService {
     ) {
         const request = await this.RequestRepository.update({
             Id: id,
-            ProjectId,
             Images,
             ProcessingTime,
             ValidationTime,
             ClassificationTime,
             CroppingTime,
-            Quality
+            Quality,
+            Project: { connect: { Id: ProjectId } }
         });
         return request;
     }

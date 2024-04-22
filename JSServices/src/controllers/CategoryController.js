@@ -1,53 +1,52 @@
 import { HttpStatusCode } from '../constants/enums/StatusCodes.js';
 
-class LogController {
-    constructor(LogService) {
-        this.LogService = LogService;
+class CategoryController {
+    constructor(CategoryService) {
+        this.CategoryService = CategoryService;
     }
 
     async getById(req, res) {
         const { id } = req.params;
-        const log = await this.LogService.getById(id);
+        const category = await this.CategoryService.getById(id);
         return res.status(HttpStatusCode.OK).json({
-            log,
+            category,
         });
     }
 
     async create(req, res) {
-        const { ProjectId, Value } = req.body;
+        const { Name } = req.body;
 
-        const log = await this.LogService.create(
-            ProjectId, Value
+        const category = await this.CategoryService.create(
+            Name
         );
 
         return res.status(HttpStatusCode.CREATED).json({
-            log
+            category
         });
     }
 
     async delete(req, res) {
         const { id } = req.params;
 
-        const log = await this.LogService.delete(id);
+        const category = await this.CategoryService.delete(id);
 
         return res.status(HttpStatusCode.OK).json({
-            log,
+            category,
         });
     }
 
     async update(req, res) {
         const { id } = req.params;
-        const { ProjectId, Value } = req.body;
+        const { Name } = req.body;
 
-        const log = await this.LogService.update(
-            id,
-            ProjectId, Value
+        const category = await this.CategoryService.update(
+            id, Name
         );
 
         return res.status(HttpStatusCode.OK).json({
-            log,
+            category,
         });
     }
 }
 
-export { LogController };
+export { CategoryController };
