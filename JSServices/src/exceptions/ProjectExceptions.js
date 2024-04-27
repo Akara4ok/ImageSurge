@@ -10,4 +10,13 @@ class ProjectNotFoundError extends HttpError {
     }
 }
 
-export { ProjectNotFoundError };
+class ProjectForbiddenError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.FORBIDDEN,
+            message: 'Forbidden operation!',
+        });
+    }
+}
+
+export { ProjectNotFoundError, ProjectForbiddenError };

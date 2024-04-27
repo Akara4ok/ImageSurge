@@ -10,6 +10,34 @@ class UserNotFoundError extends HttpError {
     }
 }
 
+class UserValidationError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.BAD_REQUEST,
+            message: 'Wrong input fields',
+        });
+    }
+}
+
+class UserExistsError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.FORBIDDEN,
+            message: 'Email or phone number are already registered',
+        });
+    }
+}
+
+class UserWrongDataError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.BAD_REQUEST,
+            message: 'Invalid email or password',
+        });
+    }
+}
+
+
 class UserForbiddenError extends HttpError {
     constructor() {
         super({
@@ -19,4 +47,4 @@ class UserForbiddenError extends HttpError {
     }
 }
 
-export { UserNotFoundError, UserForbiddenError };
+export { UserNotFoundError, UserValidationError, UserWrongDataError, UserExistsError, UserForbiddenError };

@@ -1,4 +1,4 @@
-import { DatasetNotFoundError } from '../exceptions/DatasetExceptions.js';
+import { DatasetNotFoundError, DatasetForbiddenError } from '../exceptions/DatasetExceptions.js';
 import crypto from 'crypto';
 
 class DatasetService {
@@ -6,9 +6,11 @@ class DatasetService {
         this.DatasetRepository = DatasetRepository;
     }
 
-    async getAll() {
-        const datasets = await this.DatasetRepository.getAll();
-        return datasets;
+    async getAll(userId) {
+        if(!userId){
+            return await this.DatasetRepository.getAll();
+        }
+        return await this.DatasetRepository.getAll({where: {UserId: userId}, include: {Category: true}});;
     }
 
     async getById(id) {
@@ -32,7 +34,11 @@ class DatasetService {
         return dataset;
     }
 
-    async delete(id) {
+    async delete(id, requestUserId) {
+        const requestDataset = await this.DatasetRepository.getById(id);
+        if(!requestUserId || requestUserId !== requestDataset.UserId){
+            throw new DatasetForbiddenError();
+        }
         const dataset = await this.DatasetRepository.delete(id);
         return dataset;
     }

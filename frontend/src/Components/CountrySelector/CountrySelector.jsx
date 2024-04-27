@@ -23,22 +23,23 @@ const customStyles = {
   };
   
 
-const CountrySelector = ({defaultValue}) => {
+const CountrySelector = ({currentValue, onChange}) => {
   const [value, setValue] = useState('')
   const options = useMemo(() => countryList().getData(), [])
 
   useEffect(() => {
-    if(!defaultValue){
+    if(!currentValue){
       return
     }
-    const key = countryList().getValue(defaultValue)
-    setValue({value: key, label: defaultValue})
-  }, []);
+    const key = countryList().getValue(currentValue)
+    setValue({value: key, label: currentValue})
+  }, [currentValue]);
 
   const changeHandler = value => {
-    console.log(value)
-    
-    setValue(value)
+    setValue(value);
+    if(onChange){
+      onChange(value?.label);
+    }
   }
 
   return <Select options={options} styles={customStyles} value={value} onChange={changeHandler} placeholder="Country" className='selector-component'/>

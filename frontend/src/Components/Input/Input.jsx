@@ -1,13 +1,13 @@
 import React from 'react';
 import './Input.scss';
 
-const Input = ({ label, type, placeholder, defaultValue, options, ...props }) => {
+const Input = ({ label, type, placeholder, defaultValue, value, onChange, options, ...props }) => {
   let inputField;
 
   switch (type) {
     case 'select':
       inputField = (
-        <select {...props}>
+        <select {...props} onChange={(event) => onChange ? onChange(event.target?.value) : null}>
           {options.map((option, index) => (
             <option key={index} value={option}>
               {option}
@@ -17,10 +17,10 @@ const Input = ({ label, type, placeholder, defaultValue, options, ...props }) =>
       );
       break;
     case 'checkbox':
-      inputField = <input type={type} {...props} />;
+      inputField = <input type={type} value={value ?? ""} onChange={(event) => onChange ? onChange(event.target?.value) : null} {...props} />;
       break;
     default:
-      inputField = <input type={type} placeholder={placeholder} {...props} defaultValue={defaultValue} />;
+      inputField = <input type={type} value={value ?? ""} onChange={(event) => onChange ? onChange(event.target?.value) : null} placeholder={placeholder} {...props} defaultValue={defaultValue} />;
   }
 
   return (

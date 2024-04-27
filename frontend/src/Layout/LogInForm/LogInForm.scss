@@ -6,7 +6,7 @@
         font-family: 'SourceSansPro';
         gap: 10px;
         justify-content: flex-end;
-        margin: 20px;
+        padding: 20px;
         margin-bottom: 0px;
         a{
             text-decoration: none;
@@ -30,12 +30,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 550px;
     h1{
         margin-bottom: 20px;
-    }
-    .single-line{
-        display: flex;
-        flex-direction: row;
     }
     .forgot-password {
         text-align: right;
@@ -53,10 +50,15 @@
             cursor: pointer;
           }
         }
-      }
+    }
     
-    padding: 30px 100px 30px 100px;
+    padding: 30px 100px;
     border: 1px solid #c4c4cb;
+
+    @media (max-width: 650px) {
+        padding: 10px;
+        width: 80%;
+    }
 }
 
 .forgotEmail{

@@ -11,12 +11,13 @@ model User {
     Id          String    @id @default(uuid()) @db.Uuid
     FirstName   String
     LastName    String
-    Email       String
-    PhoneNumber String
+    Email       String    @unique
+    PhoneNumber String    @unique
     Country     String
     Password    String
     Projects    Project[]
     Datasets    Dataset[]
+    Role        String    @default("user")
 }
 
 model Project {
@@ -79,6 +80,7 @@ model Dataset {
     CreatedAt    DateTime
     ParentFolder String
     Source       Int
+
     @@map("Dataset")
 }
 

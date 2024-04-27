@@ -2,9 +2,9 @@ import { wrap } from '../helpers/requests.js';
 import { Router } from 'express';
 import { UserRoutes, LogRoutes, ProjectProcessingRoutes, RequestRoutes, 
     KServeUrlRoutes, CategoryRoutes, ModelRoutes, NeuralNetworkRoutes,
-    DatasetRoutes, ProjectRoutes } from '../constants/enums/Routes.js';
+    DatasetRoutes, ProjectRoutes } from '../constants/enums/CrudRoutes.js';
 
-const initRoutes = ({
+const initCrudRoutes = ({
     userController,
     logController,
     projectProcessingController,
@@ -22,11 +22,6 @@ const initRoutes = ({
     routes.get(
         UserRoutes.GET_USER,
         wrap(userController.getById.bind(userController)),
-    );
-
-    routes.post(
-        UserRoutes.CREATE_USER,
-        wrap(userController.create.bind(userController)),
     );
 
     routes.delete(
@@ -188,11 +183,6 @@ const initRoutes = ({
 
     //dataset
     routes.get(
-        DatasetRoutes.GET_DATASETS,
-        wrap(datasetController.getAll.bind(datasetController)),
-    );
-
-    routes.get(
         DatasetRoutes.GET_DATASET,
         wrap(datasetController.getById.bind(datasetController)),
     );
@@ -200,11 +190,6 @@ const initRoutes = ({
     routes.post(
         DatasetRoutes.CREATE_DATASET,
         wrap(datasetController.create.bind(datasetController)),
-    );
-
-    routes.delete(
-        DatasetRoutes.DELETE_DATASET,
-        wrap(datasetController.delete.bind(datasetController)),
     );
 
     routes.put(
@@ -223,11 +208,6 @@ const initRoutes = ({
         wrap(projectController.create.bind(projectController)),
     );
 
-    routes.delete(
-        ProjectRoutes.DELETE_PROJECT,
-        wrap(projectController.delete.bind(projectController)),
-    );
-
     routes.put(
         ProjectRoutes.UPDATE_PROJECT,
         wrap(projectController.update.bind(projectController)),
@@ -236,4 +216,4 @@ const initRoutes = ({
     return routes
 };
 
-export { initRoutes };
+export { initCrudRoutes };

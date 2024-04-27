@@ -5,6 +5,13 @@ class ProjectController {
         this.ProjectService = ProjectService;
     }
 
+    async getAll(req, res) {
+        const projects = await this.ProjectService.getAll(req.user?.id);
+        return res.status(HttpStatusCode.OK).json({
+            projects,
+        });
+    }
+
     async getById(req, res) {
         const { id } = req.params;
         const project = await this.ProjectService.getById(id);
@@ -30,7 +37,7 @@ class ProjectController {
     async delete(req, res) {
         const { id } = req.params;
 
-        const project = await this.ProjectService.delete(id);
+        const project = await this.ProjectService.delete(id, req.user?.id);
 
         return res.status(HttpStatusCode.OK).json({
             project,

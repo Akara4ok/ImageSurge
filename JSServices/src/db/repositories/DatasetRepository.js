@@ -3,8 +3,8 @@ class DatasetRepository {
         this._dbClient = sequelizeModel;
     }
 
-    getAll() {
-        return this._dbClient.Dataset.findMany();
+    getAll(filter) {
+        return this._dbClient.Dataset.findMany(filter);
     }
 
     getById(id) {

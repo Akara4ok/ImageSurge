@@ -3,6 +3,10 @@ class ProjectRepository {
         this._dbClient = sequelizeModel;
     }
 
+    getAll(filter) {
+        return this._dbClient.Project.findMany(filter);
+    }
+
     getById(id) {
         return this._dbClient.Project.findFirst({ where: { Id: id } });
     }

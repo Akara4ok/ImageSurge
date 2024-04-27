@@ -10,4 +10,13 @@ class DatasetNotFoundError extends HttpError {
     }
 }
 
-export { DatasetNotFoundError };
+class DatasetForbiddenError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.FORBIDDEN,
+            message: 'Forbidden operation!',
+        });
+    }
+}
+
+export { DatasetNotFoundError, DatasetForbiddenError };

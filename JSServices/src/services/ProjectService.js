@@ -1,9 +1,16 @@
-import { ProjectNotFoundError } from '../exceptions/ProjectExceptions.js';
+import { ProjectNotFoundError, ProjectForbiddenError } from '../exceptions/ProjectExceptions.js';
 import crypto from 'crypto';
 
 class ProjectService {
     constructor(ProjectRepository) {
         this.ProjectRepository = ProjectRepository;
+    }
+
+    async getAll(userId) {
+        if(!userId){
+            return await this.ProjectRepository.getAll();
+        }
+        return await this.ProjectRepository.getAll({where: {UserId: userId}});;
     }
 
     async getById(id) {
@@ -29,7 +36,11 @@ class ProjectService {
         return project;
     }
 
-    async delete(id) {
+    async delete(id, requestUserId) {
+        const requestProject = await this.ProjectRepository.getById(id);
+        if(!requestUserId || requestUserId !== requestProject.UserId){
+            throw new ProjectForbiddenError();
+        }
         const project = await this.ProjectRepository.delete(id);
         return project;
     }

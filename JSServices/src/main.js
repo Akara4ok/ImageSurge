@@ -5,10 +5,13 @@ import { PrismaClient } from '@prisma/client';
 import { initRepositories } from './db/repositories/index.js';
 import { initServices } from './services/index.js';
 import { initControllers } from './controllers/index.js';
-import { initRoutes } from './routes/index.js';
+import { initCrudRoutes } from './routes/CrudRoutes.js';
+import { initAuthRoutes } from './routes/AuthRoutes.js';
+import { initUserRoutes } from './routes/UserRoutes.js';
 import { errorHandler } from './middlewares/ErrorHandler.js';
 
 import * as dotenv from 'dotenv';
+import { authMiddleware } from './middlewares/AuthMiddleware.js';
 dotenv.config();
 
 const PORT = getEnv('PORT') || 8000;
@@ -24,15 +27,18 @@ const main = async () => {
 
     // console.log(controllers)
 
-    const routes = initRoutes(controllers);
-
+    const crudRoutes = initCrudRoutes(controllers);
+    const authRoutes = initAuthRoutes(controllers.userController);
+    const userRoutes = initUserRoutes(controllers.datasetController, controllers.userController, controllers.projectController, authMiddleware);
 
     const app = express();
 
     app.use(cors())
         .use(json())
         .use(urlencoded({ extended: true }))
-        .use(routes)
+        .use(authRoutes)
+        .use("/", userRoutes)
+        .use(crudRoutes)
         .use(errorHandler)
 
         .listen(PORT, () => {

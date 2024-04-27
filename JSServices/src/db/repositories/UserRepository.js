@@ -7,6 +7,10 @@ class UserRepository {
         return this._dbClient.User.findFirst({ where: { Id: id } });
     }
 
+    getByFilter(filter){
+        return this._dbClient.User.findFirst(filter);
+    }
+
     create(User) {
         return this._dbClient.User.create({
             data: User,

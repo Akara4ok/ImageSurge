@@ -6,7 +6,7 @@ class DatasetController {
     }
 
     async getAll(req, res) {
-        const datasets = await this.DatasetService.getAll();
+        const datasets = await this.DatasetService.getAll(req.user?.id);
         return res.status(HttpStatusCode.OK).json({
             datasets,
         });
@@ -35,7 +35,7 @@ class DatasetController {
     async delete(req, res) {
         const { id } = req.params;
 
-        const dataset = await this.DatasetService.delete(id);
+        const dataset = await this.DatasetService.delete(id, req.user?.id);
 
         return res.status(HttpStatusCode.OK).json({
             dataset,

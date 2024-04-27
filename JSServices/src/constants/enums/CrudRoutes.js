@@ -55,17 +55,14 @@ const NeuralNetworkRoutes = Object.freeze({
 });
 
 const DatasetRoutes = Object.freeze({
-    GET_DATASETS: '/dataset/',
     GET_DATASET: '/dataset/:id',
     CREATE_DATASET: '/dataset/',
-    DELETE_DATASET: '/dataset/:id',
     UPDATE_DATASET: '/dataset/:id',
 });
 
 const ProjectRoutes = Object.freeze({
     GET_PROJECT: '/project/:id',
     CREATE_PROJECT: '/project/',
-    DELETE_PROJECT: '/project/:id',
     UPDATE_PROJECT: '/project/:id',
 });
 
