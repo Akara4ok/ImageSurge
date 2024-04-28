@@ -21,14 +21,15 @@ class DatasetController {
     }
 
     async create(req, res) {
-        const { UserId, Name, ImagesNum, CategoryId, CreatedAt, ParentFolder, Source  } = req.body;
+        const UserId = req.user?.id;
+        const { Name, Category, Source, GDriveLink  } = req.body;
 
         const dataset = await this.DatasetService.create(
-            UserId, Name, ImagesNum, CategoryId, CreatedAt, ParentFolder, Source
+            UserId, Name, Category, parseInt(Source), GDriveLink
         );
 
         return res.status(HttpStatusCode.CREATED).json({
-            dataset
+            message: "Start dataset creating"
         });
     }
 

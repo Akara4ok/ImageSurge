@@ -11,6 +11,7 @@ const LogInForm = () => {
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [popupMsg, setPopupMsg] = useState();
     const [isLoading, setIsLoading] = useState();
+    
     const [emailValue, setEmailValue] = useState();
     const [passwordValue, setPasswordValue] = useState();
 

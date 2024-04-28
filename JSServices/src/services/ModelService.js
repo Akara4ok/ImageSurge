@@ -1,4 +1,4 @@
-import { ModelNotFoundError } from '../exceptions/ModelExceptions.js';
+import { NotFoundError } from '../exceptions/GeneralException.js';
 import crypto from 'crypto';
 
 class ModelService {
@@ -9,7 +9,7 @@ class ModelService {
     async getById(id) {
         const model = await this.ModelRepository.getById(id);
         if (!model) {
-            throw new ModelNotFoundError();
+            throw new NotFoundError();
         }
 
         return model;

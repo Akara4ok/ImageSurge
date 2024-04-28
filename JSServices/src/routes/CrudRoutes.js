@@ -99,6 +99,11 @@ const initCrudRoutes = ({
 
     //category
     routes.get(
+        CategoryRoutes.GET_CATEGORIES,
+        wrap(categoryController.getAll.bind(categoryController)),
+    );
+
+    routes.get(
         CategoryRoutes.GET_CATEGORY,
         wrap(categoryController.getById.bind(categoryController)),
     );
@@ -185,11 +190,6 @@ const initCrudRoutes = ({
     routes.get(
         DatasetRoutes.GET_DATASET,
         wrap(datasetController.getById.bind(datasetController)),
-    );
-
-    routes.post(
-        DatasetRoutes.CREATE_DATASET,
-        wrap(datasetController.create.bind(datasetController)),
     );
 
     routes.put(

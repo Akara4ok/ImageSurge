@@ -1,4 +1,4 @@
-import { KServeUrlNotFoundError } from '../exceptions/KServeUrlExceptions.js';
+import { NotFoundError } from '../exceptions/GeneralException.js';
 import crypto from 'crypto';
 
 class KServeUrlService {
@@ -9,7 +9,7 @@ class KServeUrlService {
     async getById(id) {
         const kserveUrl = await this.KServeUrlRepository.getById(id);
         if (!kserveUrl) {
-            throw new KServeUrlNotFoundError();
+            throw new NotFoundError();
         }
 
         return kserveUrl;

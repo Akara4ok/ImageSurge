@@ -23,6 +23,7 @@ const DatasetRow = ({ dataset, onDelete }) => {
             <div className="table-row">
                 <span>{dataset.name}</span>
                 <span className="center-span">{dataset.imagesNum}</span>
+                <span className="center-span">{dataset.quality}</span>
                 <span>{dataset.category}</span>
                 <span>{dataset.createdAt}</span>
                 <span className="end-span"><button className="delete-btn" onClick={deleteDataset}>Delete</button></span>

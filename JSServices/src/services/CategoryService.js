@@ -1,4 +1,4 @@
-import { CategoryNotFoundError } from '../exceptions/CategoryExceptions.js';
+import { NotFoundError } from '../exceptions/GeneralException.js';
 import crypto from 'crypto';
 
 class CategoryService {
@@ -6,10 +6,23 @@ class CategoryService {
         this.CategoryRepository = CategoryRepository;
     }
 
+    async getAll() {
+        const categories = await this.CategoryRepository.getAll();
+        return categories;
+    }
+
+    async getWithFilter(filter) {
+        const category = await this.CategoryRepository.getWithFilter(filter);
+        if (!category) {
+            throw new NotFoundError("Category");
+        }
+        return category;
+    }
+
     async getById(id) {
         const category = await this.CategoryRepository.getById(id);
         if (!category) {
-            throw new CategoryNotFoundError();
+            throw new NotFoundError("Category");
         }
 
         return category;

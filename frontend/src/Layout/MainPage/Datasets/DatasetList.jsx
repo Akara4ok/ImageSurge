@@ -31,6 +31,7 @@ const DatasetList = ({nameFilter}) => {
             name: dataset.Name,
             imagesNum: dataset.ImagesNum,
             category: dataset.Category.Name,
+            quality: 100 - parseFloat(dataset.Quality),
             createdAt: (new Date(dataset.CreatedAt)).toLocaleString(),
           }
         }));
@@ -56,6 +57,7 @@ const DatasetList = ({nameFilter}) => {
         <div className="table-header">
           <span>Name</span>
           <span className="center-span">Images</span>
+          <span className="center-span">Quality</span>
           <span>Category</span>
           <span>Created At</span>
           <span></span>

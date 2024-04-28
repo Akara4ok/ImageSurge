@@ -1,4 +1,4 @@
-import { RequestNotFoundError } from '../exceptions/RequestExceptions.js';
+import { NotFoundError } from '../exceptions/GeneralException.js';
 import crypto from 'crypto';
 
 class RequestService {
@@ -9,7 +9,7 @@ class RequestService {
     async getById(id) {
         const request = await this.RequestRepository.getById(id);
         if (!request) {
-            throw new RequestNotFoundError();
+            throw new NotFoundError();
         }
 
         return request;

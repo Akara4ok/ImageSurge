@@ -1,4 +1,4 @@
-import { ProjectProcessingNotFoundError } from '../exceptions/ProjectProcessingExceptions.js';
+import { NotFoundError } from '../exceptions/GeneralException.js';
 import crypto from 'crypto';
 
 class ProjectProcessingService {
@@ -9,7 +9,7 @@ class ProjectProcessingService {
     async getById(id) {
         const projectProcessing = await this.ProjectProcessingRepository.getById(id);
         if (!projectProcessing) {
-            throw new ProjectProcessingNotFoundError();
+            throw new NotFoundError();
         }
 
         return projectProcessing;

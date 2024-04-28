@@ -25,7 +25,7 @@ model Project {
     User               User                @relation(fields: [UserId], references: [Id])
     UserId             String              @db.Uuid
     Status             String
-    Name               String              @unique
+    Name               String
     CreatedAt          DateTime
     Cropping           Boolean
     SecretKey          String
@@ -70,16 +70,18 @@ model ProjectProcessing {
 
 model Dataset {
     Id           String    @id @default(uuid()) @db.Uuid
+    Status       String    @default("Creating")
     Projects     Project[]
     User         User      @relation(fields: [UserId], references: [Id])
     UserId       String    @db.Uuid
-    Name         String    @unique
+    Name         String
     ImagesNum    Int
     Category     Category  @relation(fields: [CategoryId], references: [Id])
     CategoryId   String    @db.Uuid
     CreatedAt    DateTime
     ParentFolder String
     Source       Int
+    Quality      Float
 
     @@map("Dataset")
 }
@@ -102,7 +104,7 @@ model KServeUrl {
     CategoryId String   @db.Uuid
     Model      Model    @relation(fields: [ModelId], references: [Id])
     ModelId    String   @db.Uuid
-    UrlSuffix  String
+    UrlSuffix  String   @unique
 }
 
 model Category {
@@ -110,12 +112,12 @@ model Category {
     Datasets       Dataset[]
     NeuralNetworks KServeUrl[]
     KServeUrls     NeuralNetwork[]
-    Name           String
+    Name           String          @unique
 }
 
 model Model {
     Id             String          @id @default(uuid()) @db.Uuid
     NeuralNetworks NeuralNetwork[]
     KServeUrls     KServeUrl[]
-    Name           String
+    Name           String          @unique
 }

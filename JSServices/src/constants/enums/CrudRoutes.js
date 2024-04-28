@@ -28,6 +28,7 @@ const ProjectProcessingRoutes = Object.freeze({
 
 const CategoryRoutes = Object.freeze({
     GET_CATEGORY: '/category/:id',
+    GET_CATEGORIES: '/category/all',
     CREATE_CATEGORY: '/category/',
     DELETE_CATEGORY: '/category/:id',
     UPDATE_CATEGORY: '/category/:id',
@@ -56,7 +57,6 @@ const NeuralNetworkRoutes = Object.freeze({
 
 const DatasetRoutes = Object.freeze({
     GET_DATASET: '/dataset/:id',
-    CREATE_DATASET: '/dataset/',
     UPDATE_DATASET: '/dataset/:id',
 });
 

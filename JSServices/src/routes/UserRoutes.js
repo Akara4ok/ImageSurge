@@ -1,6 +1,20 @@
 import { wrap } from '../helpers/requests.js';
 import { Router } from 'express';
 import { UserRoutes } from '../constants/enums/UserRoutes.js';
+import multer from 'multer';
+import 'dotenv/config'
+const PARENT_FOLDER = process.env.PARENT_FOLDER;
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, PARENT_FOLDER)
+    },
+    filename: function (req, file, cb) {
+        cb(null, `${req.body?.Name}.zip`)
+    }
+});
+
+const upload = multer({ storage: storage });
 
 const initUserRoutes = (
     datasetController, userController, projectController, middleware
@@ -12,6 +26,11 @@ const initUserRoutes = (
     routes.get(
         UserRoutes.GET_DATASETS,
         wrap(datasetController.getAll.bind(datasetController)),
+    );
+
+    routes.post(
+        UserRoutes.CREATE_DATASET, upload.single('File'),
+        wrap(datasetController.create.bind(datasetController)),
     );
 
     routes.delete(

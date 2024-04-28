@@ -5,6 +5,13 @@ class CategoryController {
         this.CategoryService = CategoryService;
     }
 
+    async getAll(req, res) {
+        const categories = await this.CategoryService.getAll();
+        return res.status(HttpStatusCode.OK).json({
+            categories,
+        });
+    }
+
     async getById(req, res) {
         const { id } = req.params;
         const category = await this.CategoryService.getById(id);

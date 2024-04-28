@@ -21,16 +21,17 @@ const initServices = ({
     datasetRepository,
     projectRepository,
 }) => {
+    const categoryService = new CategoryService(categoryRepository);
     return {
         userService: new UserService(userRepository),
         logService: new LogService(logRepository),
         projectProcessingService: new ProjectProcessingService(projectProcessingRepository),
         requestService: new RequestService(requestRepository),
-        categoryService: new CategoryService(categoryRepository),
+        categoryService: categoryService,
         modelService: new ModelService(modelRepository),
         kserveUrlService: new KServeUrlService(kserveUrlRepository),
         neuralNetworkService: new NeuralNetworkService(neuralNetworkRepository),
-        datasetService: new DatasetService(datasetRepository),
+        datasetService: new DatasetService(datasetRepository, categoryService),
         projectService: new ProjectService(projectRepository),
     };
 };

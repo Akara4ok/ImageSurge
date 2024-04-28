@@ -1,4 +1,4 @@
-import { NeuralNetworkNotFoundError } from '../exceptions/NeuralNetworkExceptions.js';
+import { NotFoundError } from '../exceptions/GeneralException.js';
 import crypto from 'crypto';
 
 class NeuralNetworkService {
@@ -9,7 +9,7 @@ class NeuralNetworkService {
     async getById(id) {
         const neuralNetwork = await this.NeuralNetworkRepository.getById(id);
         if (!neuralNetwork) {
-            throw new NeuralNetworkNotFoundError();
+            throw new NotFoundError();
         }
 
         return neuralNetwork;

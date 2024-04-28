@@ -40,11 +40,11 @@ const CustomSelect = ({ className, options, tooltips, onOptionSelect }) => {
     }
   };
 
-  const handleOptionClick = (option, index) => {
+  const handleOptionClick = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
     if(onOptionSelect){
-      onOptionSelect(option, index);
+      onOptionSelect(option);
     }
     setFilter('');
   };
@@ -65,8 +65,8 @@ const CustomSelect = ({ className, options, tooltips, onOptionSelect }) => {
       </div>
       {isOpen && (
         <ul className="select-options">
-          {filteredOptions.map((option, index) => (
-            <li key={index} onClick={() => handleOptionClick(option, index)}>
+          {filteredOptions?.map((option, index) => (
+            <li key={index} onClick={() => handleOptionClick(option)}>
               {option}
               {tooltips ? <CiCircleInfo className="tooltip" size="20px"></CiCircleInfo> : null}
               {tooltips && tooltips[index] ? <span className="tooltiptext">{tooltips[index]}</span> : null}

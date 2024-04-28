@@ -1,16 +1,16 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config'
-
+import { NoTokenError, InvalidTokenError } from '../exceptions/GeneralException.js';
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 export const authMiddleware = ( req, res, next) => {
-	console.log('middle')
+	// console.log('middle')
 
 	const authHeader = req.headers.authorization;
 	const token = authHeader && authHeader.split(' ')[1];
 
 	if (!token) {
-		return res.status(401).send('Authentication token missing.');
+		throw new NoTokenError();
 	}
 
 	try {
@@ -18,7 +18,6 @@ export const authMiddleware = ( req, res, next) => {
 		req.user = decoded;
 		next();
 	} catch (error) {
-		console.log(error)
-		return res.status(403).send('Invalid or expired token.');
+		throw new InvalidTokenError();
 	}
 };

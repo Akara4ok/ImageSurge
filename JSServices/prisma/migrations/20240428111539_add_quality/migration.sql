@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Dataset" ADD COLUMN     "Quality" DOUBLE PRECISION NOT NULL DEFAULT 0;

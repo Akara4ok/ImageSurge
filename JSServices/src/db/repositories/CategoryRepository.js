@@ -3,6 +3,14 @@ class CategoryRepository {
         this._dbClient = sequelizeModel;
     }
 
+    getAll() {
+        return this._dbClient.Category.findMany();
+    }
+
+    getWithFilter(filter) {
+        return this._dbClient.Category.findFirst(filter);
+    }
+
     getById(id) {
         return this._dbClient.Category.findFirst({ where: { Id: id } });
     }

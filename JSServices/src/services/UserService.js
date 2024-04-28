@@ -1,4 +1,5 @@
-import { UserNotFoundError, UserValidationError, UserWrongDataError, UserExistsError, UserForbiddenError } from '../exceptions/UserExceptions.js';
+import { UserWrongDataError, UserExistsError } from '../exceptions/UserExceptions.js';
+import { NotFoundError, ValidationError, ForbiddenError } from '../exceptions/GeneralException.js';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -14,7 +15,7 @@ class UserService {
     async getById(id) {
         const user = await this.UserRepository.getById(id);
         if (!user) {
-            throw new UserNotFoundError();
+            throw new NotFoundError('User');
         }
         delete user.Password;
 
@@ -30,7 +31,7 @@ class UserService {
         Password
     ) {
         if(!FirstName || !LastName || !Email || !PhoneNumber || !Country || !Password){
-            throw new UserValidationError()
+            throw new ValidationError()
         }
 
         const existingUser = await this.UserRepository.getByFilter({ where: {OR: [{Email: Email}, {PhoneNumber: PhoneNumber}]} });
@@ -71,7 +72,7 @@ class UserService {
     ) {
         const user = await this.UserRepository.getById(id);
         if (!user) {
-            throw new UserNotFoundError();
+            throw new NotFoundError();
         }
         
         let NewHashedPassword = user.Password
@@ -80,35 +81,40 @@ class UserService {
     
             console.log(OldPassword)
             if (!match) {
-                throw new UserForbiddenError();
+                throw new ForbiddenError("Password mismatch");
             }
 
             NewHashedPassword = await bcrypt.hash(NewPassword, 12);
         }
-
-        const userUpdated = await this.UserRepository.update({
-            Id: id,
-            FirstName,
-            LastName,
-            Email,
-            PhoneNumber,
-            Country,
-            Password: NewHashedPassword,
-            Role: user.Role
-        });
-        delete userUpdated.Password;
-        return userUpdated;
+        try{
+            const userUpdated = await this.UserRepository.update({
+                Id: id,
+                FirstName,
+                LastName,
+                Email,
+                PhoneNumber,
+                Country,
+                Password: NewHashedPassword,
+                Role: user.Role
+            });
+            delete userUpdated.Password;
+            return userUpdated;
+        } catch(e){
+            if (e.code === 'P2002') {
+                throw new UserExistsError();
+            }
+        }
     }
 
     async login(email, password){
         if (!email || !password) {
-            throw new UserValidationError();
+            throw new ValidationError();
         }
         
         const user = await this.UserRepository.getByFilter({where: {Email: email}});
 
         if (!user) {
-            throw new UserWrongDataError();
+            throw new NotFoundError();
         }
 
         const isValidPassword = await bcrypt.compare(password, user.Password);

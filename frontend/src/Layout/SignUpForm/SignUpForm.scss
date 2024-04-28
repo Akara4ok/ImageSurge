@@ -34,22 +34,4 @@
     h1{
         margin-bottom: 20px;
     }
-    .single-line{
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-    }
-    .country-selector-wrapper{
-        width: 100%;
-        box-sizing: border-box;
-    }
-}
-
-@media (max-width: 800px) {
-    .signup-form{
-        .single-line{
-            display: flex;
-            flex-direction: column;
-        }
-    }
 }

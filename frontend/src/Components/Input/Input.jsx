@@ -1,7 +1,7 @@
-import React from 'react';
+import {React} from 'react';
 import './Input.scss';
 
-const Input = ({ label, type, placeholder, defaultValue, value, onChange, options, ...props }) => {
+const Input = ({ label, ref, type, errorMsg, placeholder, defaultValue, value, onChange, options, ...props }) => {
   let inputField;
 
   switch (type) {
@@ -24,10 +24,11 @@ const Input = ({ label, type, placeholder, defaultValue, value, onChange, option
   }
 
   return (
-    <div className={`input-component ${type}`}>
+    <div className={`input-component ${type} ${errorMsg ? 'error-input' : ''}`}>
       {label && type !== 'checkbox' && <label>{label}</label>}
       {inputField}
       {label && type === 'checkbox' && <label>{label}</label>}
+      {errorMsg ? <div className='error-input-msg'>{errorMsg}</div> : null}
     </div>
   );
 };

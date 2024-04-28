@@ -7,6 +7,11 @@ class DatasetRepository {
         return this._dbClient.Dataset.findMany(filter);
     }
 
+    getWithFilter(filter) {
+        return this._dbClient.Dataset.findFirst(filter);
+    }
+
+
     getById(id) {
         return this._dbClient.Dataset.findFirst({ where: { Id: id } });
     }

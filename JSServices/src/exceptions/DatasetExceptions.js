@@ -1,22 +1,40 @@
 import { HttpError } from './HttpErrors.js';
 import { HttpStatusCode } from '../constants/enums/StatusCodes.js';
 
-class DatasetNotFoundError extends HttpError {
-    constructor() {
-        super({
-            status: HttpStatusCode.NOT_FOUND,
-            message: 'Dataset was not found!',
-        });
-    }
-}
-
-class DatasetForbiddenError extends HttpError {
+class DatasetExistsError extends HttpError {
     constructor() {
         super({
             status: HttpStatusCode.FORBIDDEN,
-            message: 'Forbidden operation!',
+            message: 'Dataset with this names exists',
         });
     }
 }
 
-export { DatasetNotFoundError, DatasetForbiddenError };
+class DatasetArchiveError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.BAD_REQUEST,
+            message: 'Archive is invalid or corrupted',
+        });
+    }
+}
+
+class ArchiveSizeError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.BAD_REQUEST,
+            message: 'Too small or too large number of images',
+        });
+    }
+}
+
+class GDriveLoadingError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.BAD_REQUEST,
+            message: 'Error caused gdrive file',
+        });
+    }
+}
+
+export { DatasetExistsError, DatasetArchiveError, ArchiveSizeError, GDriveLoadingError };

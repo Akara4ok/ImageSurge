@@ -1,4 +1,4 @@
-import { LogNotFoundError } from '../exceptions/LogExceptions.js';
+import { NotFoundError } from '../exceptions/GeneralException.js';
 import crypto from 'crypto';
 
 class LogService {
@@ -9,7 +9,7 @@ class LogService {
     async getById(id) {
         const log = await this.LogRepository.getById(id);
         if (!log) {
-            throw new LogNotFoundError();
+            throw new NotFoundError();
         }
 
         return log;

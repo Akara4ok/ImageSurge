@@ -6,8 +6,8 @@
     padding: 10px 40px;
 
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    font-size: 20px;
+    grid-template-columns: 2fr 1fr 2fr 2fr 2fr 1fr;
+    font-size: 18px;
     font-family: 'Source Sans Pro';
 
     border: 1px solid $border-color;
@@ -52,9 +52,8 @@
     .table-row {
         display: flex;
         flex-wrap: wrap;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
         justify-content: space-around;
-        font-size: 15px;
+        font-size: 12px;
     }
 }
 }
