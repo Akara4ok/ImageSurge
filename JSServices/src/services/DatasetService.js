@@ -2,9 +2,11 @@ import { NotFoundError, ForbiddenError } from '../exceptions/GeneralException.js
 import { DatasetExistsError, DatasetArchiveError, ArchiveSizeError } from '../exceptions/DatasetExceptions.js';
 import crypto from 'crypto';
 import 'dotenv/config'
-import AdmZip from 'adm-zip';
-import { getDatasetPath } from '../utils/utils.js';
-import { DataHandler } from './DataHandler.js';
+import { getDatasetPath, getDockerDatasetPath } from '../utils/utils.js';
+import { DataHandler, MIN_IMG } from './DataHandler.js';
+import axios from 'axios';
+import { existsSync, rmSync } from 'fs';
+
 const PARENT_FOLDER = process.env.PARENT_FOLDER;
 
 class DatasetService {
@@ -40,20 +42,43 @@ class DatasetService {
         }
         const category = await this.CategoryService.getWithFilter({where: {Name: Category}});
 
-        if(Source === 1){
-            this.DataHandler.checkZipFile(getDatasetPath(Name));
-        } else if(Source === 4){
+        if(Source === 4){
             await this.DataHandler.downloadFile(GDriveLink, getDatasetPath(Name));
-            this.DataHandler.checkZipFile(getDatasetPath(Name));
         }
 
-        this.checkZipFile(getDatasetPath(Name));
+        this.DataHandler.checkZipFile(getDatasetPath(Name));
+        this.DataHandler.extractAll(getDatasetPath(Name), PARENT_FOLDER, Name)
 
         const dataset = await this.DatasetRepository.create({
             Id: id,
-            Name, ImagesNum: 0, Quality: 0, CreatedAt: new Date(), ParentFolder: PARENT_FOLDER, Source: 1, 
+            Name, ImagesNum: 0, Quality: 0, CreatedAt: new Date(), ParentFolder: PARENT_FOLDER, Source: 2, 
             User: { connect: { Id: UserId } }, Category: { connect: { Id: category.Id } }, Status: "Creating"
         });
+
+        axios({
+            url: "http://localhost:5005/validate",
+            method:"POST",
+            data: {
+                path: getDockerDatasetPath(Name),
+                name: Name,
+                source: 2
+            }
+        }).then(async response => {
+            if(response.data?.result &&  response.data?.result.length > MIN_IMG){
+                await this.DatasetRepository.update({
+                    Id: id,
+                    Name, ImagesNum: response.data?.result.length, Quality: response.data?.quality, CreatedAt: dataset.CreatedAt, ParentFolder: PARENT_FOLDER, Source: 1, 
+                    User: { connect: { Id: UserId } }, Category: { connect: { Id: category.Id } }, Status: "Created"
+                });
+                this.DataHandler.deleteLowQualityImgs(PARENT_FOLDER + "/" + Name, response.data?.result)
+            } else {
+                throw new ArchiveSizeError(); 
+            }
+        }).catch(error => {
+            console.log(error)
+            this.delete(dataset.id, UserId);
+        });    
+
         return dataset;
     }
 
@@ -63,6 +88,15 @@ class DatasetService {
             throw new ForbiddenError();
         }
         const dataset = await this.DatasetRepository.delete(id);
+        try{
+            if(existsSync(dataset.ParentFolder + "/" + dataset.Name)){
+                rmSync(dataset.ParentFolder + "/" + dataset.Name, {recursive: true, force: true});
+            }
+            if(existsSync(dataset.ParentFolder + "/" + dataset.Name) + ".zip"){
+                rmSync(dataset.ParentFolder + "/" + dataset.Name + ".zip", {recursive: true, force: true});
+            }
+        } catch {}
+
         return dataset;
     }
 

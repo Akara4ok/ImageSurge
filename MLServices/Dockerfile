@@ -13,6 +13,7 @@ COPY Services/TrainService.py Services/TrainService.py
 COPY Services/InferenceService.py Services/InferenceService.py
 COPY Services/GpuMemory.py Services/GpuMemory.py
 COPY Services/config.py Services/config.py
+COPY Services/data_utils.py Services/data_utils.py
 COPY OneClassML/utils/non_tf_functions.py OneClassML/utils/non_tf_functions.py
 COPY .env .env
 

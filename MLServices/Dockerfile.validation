@@ -10,8 +10,11 @@ RUN pip3 install opencv_python==4.7.0.72
 RUN pip3 install opencv-contrib-python==4.9.0.80
 RUN pip3 install Flask==3.0.2
 RUN pip3 install Flask_Cors==4.0.0
+RUN pip3 install gdown==5.1.0
 
 COPY Services/Validation Services/Validation
+COPY Services/data_utils.py Services/data_utils.py
+COPY Services/config.py Services/config.py
 COPY OneClassML/Dataloader OneClassML/Dataloader
 COPY .env .env
 

@@ -90,13 +90,14 @@ const NewDataset = ({ setActiveCallback, toggleMenu }) => {
         console.log(file)
         const token = "Bearer " + localStorage.getItem('token');
         const formData = new FormData();
-    
+        
         formData.append('Name', name);
         formData.append('Category', category);
         formData.append('Source', !swapped ? 1 : 4);
         formData.append('GDriveLink', gdriveLink);
         formData.append('File', !swapped ? file : "");
-
+        
+        setIsLoading(true);
         axios({
             method: 'post',
             url: 'http://localhost:8000/dataset/',

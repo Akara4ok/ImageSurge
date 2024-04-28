@@ -1,15 +1,45 @@
 import { DatasetArchiveError, ArchiveSizeError, GDriveLoadingError } from '../exceptions/DatasetExceptions.js';
-import 'dotenv/config'
 import AdmZip from 'adm-zip';
-import { google } from 'googleapis';
-import fs from 'fs';
+import fs, { existsSync } from 'fs';
 import axios from 'axios';
+import path from 'path';
 
-const PARENT_FOLDER = process.env.PARENT_FOLDER;
+export const MIN_IMG = 0;
 
 export class DataHandler {
-    constructor(){
-        this.drive = google.drive({ version: 'v3', auth: null });
+    checkZipFile(zipPath) {
+        let zip;
+        try{
+            zip = new AdmZip(zipPath);
+            if(!zip){
+                throw new DatasetArchiveError();
+            }
+        } catch(error) {
+            console.log(zipPath);
+            console.log(error)
+            throw new DatasetArchiveError();
+        }
+
+        const zipEntries = zip.getEntries();
+
+        let directoryCount = 0;
+        zipEntries.forEach((entry) => {
+            if (entry.isDirectory) {
+                directoryCount++;
+            } else {
+                if (!entry.entryName.match(/\.(jpg|png|jpeg)$/i)) {
+                    throw new DatasetArchiveError();
+                }
+            }
+        });
+
+        if(directoryCount > 1){
+            throw new DatasetArchiveError();
+        }
+
+        if(zipEntries.length < MIN_IMG || zipEntries.length > 10000){
+            throw new ArchiveSizeError();
+        }
     }
 
     checkZipFile(zipPath) {
@@ -42,9 +72,50 @@ export class DataHandler {
             throw new DatasetArchiveError();
         }
 
-        if(zipEntries.length < 10 || zipEntries.length > 10000){
+        if(zipEntries.length < MIN_IMG || zipEntries.length > 10000){
             throw new ArchiveSizeError();
         }
+    }
+
+    extractAll(path, folder, dataset_name){
+        const save_path = folder + "/" + dataset_name;
+        if(existsSync(save_path)){
+            throw new DatasetArchiveError();
+        }
+        if(!path.endsWith(".zip")){
+            throw new DatasetArchiveError()
+        }
+        const zip = new AdmZip(path);
+        const zipEntries = zip.getEntries();
+        let directoryEntry = null;
+        zipEntries.forEach((entry) => {
+            if (entry.isDirectory) {
+                directoryEntry = entry;
+            }
+        });
+        try{
+            if(directoryEntry){
+                zip.extractEntryTo(directoryEntry.entryName, save_path, false, false, false, dataset_name);
+            } else {
+                zip.extractAllTo(save_path);
+            }
+        } catch(error) {
+            console.log(error)
+            throw new DatasetArchiveError();
+        }
+    }
+
+    deleteLowQualityImgs(directoryPath, filesToKeep){
+        const files = fs.readdirSync(directoryPath);
+        files.forEach(file => {
+            if (!filesToKeep.includes(file)) {
+                const filePath = path.join(directoryPath, file);
+                const stat = fs.statSync(filePath);
+                if (stat.isFile()) {
+                    fs.unlinkSync(filePath);
+                }
+            }
+        });
     }
 
     extractFileId(url) {
@@ -59,34 +130,6 @@ export class DataHandler {
         }
       
         return undefined;
-    }
-     
-    async downloadFile2(link, destinationPath) {
-        const fileId = this.extractFileId(link);
-        if(!fileId){
-            throw new GDriveLoadingError();
-        }
-        try {
-          const response = await this.drive.files.get({
-            fileId: fileId,
-            alt: 'media'
-          }, { responseType: 'stream' });
-      
-          return new Promise((resolve, reject) => {
-            const dest = fs.createWriteStream(destinationPath);
-            response.data
-              .on('end', () => {
-                resolve(filePath);
-              })
-              .on('error', err => {
-                reject(err);
-              })
-              .pipe(dest);
-          });
-        } catch (error) {
-            console.log(error)
-          throw new GDriveLoadingError();
-        }
     }
 
     async downloadFile(link, dest){

@@ -12,12 +12,7 @@ import config
 from multiprocessing.pool import ThreadPool
 from threading import Lock
 from GpuMemory import GpuMemory
-
-class DatasetSource(enum.Enum):
-    LocalZip = 1
-    LocalFolder = 2
-    Minio = 3
-    GDrive = 4
+from data_utils import download, unzip
 
 class TrainService:
     """ Service for creating training pipelines """
@@ -36,60 +31,6 @@ class TrainService:
         
     def add_socket(self, ws):
         self.connections.append(ws)
-    
-    def download(self, path: str, dataset_name: str = "", source: int = 1) -> str:
-        folder_res = self.default_folder + dataset_name
-        if(os.path.exists(folder_res)):
-            return folder_res
-        if(os.path.exists(folder_res + ".zip")):
-            return folder_res + ".zip"
-        
-        source = DatasetSource(source)
-        
-        match source:
-            case DatasetSource.LocalZip:
-                shutil.copytree(path, self.default_folder + dataset_name + ".zip")
-                return folder_res
-            case DatasetSource.LocalFolder:
-                shutil.copytree(path, self.default_folder + dataset_name)
-                return folder_res
-            case DatasetSource.Minio:
-                subprocess.call(["mc", "cp", "--recursive", path, self.default_folder])
-            case DatasetSource.GDrive:
-                gdown.download(path, self.default_folder + dataset_name + ".zip", fuzzy=True)
-        return folder_res + ".zip"
-                
-    def unzip(self, path: str, dataset_name: str):
-        if(os.path.isdir(path)):
-            return
-        
-        save_path = self.default_folder + dataset_name
-        if(os.path.isdir(save_path)):
-            return
-        if(not path.lower().endswith(('.zip'))):
-            return
-        
-        
-        with zipfile.ZipFile(path, 'r') as zip_ref:
-            zip_ref.extractall(save_path)
-            
-            def get_single_subdirectory(path: str) -> str:
-                subdirectories = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
-                if len(subdirectories) == 1:
-                    return path + "/" + subdirectories[0]
-                else:
-                    return None
-            def move_files_and_delete_folder(src_folder: str, dest_folder: str) -> None:
-                for file_name in os.listdir(src_folder):
-                    src_file_path = os.path.join(src_folder, file_name)
-                    dest_file_path = os.path.join(dest_folder, file_name)
-                    shutil.move(src_file_path, dest_file_path)
-
-                os.rmdir(src_folder)
-                        
-            subfolder = get_single_subdirectory(save_path)
-            if(subfolder is not None):
-                move_files_and_delete_folder(subfolder, save_path)
                 
     def get_ref_path(self, category: str) -> str:
         match category:
@@ -119,9 +60,9 @@ class TrainService:
               save_path: str = "Artifacts/") -> None:
         downloaded_paths: list[str] = []
         for i, path in enumerate(data_path):
-            downloaded = self.download(path, dataset_names[i], sources[i])
+            downloaded = download(path, self.default_folder, dataset_names[i], sources[i])
             downloaded_paths.append(downloaded)
-            self.unzip(downloaded, dataset_names[i])
+            unzip(downloaded, self.default_folder, dataset_names[i])
         
         command_args = ["python3", "Services/train.py", "--user", user, "--project", project, "--experiment", experiment_str, 
                         "--model-name", model_name, "--cropping", str(cropping), "--data-path", ",".join(downloaded_paths)]

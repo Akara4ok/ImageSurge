@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node ./src/main.js",
+    "start": "sudo node ./src/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:generate": "prisma generate",
     "db:migrate:create": "prisma migrate dev --create-only",
