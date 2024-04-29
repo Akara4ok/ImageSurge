@@ -11,6 +11,8 @@ from Pipeline.utils.FileHandler import FileHandler
 from utils.ExperimentInfo import ExperimentInfo
 from Dataset.InferenceImageDataset import InferenceImageDataset
 from Pipeline.ModelHandlers.KServeModel import KServeModel
+from PostProcessings import applyPostprocessingToAll
+from utils.functions import recrop_1d
 
 IMAGE_HEIGHT = 224
 IMAGE_WIDTH = 224
@@ -119,5 +121,27 @@ class InferenceHandler:
             inference_crop = self.iference_map[inference_crop_key]
             result_crop = inference_crop.process(dataset.get_data(), result_classification = result.tolist(), 
                                                  level = level, similarity = similarity)
+            if(result_crop is not None):
+                recropped = []
+                for index, crop in enumerate(result_crop):
+                    was_width, was_height = images[index].shape[:2]
+                    recropped.append(recrop_1d(crop, IMAGE_WIDTH, IMAGE_HEIGHT, was_width, was_height))
+                
+                result_crop = np.asarray(recropped)
         
         return (result, quality, result_crop)
+    
+    def postprocess(self, images: list[np.ndarray], postprocessings: list[str], cropping: np.ndarray) -> list[np.ndarray]:
+        processed = images
+        if(cropping is not None):
+            cropping_op = "cropping" 
+            postprocessings.insert(0, cropping_op)
+        for postProcess in postprocessings:
+            processed = applyPostprocessingToAll(processed, postProcess, cropping)
+        
+        result = []
+        for img in enumerate(processed):
+            result_encode, buffer = cv2.imencode('.jpg', img)
+            if(result_encode):
+                result.append(buffer)
+        return result

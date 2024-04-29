@@ -65,12 +65,13 @@ def process_endpoint():
     cropping = True if content["cropping"] == "True" else False
     level = int(content["level"])
     similarity = float(content["similarity"]) if "similarity" in content else None
+    postprocessing = eval(content["postprocessing"]) if "postprocessing" in content else []
     
     images = request.files.getlist('file')
     process_files_result  = processFiles(images)
     if(process_files_result is None or len(process_files_result[0]) == 0):
         return {
-                "message": "Internal server error"
+                "message": str(len(process_files_result[0]))
             }, 500
     
     images, _ = process_files_result
@@ -78,10 +79,10 @@ def process_endpoint():
     result = inferenceHandler.process(images, user, project, experiment_str, cropping, level, similarity)
     if(result is None):
         return {
-                "message": "Internal server error"
+                "message": "Error during processing"
             }, 500
-    
     (result_classification, quality, result_crop) = result
+    images = inferenceHandler.postprocess(images, postprocessing, result_crop)
     
     data = {
         "result_classification": result_classification.tolist(),

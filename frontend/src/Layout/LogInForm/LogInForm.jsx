@@ -41,6 +41,7 @@ const LogInForm = () => {
         }).then((response) => {
           setIsLoading(false);
           localStorage.setItem('token', response?.data?.token);
+          
           navigate("/");
         }).catch((error) => {
           setIsLoading(false);

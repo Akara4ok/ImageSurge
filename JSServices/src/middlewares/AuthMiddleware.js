@@ -5,7 +5,6 @@ const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 export const authMiddleware = ( req, res, next) => {
 	// console.log('middle')
-
 	const authHeader = req.headers.authorization;
 	const token = authHeader && authHeader.split(' ')[1];
 
