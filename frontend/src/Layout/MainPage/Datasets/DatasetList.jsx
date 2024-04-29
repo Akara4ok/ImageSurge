@@ -4,6 +4,7 @@ import './DatasetList.scss';
 import axios from 'axios';
 import Popup from '../../../Components/Popup/Popup';
 import Spinner from '../../../Components/Spinner/Spinner';
+import { socket } from '../../../utils/socket';
 
 const DatasetList = ({nameFilter}) => {
   const [popupMsg, setPopupMsg] = useState();
@@ -13,6 +14,17 @@ const DatasetList = ({nameFilter}) => {
 
   useEffect(() => {
     updateDatasetList();
+    socket.on('dataset', (message) => {
+      if(!message){
+        return;
+      }
+      const parsed_message = message.split(" ");
+      if(parsed_message.length < 2){
+        return;
+      }
+      updateDatasetList();
+    });
+
   }, []);
 
   const updateDatasetList = () => {
@@ -29,9 +41,10 @@ const DatasetList = ({nameFilter}) => {
           return {
             id: dataset.Id,
             name: dataset.Name,
+            status: dataset.Status,
             imagesNum: dataset.ImagesNum,
             category: dataset.Category.Name,
-            quality: 100 - parseFloat(dataset.Quality),
+            quality: 100 - parseFloat(dataset.Quality).toPrecision(4),
             createdAt: (new Date(dataset.CreatedAt)).toLocaleString(),
           }
         }));
@@ -64,7 +77,9 @@ const DatasetList = ({nameFilter}) => {
         </div>
         <div className="table-body">
             {datasets.map((dataset) => (
-                !nameFilter || dataset.name.includes(nameFilter)  ? <DatasetRow key={dataset.id} dataset={dataset} onDelete={onDeleteDataset} /> : null
+                !nameFilter || dataset.name.includes(nameFilter)  
+                ? 
+                <DatasetRow key={dataset.id} dataset={dataset} onDelete={onDeleteDataset} /> : null
             ))}
         </div>
         {isPopupOpen && <Popup message={popupMsg} onClose={() => {setPopupOpen(false)}} />}

@@ -9,6 +9,7 @@ import { initCrudRoutes } from './routes/CrudRoutes.js';
 import { initAuthRoutes } from './routes/AuthRoutes.js';
 import { initUserRoutes } from './routes/UserRoutes.js';
 import { errorHandler } from './middlewares/ErrorHandler.js';
+import { ioServer } from './wssocket/wssocket.js';
 
 import * as dotenv from 'dotenv';
 import { authMiddleware } from './middlewares/AuthMiddleware.js';
@@ -33,7 +34,7 @@ const main = async () => {
 
     const app = express();
 
-    app.use(cors())
+    const server = app.use(cors())
         .use(json())
         .use(urlencoded({ extended: true }))
         .use(authRoutes)
@@ -44,6 +45,9 @@ const main = async () => {
         .listen(PORT, () => {
             console.log('Server listening on PORT:', PORT);
         });
+    
+    
+    ioServer.attach(server)
 };
 
 main();

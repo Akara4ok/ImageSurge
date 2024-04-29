@@ -8,7 +8,7 @@ import Button from '../../../Components/Button/Button';
 import { IoSwapHorizontal } from "react-icons/io5";
 import axios from 'axios';
 import Spinner from '../../../Components/Spinner/Spinner';
-import { gdriveValidate } from '../../../Validators/Validators.js'
+import { gdriveValidate } from '../../../utils/Validators.js'
 import Popup from '../../../Components/Popup/Popup.jsx';
 import FormData from 'form-data';
 
@@ -126,7 +126,7 @@ const NewDataset = ({ setActiveCallback, toggleMenu }) => {
     const onPopupClose = () => {
         if(sucessCreated){
             setSuccessCreated(false);
-            // navigate("/datasets")
+            navigate("/datasets")
         }
         setPopupOpen(false)
     }

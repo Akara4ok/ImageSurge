@@ -12,6 +12,7 @@ import NewDataset from './Layout/MainPage/NewDataset/NewDataset';
 import NewProject from './Layout/MainPage/NewProject/NewProject';
 import Inference from './Layout/MainPage/Inference/Inference';
 import { jwtDecode } from "jwt-decode";
+import {socket} from './utils/socket'
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function RouterComponent() {
     if (decodedToken.exp * 1000 < currentDate.getTime() && location.pathname !== '/signup') {
       navigate('/login');
     }
+    socket.emit('authenticate', token)
   }, [navigate, location.pathname]); // Include location.pathname in the dependency array
 
   return (

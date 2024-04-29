@@ -1,5 +1,11 @@
 @import '../../../../global/global.scss';
 
+.dataset-creating{
+    span{
+        color: gray;
+    }
+}
+
 .dataset-table-row-wrapper{
     border-bottom: 1px solid $border-items-color;
 .table-row {

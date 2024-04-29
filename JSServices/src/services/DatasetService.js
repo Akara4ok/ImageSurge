@@ -6,6 +6,7 @@ import { getDatasetPath, getDockerDatasetPath } from '../utils/utils.js';
 import { DataHandler, MIN_IMG } from './DataHandler.js';
 import axios from 'axios';
 import { existsSync, rmSync } from 'fs';
+import { ioServer } from '../wssocket/wssocket.js';
 
 const PARENT_FOLDER = process.env.PARENT_FOLDER;
 
@@ -71,12 +72,12 @@ class DatasetService {
                     User: { connect: { Id: UserId } }, Category: { connect: { Id: category.Id } }, Status: "Created"
                 });
                 this.DataHandler.deleteLowQualityImgs(PARENT_FOLDER + "/" + Name, response.data?.result)
+                ioServer.sendMessage("dataset", `created ${Name}`, UserId);
             } else {
                 throw new ArchiveSizeError(); 
             }
         }).catch(error => {
-            console.log(error)
-            this.delete(dataset.id, UserId);
+            this.delete(id, UserId);
         });    
 
         return dataset;

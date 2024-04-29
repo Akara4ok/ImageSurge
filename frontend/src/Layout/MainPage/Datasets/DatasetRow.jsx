@@ -19,7 +19,7 @@ const DatasetRow = ({ dataset, onDelete }) => {
     }
 
     return (
-        <div className="dataset-table-row-wrapper">
+        <div className={`dataset-table-row-wrapper ${dataset.status === "Creating" ? "dataset-creating" : ""}`}>
             <div className="table-row">
                 <span>{dataset.name}</span>
                 <span className="center-span">{dataset.imagesNum}</span>

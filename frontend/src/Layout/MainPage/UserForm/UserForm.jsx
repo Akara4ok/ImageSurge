@@ -3,7 +3,7 @@ import './UserForm.scss';
 import Input from '../../../Components/Input/Input';
 import CountrySelector from '../../../Components/CountrySelector/CountrySelector';
 import Button from '../../../Components/Button/Button';
-import {emailValidate, phoneValidate, nameValidate, passwordValidate} from '../../../Validators/Validators'
+import {emailValidate, phoneValidate, nameValidate, passwordValidate} from '../../../utils/Validators'
 
 const UserForm = ({ defaultValueProp, firstPassPlaceholder, seconfPassPlaceholder, samePasswords, requestFun }) => {
   const [firstName, setFirstName] = useState(defaultValueProp?.firstName ?? "");
