@@ -4,12 +4,12 @@ load_dotenv()
 
 import os
 import argparse
-from flask import Flask, request
+from flask import Flask, request, send_file
 from flask_cors import CORS
 import sys
 sys.path.append("Services/")
 from InferenceHandler import InferenceHandler
-from FileUtils import processFiles
+from FileUtils import processFiles, create_result_zip
 import config
 import tensorflow as tf
 
@@ -74,7 +74,7 @@ def process_endpoint():
                 "message": str(len(process_files_result[0]))
             }, 500
     
-    images, _ = process_files_result
+    images, filenames = process_files_result
     
     result = inferenceHandler.process(images, user, project, experiment_str, cropping, level, similarity)
     if(result is None):
@@ -84,16 +84,14 @@ def process_endpoint():
     (result_classification, quality, result_crop) = result
     images = inferenceHandler.postprocess(images, postprocessing, result_crop)
     
-    data = {
-        "result_classification": result_classification.tolist(),
-        "quality": quality.tolist()
-    }
-    if(result_crop is not None):
-        data["result_crop"] = result_crop.tolist()
-    return {
-            "message": "Successfully processed",
-            "data": data
-        }, 200
+    data = create_result_zip(result_classification, quality, result_crop, filenames, images)
+    return send_file(
+        data,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name='result.zip'
+    )
+
 
 if __name__ == "__main__":
     parser=argparse.ArgumentParser()

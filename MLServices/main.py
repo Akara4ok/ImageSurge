@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-from flask import Flask, request
+from flask import Flask, request, Response
 from flask_cors import CORS
 from flask_sock import Sock
 import sys
@@ -81,10 +81,18 @@ def process_endpoint():
     cropping = content["cropping"]
     level = content["level"]
     similarity = content["similarity"] if "similarity" in content else None
+    postprocessing = content["postprocessing"]
     
     images = request.files.getlist('file')
     
-    return ifnferenceService.process(images, user, project, experiment_str, cropping, level, similarity)
+    response = ifnferenceService.process(images, user, project, experiment_str, cropping, level, similarity=similarity, postprocessing=postprocessing)
+    if(response.status_code != 200):
+        return response.json(), response.status_code
+    else:
+        return Response(
+            response.content,
+            headers = dict(response.headers)
+        )
 
 @sock.route('/train_ws')
 def echo(ws):

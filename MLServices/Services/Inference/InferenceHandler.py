@@ -140,7 +140,7 @@ class InferenceHandler:
             processed = applyPostprocessingToAll(processed, postProcess, cropping)
         
         result = []
-        for img in enumerate(processed):
+        for img in processed:
             result_encode, buffer = cv2.imencode('.jpg', img)
             if(result_encode):
                 result.append(buffer)

@@ -117,13 +117,14 @@ class InferenceService:
 
 
     def process(self, images: list, user: str, project: str, experiment_str: str, cropping: str,
-                level: str, similarity: str = None): 
+                level: str, similarity: str = None, postprocessing: str = None): 
         multipart_form_data = [
             ('user', (None, user)),
             ('project', (None, project)),
             ('experiment', (None, experiment_str)),
             ('cropping', (None, cropping)),
             ('level', (None, level)),
+            ('postprocessing', (None, postprocessing)),
         ]
         
         if(similarity is not None):
@@ -141,7 +142,7 @@ class InferenceService:
             self.lock.release()
             response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
             GpuMemory().inference_request_end("kserve")
-            return response.json(), response.status_code
+            return response
         
         if(not self.lock.locked()):
             self.lock.acquire(True)
@@ -151,10 +152,10 @@ class InferenceService:
             self.lock.release()
             response = requests.post(self.gpu_url + "/process", files=multipart_form_data)
             GpuMemory().inference_request_end("gpu")
-            return response.json(), response.status_code
+            return response
         
         if(self.lock.locked()):
             self.lock.release()
         
         response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
-        return response.json(), response.status_code
+        return response

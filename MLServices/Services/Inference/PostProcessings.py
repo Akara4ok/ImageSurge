@@ -37,7 +37,7 @@ def toColorSpace(img: np.ndarray, colorspace: str) -> np.ndarray:
         case _:
             return img
 
-def crop_with_recrop(img: np.ndarray, left: int, top: int, width: int, height: int) -> np.ndarray:
+def crop(img: np.ndarray, left: int, top: int, width: int, height: int) -> np.ndarray:
     img = img[top:top+height, left:left+width]
     return img
 
@@ -51,6 +51,10 @@ def applyPostprocessing(img: np.ndarray, postprocessing: str) -> np.ndarray:
     
     op = parsed[0]
     match op:
+        case 'cropping':
+            if(len(parsed) < 5):
+                return img
+            return crop(img, int(parsed[1]), int(parsed[2]), int(parsed[3]), int(parsed[4]))
         case 'blur':
             return blur(img, int(parsed[1]))
         case 'rotate':
@@ -73,6 +77,6 @@ def applyPostprocessingToAll(imgs: list[np.ndarray], postprocessing: str, croppi
     result = []
     for index, img in enumerate(imgs):
         if(postprocessing == "cropping"):
-            postprocessing = "cropping" + str(cropping[index, 0]) + " " + str(cropping[index, 1]) + " " + str(cropping[index, 2] - cropping[index, 0]) + " " + str(cropping[index, 3] - cropping[index, 1]) 
+            postprocessing = "cropping " + str(cropping[index, 0]) + " " + str(cropping[index, 1]) + " " + str(cropping[index, 2] - cropping[index, 0]) + " " + str(cropping[index, 3] - cropping[index, 1]) 
         result.append(applyPostprocessing(img, postprocessing))
     return result

@@ -60,7 +60,7 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
             ('file', (name, open(dataset_path + name, 'rb'), "image/jpg")),
         ]
     result = requests.post(main_service_url + "/process", files=multipart_form_data)
-    print("Processing res", result.status_code, result.json())
+    print("Processing res", result.status_code)
     
     stop_data = {
         "user": user,
