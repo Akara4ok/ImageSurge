@@ -15,6 +15,28 @@ class NeuralNetworkService {
         return neuralNetwork;
     }
 
+    async getBestNetwork(categoryId, modelId){
+        const relatedNetworks = await this.NeuralNetworkRepository.getRelatedNetworks(categoryId, modelId);
+        if (!relatedNetworks || relatedNetworks.length === 0) {
+            throw new NotFoundError("NeuralNetworks");
+        }
+        let localKserveNetwork;
+        let nonLocalKserveNetwork;
+        for (let index = 0; index < relatedNetworks.length; index++) {
+            const element = relatedNetworks[index];
+            if(!localKserveNetwork && element.LocalKserve && element.KservePath){
+                localKserveNetwork = element;
+            }
+            if(!element.LocalKserve && element.KservePath){
+                return element
+            }
+        }
+        if(nonLocalKserveNetwork){
+            return nonLocalKserveNetwork;
+        }
+        return relatedNetworks[0]
+    }
+
     async create(
         CategoryId, KservePath, LocalKserve, ModelId
     ) {

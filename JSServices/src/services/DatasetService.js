@@ -27,7 +27,16 @@ class DatasetService {
     async getById(id) {
         const dataset = await this.DatasetRepository.getById(id);
         if (!dataset) {
-            throw new NotFoundError();
+            throw new NotFoundError("Dataset");
+        }
+
+        return dataset;
+    }
+
+    async getByName(name) {
+        const dataset = await this.DatasetRepository.getByName(name);
+        if (!dataset) {
+            throw new NotFoundError("Dataset");
         }
 
         return dataset;
@@ -37,7 +46,7 @@ class DatasetService {
         UserId, Name, Category, Source, GDriveLink
     ) {
         const id = crypto.randomUUID();
-        const datasetWithName = await this.DatasetRepository.getWithFilter({where: {Name: Name}});
+        const datasetWithName = await this.DatasetRepository.getWithFilter({where: {UserId: UserId, Name: Name}});
         if(datasetWithName){
             throw new DatasetExistsError();
         }
@@ -68,15 +77,17 @@ class DatasetService {
             if(response.data?.result &&  response.data?.result.length > MIN_IMG){
                 await this.DatasetRepository.update({
                     Id: id,
-                    Name, ImagesNum: response.data?.result.length, Quality: response.data?.quality, CreatedAt: dataset.CreatedAt, ParentFolder: PARENT_FOLDER, Source: 1, 
+                    Name, ImagesNum: response.data?.result.length, Quality: response.data?.quality, CreatedAt: dataset.CreatedAt, ParentFolder: PARENT_FOLDER, Source: dataset.Source, 
                     User: { connect: { Id: UserId } }, Category: { connect: { Id: category.Id } }, Status: "Created"
                 });
                 this.DataHandler.deleteLowQualityImgs(PARENT_FOLDER + "/" + Name, response.data?.result)
                 ioServer.sendMessage("dataset", `created ${Name}`, UserId);
             } else {
+                ioServer.sendMessage("dataset", `Too small number of images pass validation`, UserId);
                 throw new ArchiveSizeError(); 
             }
         }).catch(error => {
+            ioServer.sendMessage("dataset", `Creating error`, UserId);
             this.delete(id, UserId);
         });    
 

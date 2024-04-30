@@ -7,6 +7,27 @@ class NeuralNetworkRepository {
         return this._dbClient.NeuralNetwork.findFirst({ where: { Id: id } });
     }
 
+    getRelatedNetworks(CategoryId, ModelId) {
+        return this._dbClient.NeuralNetwork.findMany({ 
+            where: { 
+                Category: {
+                    is: {
+                        Id: CategoryId
+                    }
+                },
+                Model: {
+                    is: {
+                        Id: ModelId
+                    }
+                }
+            },
+            include: {
+                Category: true,
+                Model: true
+            }
+        });
+    }    
+
     create(NeuralNetwork) {
         return this._dbClient.NeuralNetwork.create({
             data: NeuralNetwork,

@@ -4,6 +4,7 @@ import './ProjectList.scss';
 import axios from 'axios';
 import Popup from '../../../Components/Popup/Popup';
 import Spinner from '../../../Components/Spinner/Spinner';
+import { socket } from '../../../utils/socket';
 
 const ProjectList = ({nameFilter}) => {
   const [projects, setProjects] = useState([]);
@@ -13,6 +14,16 @@ const ProjectList = ({nameFilter}) => {
 
   useEffect(() => {
     updateProjectList();
+    socket.on('project', (message) => {
+      if(!message){
+        return;
+      }
+      const parsed_message = message.split(" ");
+      if(parsed_message.length < 2){
+        return;
+      }
+      updateProjectList();
+    });
   }, []);
 
   const updateProjectList = () => {

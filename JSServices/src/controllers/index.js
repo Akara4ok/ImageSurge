@@ -5,7 +5,6 @@ import { RequestController } from './RequestController.js';
 import { CategoryController } from './CategoryController.js';
 import { ModelController } from './ModelController.js';
 import { NeuralNetworkController } from './NeuralNetworkController.js';
-import { KServeUrlController } from './KServeUrlController.js';
 import { DatasetController } from './DatasetController.js';
 import { ProjectController } from './ProjectController.js';
 
@@ -17,7 +16,6 @@ const initControllers = ({
     categoryService,
     modelService,
     neuralNetworkService,
-    kserveUrlService,
     datasetService,
     projectService,
 }) => {
@@ -29,7 +27,6 @@ const initControllers = ({
         categoryController: new CategoryController(categoryService),
         modelController: new ModelController(modelService),
         neuralNetworkController: new NeuralNetworkController(neuralNetworkService),
-        kserveUrlController: new KServeUrlController(kserveUrlService),
         datasetController: new DatasetController(datasetService),
         projectController: new ProjectController(projectService),
     };
@@ -44,7 +41,6 @@ export {
     CategoryController,
     ModelController,
     NeuralNetworkController,
-    KServeUrlController,
     DatasetController,
     ProjectController
 };

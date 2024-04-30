@@ -21,16 +21,15 @@ class ProjectController {
     }
 
     async create(req, res) {
-        const { UserId, Status, Name, CreatedAt, Cropping, 
-            SecretKey, NeuralNetworkId, CroppingNetworkId, ArtifactPath, level, similarity, Datasets } = req.body;
+        const UserId = req.user?.id;
+        const { Name, Cropping, NeuralNetworkName, Datasets, Postprocessings } = req.body;
 
         const project = await this.ProjectService.create(
-            UserId, Status, Name, CreatedAt, Cropping, 
-            SecretKey, NeuralNetworkId, CroppingNetworkId, ArtifactPath, level, similarity, Datasets
+            UserId, Name, Cropping, NeuralNetworkName, Datasets, Postprocessings
         );
 
         return res.status(HttpStatusCode.CREATED).json({
-            project
+            message: "Start project creating"
         });
     }
 

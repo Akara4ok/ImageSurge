@@ -1,7 +1,6 @@
 import { wrap } from '../helpers/requests.js';
 import { Router } from 'express';
-import { UserRoutes, LogRoutes, ProjectProcessingRoutes, RequestRoutes, 
-    KServeUrlRoutes, CategoryRoutes, ModelRoutes, NeuralNetworkRoutes,
+import { UserRoutes, LogRoutes, ProjectProcessingRoutes, RequestRoutes, CategoryRoutes, ModelRoutes, NeuralNetworkRoutes,
     DatasetRoutes, ProjectRoutes } from '../constants/enums/CrudRoutes.js';
 
 const initCrudRoutes = ({
@@ -11,7 +10,6 @@ const initCrudRoutes = ({
     requestController,
     categoryController,
     modelController,
-    kserveUrlController,
     neuralNetworkController,
     datasetController,
     projectController,
@@ -170,27 +168,6 @@ const initCrudRoutes = ({
         wrap(neuralNetworkController.update.bind(neuralNetworkController)),
     );
 
-    //kserveurl
-    routes.get(
-        KServeUrlRoutes.GET_KSERVEURL,
-        wrap(kserveUrlController.getById.bind(kserveUrlController)),
-    );
-
-    routes.post(
-        KServeUrlRoutes.CREATE_KSERVEURL,
-        wrap(kserveUrlController.create.bind(kserveUrlController)),
-    );
-
-    routes.delete(
-        KServeUrlRoutes.DELETE_KSERVEURL,
-        wrap(kserveUrlController.delete.bind(kserveUrlController)),
-    );
-
-    routes.put(
-        KServeUrlRoutes.UPDATE_KSERVEURL,
-        wrap(kserveUrlController.update.bind(kserveUrlController)),
-    );
-
     //dataset
     routes.get(
         DatasetRoutes.GET_DATASET,
@@ -206,11 +183,6 @@ const initCrudRoutes = ({
     routes.get(
         ProjectRoutes.GET_PROJECT,
         wrap(projectController.getById.bind(projectController)),
-    );
-
-    routes.post(
-        ProjectRoutes.CREATE_PROJECT,
-        wrap(projectController.create.bind(projectController)),
     );
 
     routes.put(

@@ -44,7 +44,7 @@ def train(user: str, project: str, experiment_str: str, model_name: str, croppin
     train_pipeline.train(dataset, epochs=3, save_cache=True)
     train_pipeline.save()
     
-    if(cropping is None or not cropping):
+    if(cropping is None or not cropping or cropping == "False"):
         return
     
     experiment_crop_str = experiment_str + "-crop"
@@ -52,12 +52,12 @@ def train(user: str, project: str, experiment_str: str, model_name: str, croppin
     file_handler_crop = FileHandler(save_path, experiment_crop)
     train_pipeline_crop = OneClassClassificationTrain(file_handler_crop)
     
-    model_crop = ModelFactory.create_model("Resnet", kserve_path_crop, token)
+    model_crop = ModelFactory.create_model("ResNet", kserve_path_crop, token)
     oc_svm_crop = svm.OneClassSVM(kernel='rbf', nu=0.08)
     
     train_pipeline_crop.configure(model_crop, oc_svm_crop)
     
-    if(model_name == "Resnet" or model_name == "VGG"):
+    if(model_name == "ResNet" or model_name == "VGG"):
         cache = train_pipeline.get_cache_data()
         train_pipeline_crop.cache_features(cache[0], cache[1])
 
@@ -72,8 +72,8 @@ if __name__ == "__main__":
     parser.add_argument("--project", "-p", default=os.getenv('PROJECT'), help="project id", type=str)
     parser.add_argument("--experiment", "-e", default=os.getenv('EXPERIMENT'), help="experiment id", type=str)
     
-    parser.add_argument("--model-name", "-m", default=os.getenv('MODEL_NAME'), help="model name(VGG, Resnet, ImprovedResnet, Clip", type=str)
-    parser.add_argument("--cropping", "-c", default=os.getenv('CROPPING'), help="Need cropping", type=bool)
+    parser.add_argument("--model-name", "-m", default=os.getenv('MODEL_NAME'), help="model name(VGG, ResNet, ImprovedResnet, Clip", type=str)
+    parser.add_argument("--cropping", "-c", default=os.getenv('CROPPING'), help="Need cropping", type=str)
     
     parser.add_argument("--data-path", "-d", default=os.getenv('DATA_PATH'), help="Data path(separated by comma)", type=str)
     parser.add_argument("--ref-data-path", "-r", default=os.getenv('REF_DATA_PATH'), help="Reference datapath if needed", type=str)

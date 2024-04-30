@@ -40,9 +40,9 @@ def train_endpoint():
     
     result = trainService.train(user, project, experiment_str, model_name, cropping, data_path, dataset_names, sources, category, 
                                 kserve_path_classification, kserve_path_crop, local_kserve)
-    if(result == 0):
+    if(result['StatusCode'] == 0):
         return {
-                "message": "Training successfully started"
+                "message": "Successfully trained"
             }, 200
 
     return {
@@ -81,10 +81,9 @@ def process_endpoint():
     cropping = content["cropping"]
     level = content["level"]
     similarity = content["similarity"] if "similarity" in content else None
-    postprocessing = content["postprocessing"]
+    postprocessing = content["postprocessing"] if "postprocessing" in content else None
     
     images = request.files.getlist('file')
-    
     response = ifnferenceService.process(images, user, project, experiment_str, cropping, level, similarity=similarity, postprocessing=postprocessing)
     if(response.status_code != 200):
         return response.json(), response.status_code

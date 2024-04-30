@@ -5,7 +5,6 @@ import { RequestRepository } from './RequestRepository.js';
 import { CategoryRepository } from './CategoryRepository.js';
 import { ModelRepository } from './ModelRepository.js';
 import { NeuralNetworkRepository } from './NeuralNetworkRepository.js';
-import { KServeUrlRepository } from './KServeUrlRepository.js';
 import { DatasetRepository } from './DatasetRepository.js';
 import { ProjectRepository } from './ProjectRepository.js';
 
@@ -18,7 +17,6 @@ const initRepositories = (prismaClient) => {
         categoryRepository: new CategoryRepository(prismaClient),
         modelRepository: new ModelRepository(prismaClient),
         neuralNetworkRepository: new NeuralNetworkRepository(prismaClient),
-        kserveUrlRepository: new KServeUrlRepository(prismaClient),
         datasetRepository: new DatasetRepository(prismaClient),
         projectRepository: new ProjectRepository(prismaClient),
     };
@@ -33,7 +31,6 @@ export {
     CategoryRepository,
     ModelRepository,
     NeuralNetworkRepository,
-    KServeUrlRepository,
     DatasetRepository,
     ProjectRepository
 };

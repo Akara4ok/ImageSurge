@@ -11,6 +11,10 @@ class ModelRepository {
         return this._dbClient.Model.findFirst({ where: { Id: id } });
     }
 
+    getByName(name) {
+        return this._dbClient.Model.findFirst({ where: { Name: name } });
+    }
+
     create(Model) {
         return this._dbClient.Model.create({
             data: Model,

@@ -5,7 +5,7 @@ class DatasetExistsError extends HttpError {
     constructor() {
         super({
             status: HttpStatusCode.FORBIDDEN,
-            message: 'Dataset with this names exists',
+            message: 'Dataset with this name exists',
         });
     }
 }

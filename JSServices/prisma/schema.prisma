@@ -44,7 +44,7 @@ model Project {
 
 model Request {
     Id                 String  @id @default(uuid()) @db.Uuid
-    Project            Project @relation(fields: [ProjectId], references: [Id])
+    Project            Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
     ProjectId          String  @db.Uuid
     Images             Int
     ProcessingTime     Int
@@ -56,14 +56,14 @@ model Request {
 
 model Log {
     Id        String  @id @default(uuid()) @db.Uuid
-    Project   Project @relation(fields: [ProjectId], references: [Id])
+    Project   Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
     ProjectId String  @db.Uuid
     Value     String
 }
 
 model ProjectProcessing {
     Id        String  @id @default(uuid()) @db.Uuid
-    Project   Project @relation(fields: [ProjectId], references: [Id])
+    Project   Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
     ProjectId String  @db.Uuid
     Value     String
 }
@@ -98,27 +98,16 @@ model NeuralNetwork {
     ModelId                String    @db.Uuid
 }
 
-model KServeUrl {
-    Id         String   @id @default(uuid()) @db.Uuid
-    Category   Category @relation(fields: [CategoryId], references: [Id])
-    CategoryId String   @db.Uuid
-    Model      Model    @relation(fields: [ModelId], references: [Id])
-    ModelId    String   @db.Uuid
-    UrlSuffix  String   @unique
-}
-
 model Category {
     Id             String          @id @default(uuid()) @db.Uuid
     Datasets       Dataset[]
-    NeuralNetworks KServeUrl[]
-    KServeUrls     NeuralNetwork[]
+    NeuralNetworks NeuralNetwork[]
     Name           String          @unique
 }
 
 model Model {
     Id             String          @id @default(uuid()) @db.Uuid
     NeuralNetworks NeuralNetwork[]
-    KServeUrls     KServeUrl[]
     Name           String          @unique
     Description    String?
 }

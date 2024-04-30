@@ -1,15 +1,8 @@
-import enum
-import shutil
-import os
 import sys
-import gdown
-import subprocess
-import zipfile
 sys.path.append("OneClassML")
 from utils.non_tf_functions import get_access_token
 import docker
 import config
-from multiprocessing.pool import ThreadPool
 from threading import Lock
 from GpuMemory import GpuMemory
 from data_utils import download, unzip
@@ -24,14 +17,9 @@ class TrainService:
         self.time_limit = time_limit
         self.working_dir = config.WORKDIR
         self.device_map: dict[str, str] = {}
-        self.pool = ThreadPool(processes=8)
         self.subscriptions: dict = {}
-        self.connections: list = []
         self.lock = Lock()
         
-    def add_socket(self, ws):
-        self.connections.append(ws)
-                
     def get_ref_path(self, category: str) -> str:
         match category:
             case "Animals":
@@ -41,17 +29,17 @@ class TrainService:
             case _:
                 return self.default_folder + "natural_images"
         
-    def wait_task(self, container):
-        try:
-            return container.wait(timeout=self.time_limit)
-        except:
-            container.kill()
-            return {"Status code": 139}
+    # def wait_task(self, container):
+    #     try:
+    #         return container.wait(timeout=self.time_limit)
+    #     except:
+    #         container.kill()
+    #         return {"Status code": 139}
         
-    def send_result_ws(self, container):
-        result = self.wait_task(container)
-        for conn in self.connections:
-            conn.send(result)
+    # def send_result_ws(self, container):
+    #     result = self.wait_task(container)
+    #     for conn in self.connections:
+    #         conn.send(result)
             
     def train(self, user: str, project: str, experiment_str: str, model_name: str, 
               cropping: bool, data_path: list[str], dataset_names: list[str],
@@ -74,7 +62,7 @@ class TrainService:
 
         volumes = []
         for path in downloaded_paths:
-            volumes.append(f"{self.abs_path + '/' +path}:{self.working_dir + path}")
+            volumes.append(f"{self.abs_path + '/' + path}:{self.working_dir + path}")
         volumes.append(f"{self.abs_path + '/' + save_path}:{self.working_dir + save_path}")
         
         with self.lock:
@@ -117,5 +105,8 @@ class TrainService:
                 else:
                     GpuMemory().add_new_train_request(container.id, "cpu")
                     
-        self.pool.apply_async(self.send_result_ws, (container,))
-        return 0
+        try:
+            return container.wait(timeout=self.time_limit)
+        except:
+            container.kill()
+            return {"Status code": 139}

@@ -11,9 +11,10 @@ const ProjectRow = ({ project, onDelete }) => {
     const iconSize = '25px';
 
     const statusIcons = {
-        'stopped': <FaStop className="status-icon" size={iconSize} />,
+        'Stopped': <FaStop className="status-icon" size={iconSize} />,
         'Running': <CiCircleCheck className="status-icon" size={iconSize} />,
-        'loading': <LiaSpinnerSolid className="status-icon" size={iconSize} />
+        'Creating': <LiaSpinnerSolid className="status-icon" size={iconSize} />,
+        'Loading': <LiaSpinnerSolid className="status-icon" size={iconSize} />
     };
 
     const deleteProject = () => {

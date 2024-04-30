@@ -16,6 +16,10 @@ class DatasetRepository {
         return this._dbClient.Dataset.findFirst({ where: { Id: id } });
     }
 
+    getByName(name) {
+        return this._dbClient.Dataset.findFirst({ where: { Name: name } });
+    }
+
     create(Dataset) {
         return this._dbClient.Dataset.create({
             data: Dataset,

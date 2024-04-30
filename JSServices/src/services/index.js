@@ -3,7 +3,6 @@ import { LogService } from './LogService.js';
 import { ProjectProcessingService } from './ProjectProcessingService.js';
 import { RequestService } from './RequestService.js';
 import { CategoryService } from './CategoryService.js';
-import { KServeUrlService } from './KServeUrlService.js';
 import { ModelService } from './ModelService.js';
 import { NeuralNetworkService } from './NeuralNetworkService.js';
 import { DatasetService } from './DatasetService.js';
@@ -16,23 +15,26 @@ const initServices = ({
     requestRepository,
     categoryRepository,
     modelRepository,
-    kserveUrlRepository,
     neuralNetworkRepository,
     datasetRepository,
     projectRepository,
 }) => {
     const categoryService = new CategoryService(categoryRepository);
+    const datasetService = new DatasetService(datasetRepository, categoryService);
+    const neuralNetworkService = new NeuralNetworkService(neuralNetworkRepository);
+    const modelService = new ModelService(modelRepository);
+    const projectProcessingService = new ProjectProcessingService(projectProcessingRepository)
+    const projectService = new ProjectService(projectRepository, datasetService, neuralNetworkService, modelService, categoryService);
     return {
         userService: new UserService(userRepository),
         logService: new LogService(logRepository),
-        projectProcessingService: new ProjectProcessingService(projectProcessingRepository),
         requestService: new RequestService(requestRepository),
+        projectProcessingService: projectProcessingService,
         categoryService: categoryService,
-        modelService: new ModelService(modelRepository),
-        kserveUrlService: new KServeUrlService(kserveUrlRepository),
-        neuralNetworkService: new NeuralNetworkService(neuralNetworkRepository),
-        datasetService: new DatasetService(datasetRepository, categoryService),
-        projectService: new ProjectService(projectRepository),
+        modelService: modelService,
+        neuralNetworkService: neuralNetworkService,
+        datasetService: datasetService,
+        projectService: projectService,
     };
 };
 
@@ -42,6 +44,5 @@ export { initServices,
     ProjectProcessingService, 
     RequestService, 
     CategoryService, 
-    KServeUrlService, 
     ModelService, 
     NeuralNetworkService,  };

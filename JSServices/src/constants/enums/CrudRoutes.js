@@ -42,13 +42,6 @@ const ModelRoutes = Object.freeze({
     UPDATE_MODEL: '/model/:id',
 });
 
-const KServeUrlRoutes = Object.freeze({
-    GET_KSERVEURL: '/kserveurl/:id',
-    CREATE_KSERVEURL: '/kserveurl/',
-    DELETE_KSERVEURL: '/kserveurl/:id',
-    UPDATE_KSERVEURL: '/kserveurl/:id',
-});
-
 const NeuralNetworkRoutes = Object.freeze({
     GET_NEURALNETWORK: '/neuralnetwork/:id',
     CREATE_NEURALNETWORK: '/neuralnetwork/',
@@ -70,6 +63,6 @@ const ProjectRoutes = Object.freeze({
 export {
     UserRoutes, RequestRoutes, LogRoutes, 
     ProjectProcessingRoutes, CategoryRoutes, 
-    ModelRoutes, KServeUrlRoutes, NeuralNetworkRoutes,
+    ModelRoutes, NeuralNetworkRoutes,
     ProjectRoutes, DatasetRoutes
 }

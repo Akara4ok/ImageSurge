@@ -45,6 +45,11 @@ const initUserRoutes = (
         wrap(projectController.getAll.bind(projectController)),
     );
 
+    routes.post(
+        UserRoutes.CREATE_PROJECT,
+        wrap(projectController.create.bind(projectController)),
+    );
+
     routes.delete(
         UserRoutes.DELETE_PROJECT,
         wrap(projectController.delete.bind(projectController)),

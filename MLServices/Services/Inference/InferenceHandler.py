@@ -135,6 +135,7 @@ class InferenceHandler:
         processed = images
         if(cropping is not None):
             cropping_op = "cropping" 
+            print(postprocessings)
             postprocessings.insert(0, cropping_op)
         for postProcess in postprocessings:
             processed = applyPostprocessingToAll(processed, postProcess, cropping)

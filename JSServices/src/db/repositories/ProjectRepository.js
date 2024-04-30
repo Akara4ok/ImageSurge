@@ -7,6 +7,10 @@ class ProjectRepository {
         return this._dbClient.Project.findMany(filter);
     }
 
+    getWithFilter(filter) {
+        return this._dbClient.Project.findFirst(filter);
+    }
+
     getById(id) {
         return this._dbClient.Project.findFirst({ where: { Id: id } });
     }

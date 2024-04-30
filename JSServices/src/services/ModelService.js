@@ -14,7 +14,16 @@ class ModelService {
     async getById(id) {
         const model = await this.ModelRepository.getById(id);
         if (!model) {
-            throw new NotFoundError();
+            throw new NotFoundError("Model");
+        }
+
+        return model;
+    }
+
+    async getByName(name) {
+        const model = await this.ModelRepository.getByName(name);
+        if (!model) {
+            throw new NotFoundError("Model");
         }
 
         return model;
