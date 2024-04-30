@@ -3,6 +3,10 @@ class ModelRepository {
         this._dbClient = sequelizeModel;
     }
 
+    getAll() {
+        return this._dbClient.Model.findMany();
+    }
+
     getById(id) {
         return this._dbClient.Model.findFirst({ where: { Id: id } });
     }

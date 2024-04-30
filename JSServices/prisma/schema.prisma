@@ -120,4 +120,5 @@ model Model {
     NeuralNetworks NeuralNetwork[]
     KServeUrls     KServeUrl[]
     Name           String          @unique
+    Description    String?
 }

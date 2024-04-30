@@ -75,7 +75,7 @@ const NewDataset = ({ setActiveCallback, toggleMenu }) => {
         setCategoryError(categoryError);
         let fileError = "";
         if(!file && !swapped){
-            fileError = "file is required";
+            fileError = "File is required";
         }
         setFileError(fileError);
 

@@ -12,19 +12,17 @@ const Input2 = ({ label, type, errorMsg, onChange, placeholder, value, options, 
         case 'select':
             inputField = (
                 <CustomSelect
-                    onChange={(event) => onChange ? onChange(event.target?.value) : null}
+                    onChange={onChange}
                     options={options}
                     tooltips={tooltips}
-                    onOptionSelect={onChange}
                 />
             );
             break;
         case 'multi-select':
             inputField = (
                 <MultiSelect
-                    onChange={(event) => onChange ? onChange(event.target?.value) : null}
+                    onChange={onChange}
                     options={options}
-                    onOptionSelect={onChange}
                     {...props}
                 />
             );
@@ -32,9 +30,8 @@ const Input2 = ({ label, type, errorMsg, onChange, placeholder, value, options, 
         case 'multi-select-2':
             inputField = (
                 <MultiSelect2
-                    onChange={(event) => onChange ? onChange(event.target?.value) : null}
+                    onChange={onChange}
                     options={options}
-                    onOptionSelect={onChange}
                     {...props}
                 />
             );
@@ -43,7 +40,7 @@ const Input2 = ({ label, type, errorMsg, onChange, placeholder, value, options, 
             inputField = <div className='switch-wrapper'>
                 <p>{placeholder}</p>
                 <label className="switch" htmlFor="checkbox">
-                    <input onChange={(event) => onChange ? onChange(event.target?.value) : null} type="checkbox" value={value} id="checkbox" />
+                    <input onChange={(event) => onChange ? onChange(event.currentTarget?.checked) : null} type="checkbox" value={value} id="checkbox" />
                     <div className="slider round"></div>
                 </label>
             </div>

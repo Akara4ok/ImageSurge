@@ -6,6 +6,11 @@ class ModelService {
         this.ModelRepository = ModelRepository;
     }
 
+    async getAll() {
+        const models = await this.ModelRepository.getAll();
+        return models;
+    }
+
     async getById(id) {
         const model = await this.ModelRepository.getById(id);
         if (!model) {

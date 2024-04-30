@@ -30,7 +30,7 @@ def toColorSpace(img: np.ndarray, colorspace: str) -> np.ndarray:
             return cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         case "HSV":
             return cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-        case "GRAY":
+        case "GrayScale":
             return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         case "RGBA":
             return cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)
@@ -68,7 +68,7 @@ def applyPostprocessing(img: np.ndarray, postprocessing: str) -> np.ndarray:
             if(len(parsed) < 3):
                 return img
             return resize(img, int(parsed[1]), int(parsed[2]))
-        case 'toColorSpace':
+        case 'colorspace':
             return toColorSpace(img, parsed[1])
         case _:
             return img

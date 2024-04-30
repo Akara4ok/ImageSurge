@@ -5,6 +5,13 @@ class ModelController {
         this.ModelService = ModelService;
     }
 
+    async getAll(req, res) {
+        const models = await this.ModelService.getAll();
+        return res.status(HttpStatusCode.OK).json({
+            models,
+        });
+    }
+
     async getById(req, res) {
         const { id } = req.params;
         const model = await this.ModelService.getById(id);
@@ -14,10 +21,10 @@ class ModelController {
     }
 
     async create(req, res) {
-        const { Name } = req.body;
+        const { Name, Desc } = req.body;
 
         const model = await this.ModelService.create(
-            Name
+            Name, Desc
         );
 
         return res.status(HttpStatusCode.CREATED).json({
@@ -37,10 +44,10 @@ class ModelController {
 
     async update(req, res) {
         const { id } = req.params;
-        const { Name } = req.body;
+        const { Name, Desc } = req.body;
 
         const model = await this.ModelService.update(
-            id, Name
+            id, Name, Desc
         );
 
         return res.status(HttpStatusCode.OK).json({

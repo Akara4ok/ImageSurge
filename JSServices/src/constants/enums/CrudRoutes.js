@@ -36,6 +36,7 @@ const CategoryRoutes = Object.freeze({
 
 const ModelRoutes = Object.freeze({
     GET_MODEL: '/model/:id',
+    GET_MODELS: '/model/all',
     CREATE_MODEL: '/model/',
     DELETE_MODEL: '/model/:id',
     UPDATE_MODEL: '/model/:id',

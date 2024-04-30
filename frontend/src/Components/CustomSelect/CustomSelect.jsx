@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import './CustomSelect.scss'; // Make sure the SCSS file is in the same directory
 import { CiCircleInfo } from "react-icons/ci";
 
-const CustomSelect = ({ className, options, tooltips, onOptionSelect }) => {
+const CustomSelect = ({ className, options, tooltips, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [filter, setFilter] = useState('');
@@ -43,8 +43,8 @@ const CustomSelect = ({ className, options, tooltips, onOptionSelect }) => {
   const handleOptionClick = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
-    if(onOptionSelect){
-      onOptionSelect(option);
+    if(onChange){
+      onChange(option);
     }
     setFilter('');
   };

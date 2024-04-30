@@ -125,6 +125,11 @@ const initCrudRoutes = ({
 
     //models
     routes.get(
+        ModelRoutes.GET_MODELS,
+        wrap(modelController.getAll.bind(modelController)),
+    );
+
+    routes.get(
         ModelRoutes.GET_MODEL,
         wrap(modelController.getById.bind(modelController)),
     );
