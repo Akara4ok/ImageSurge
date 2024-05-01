@@ -38,6 +38,33 @@ class ProjectService {
         return project;
     }
 
+    async getKey(id, UserId) {
+        const project = await this.ProjectRepository.getById(id);
+        if (!project) {
+            throw new NotFoundError();
+        }
+        if (project.UserId !== UserId){
+            throw new ForbiddenError();
+        }
+
+        return project.SecretKey;
+    }
+
+    async getFullInfoById(id, UserId) {
+        const project = await this.ProjectRepository.getFullInfoById(id);
+        delete project.SecretKey;
+
+        if (!project) {
+            throw new NotFoundError();
+        }
+
+        if(project.UserId != UserId){
+            throw new ForbiddenError();
+        }
+
+        return project;
+    }
+
     async create(
         UserId, Name, Cropping, NeuralNetworkName, Datasets, Postprocessings
     ) {
@@ -95,16 +122,13 @@ class ProjectService {
                 sources: datasetList.map(dataset => dataset.Source),
                 "category": (await this.CategoryService.getById(categoryId)).Name,
                 "kserve-path-classification": NeuralNetwork.KservePath ? KSERVE_URL + NeuralNetwork.KservePath : undefined,
-                "kserve-path-crop": NeuralNetwork.KservePath ? KSERVE_URL + NeuralNetwork.KservePath : undefined,
+                "kserve-path-crop": CroppingNetwork?.KservePath ? KSERVE_URL + CroppingNetwork.KservePath : undefined,
                 "local-kserve": NeuralNetwork.LocalKserve
             }
         }).then(async response => {
             await this.ProjectRepository.update({
                 Id: id,
-                Status: "Stopped", Name, CreatedAt: project.CreatedAt, Cropping, SecretKey, ArtifactPath: project.ArtifactPath,
-                User: { connect: { Id: UserId } },
-                NeuralNetwork: { connect: { Id: NeuralNetwork.Id } },
-                CroppingNetwork: CroppingNetwork ? { connect: { Id: CroppingNetwork.Id } } : undefined,
+                Status: "Stopped"
             });
             ioServer.sendMessage("project", `created ${Name}`, UserId);
         }).catch(async error => {
@@ -115,13 +139,88 @@ class ProjectService {
         return project;
     }
 
+    async load(UserId, ProjectId){
+        
+        const project = await this.getFullInfoById(ProjectId, UserId);
+        
+        await this.ProjectRepository.update({
+            Id: ProjectId,
+            Status: "Loading"
+        });
+
+        ioServer.sendMessage("project", `Start loading ${project.Name}`, UserId);
+
+
+        axios({
+            url: "http://localhost:5000/load",
+            method:"POST",
+            data: {
+                user: UserId,
+                project: ProjectId,
+                experiment: EXPERIMENT,
+                cropping: project.Cropping,
+                "kserve-path-classification": project.NeuralNetwork.KservePath ? KSERVE_URL + project.NeuralNetwork.KservePath : undefined,
+                "kserve-path-crop": project.CroppingNetwork?.KservePath ? KSERVE_URL + project.CroppingNetwork.KservePath : undefined,
+                "local-kserve": project.NeuralNetwork.LocalKserve
+            }
+        }).then(async response => {
+            await this.ProjectRepository.update({
+                Id: ProjectId,
+                Status: "Running"
+            });
+            ioServer.sendMessage("project", `loaded ${project.Name}`, UserId);
+        }).catch(async error => {
+            await this.ProjectRepository.update({
+                Id: ProjectId,
+                Status: "Stopped"
+            });
+            ioServer.sendMessage("project", `Load error`, UserId);
+            console.log
+        });    
+
+        return project;
+    }
+
+    async stop(UserId, ProjectId){
+        const project = await this.getFullInfoById(ProjectId, UserId);
+        
+        try{
+            const response = await axios({
+                url: "http://localhost:5000/stop",
+                method:"POST",
+                data: {
+                    user: UserId,
+                    project: ProjectId,
+                    experiment: EXPERIMENT,
+                    cropping: project.Cropping,
+                }
+            })
+
+            await this.ProjectRepository.update({
+                Id: ProjectId,
+                Status: "Stopped"
+            });
+
+        } catch {
+            await this.ProjectRepository.update({
+                Id: ProjectId,
+                Status: "Running"
+            });
+        }
+        
+        ioServer.sendMessage("project", `Stop occured`, UserId);
+        return project;
+    }
+
     async delete(id, requestUserId) {
         const requestProject = await this.ProjectRepository.getById(id);
         if(!requestUserId || requestUserId !== requestProject.UserId){
             throw new ForbiddenError();
         }
+        if(requestProject.Status === "Running"){
+            await this.stop(requestUserId, id);
+        }
         const project = await this.ProjectRepository.delete(id);
-
         try{
             if(existsSync(project.ArtifactPath + "/" + project.UserId + "/" + project.Id)){
                 rmSync(project.ArtifactPath + "/" + project.UserId + "/" + project.Id, {recursive: true, force: true});

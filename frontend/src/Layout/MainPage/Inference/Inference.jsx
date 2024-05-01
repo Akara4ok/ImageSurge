@@ -9,6 +9,7 @@ import Overview from './Overview';
 import Logs from './Logs';
 import Stats from './Stats';
 import Cropping from './Cropping';
+import CopyKeyButton from './CopyKeyButton';
 
 const Inference = ({ setActiveCallback, toggleMenu }) => {
     useEffect(() => {
@@ -23,6 +24,7 @@ const Inference = ({ setActiveCallback, toggleMenu }) => {
                     <div className='inference-header'>
                         <Link className="links" to="/projects"><MdKeyboardBackspace size="40px"/></Link>
                         <p>Project details</p>
+                        <div><CopyKeyButton/></div>
                     </div>
                     <div className='inference-header-2'>
                         <p className='inference-header-title'>Project details</p>

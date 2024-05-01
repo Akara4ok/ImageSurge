@@ -3,6 +3,7 @@ import './MultiSelect2.scss'; // Make sure the SCSS file is in the same director
 import { CiCircleInfo } from "react-icons/ci";
 import Button from '../Button/Button';
 import CustomSelect from '../CustomSelect/CustomSelect';
+import { processingCreator } from '../../utils/utils';
 
 const MultiSelect2 = ({ className, options, onChange, customFilter }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -117,34 +118,7 @@ const MultiSelect2 = ({ className, options, onChange, customFilter }) => {
   }
 
   const nameCreator = (item, index) => {
-    switch (item.name) {
-      case 'resize':
-        if(!item.param1 || !item.param2){
-          return false;
-        }
-        return index + ". Resize " + item.param1 + "x" + item.param2;
-      case 'colorspace':
-        if(!item.param1){
-          return false;
-        }
-        return "Colorspace: " + item.param1;
-      case 'flip H':
-        return index + ". Horizontal Flip";
-      case 'flip V':
-        return index + ". Vertical Flip";
-      case 'blur':
-        if(!item.param1 || !(/^\d+$/.test(item.param1)) || parseInt(item.param1) % 2 !== 1){
-          return false;
-        }
-        return index + ". Blur: " + item.param1;
-      case 'rotate':
-        if(!item.param1){
-          return false;
-        }
-        return index + ". Rotate:  " + item.param1;
-      default:
-        break;
-    }
+    return index + ". " + processingCreator(item)
   }
 
   return (

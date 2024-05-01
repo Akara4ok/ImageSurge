@@ -15,6 +15,18 @@ class ProjectRepository {
         return this._dbClient.Project.findFirst({ where: { Id: id } });
     }
 
+    getFullInfoById(id) {
+        return this._dbClient.Project.findFirst({ 
+            where: { Id: id },
+            include: {
+                Datasets: true,
+                ProjectProcessings: true,
+                NeuralNetwork: true,
+                CroppingNetwork: true
+            }
+        });
+    }
+
     create(Project) {
         return this._dbClient.Project.create({
             data: Project,

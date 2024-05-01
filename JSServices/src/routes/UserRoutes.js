@@ -45,10 +45,31 @@ const initUserRoutes = (
         wrap(projectController.getAll.bind(projectController)),
     );
 
+    routes.get(
+        UserRoutes.GET_PROJECT_KEY,
+        wrap(projectController.getKey.bind(projectController)),
+    );
+
+    routes.get(
+        UserRoutes.GET_PROJECT_INFO,
+        wrap(projectController.getFullInfoById.bind(projectController)),
+    );
+
     routes.post(
         UserRoutes.CREATE_PROJECT,
         wrap(projectController.create.bind(projectController)),
     );
+
+    routes.get(
+        UserRoutes.LOAD_PROJECT,
+        wrap(projectController.load.bind(projectController)),
+    );
+
+    routes.get(
+        UserRoutes.STOP_PROJECT,
+        wrap(projectController.stop.bind(projectController)),
+    );
+
 
     routes.delete(
         UserRoutes.DELETE_PROJECT,

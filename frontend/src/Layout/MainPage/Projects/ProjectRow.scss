@@ -4,7 +4,7 @@
     border-bottom: 1px solid $border-items-color;
 
     .table-row {
-        padding: 10px;
+        padding: 10px 0px;
 
         display: grid;
         grid-template-columns: 150px 1fr 1fr 1fr 1fr;
@@ -17,6 +17,19 @@
         span{
             display: flex;
             align-items: center;
+            .name-button{
+                height: 100%;
+                width: 100%;
+                cursor: pointer;
+                background-color: transparent;
+                border: none;
+                display: flex;
+                justify-content: start;
+                align-items: center;
+                font: inherit;
+                padding: 0px;
+                margin: 0px;
+            }
         }
 
         .status-icon {

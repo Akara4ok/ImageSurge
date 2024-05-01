@@ -46,6 +46,15 @@
                 align-items: center;
                 color: inherit;
             }
+            p{
+                margin-right: auto;
+            }
+            div{
+                margin-left: auto;
+                display: flex;
+                align-items: center;
+                margin-right: 10px;
+            }
         }
 
         .inference-header-2{

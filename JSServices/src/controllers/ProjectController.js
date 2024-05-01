@@ -20,6 +20,22 @@ class ProjectController {
         });
     }
 
+    async getKey(req, res) {
+        const { id } = req.params;
+        const key = await this.ProjectService.getKey(id, req.user?.id);
+        return res.status(HttpStatusCode.OK).json({
+            key,
+        });
+    }
+
+    async getFullInfoById(req, res) {
+        const { id } = req.params;
+        const project = await this.ProjectService.getFullInfoById(id, req.user?.id);
+        return res.status(HttpStatusCode.OK).json({
+            project,
+        });
+    }
+
     async create(req, res) {
         const UserId = req.user?.id;
         const { Name, Cropping, NeuralNetworkName, Datasets, Postprocessings } = req.body;
@@ -32,6 +48,34 @@ class ProjectController {
             message: "Start project creating"
         });
     }
+
+    async load(req, res) {
+        const UserId = req.user?.id;
+        const { id } = req.params;
+
+        const project = await this.ProjectService.load(
+            UserId, id
+        );
+
+        return res.status(HttpStatusCode.CREATED).json({
+            message: "Start project loading"
+        });
+    }
+
+    async stop(req, res) {
+        const UserId = req.user?.id;
+        const { id } = req.params;
+
+        const project = await this.ProjectService.stop(
+            UserId, id
+        );
+
+        return res.status(HttpStatusCode.CREATED).json({
+            message: "Start project loading"
+        });
+    }
+
+
 
     async delete(req, res) {
         const { id } = req.params;

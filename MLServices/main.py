@@ -58,9 +58,9 @@ def load_endpoint():
     cropping = content["cropping"]
     kserve_path_classification = content["kserve-path-classification"] if "kserve-path-classification" in content else None
     kserve_path_crop = content["kserve-path-crop"] if "kserve-path-crop" in content else None
-    token = content["token"] if "token" in content else None
+    local_kserve = content["local-kserve"] if "local-kserve" in content else None
     
-    return ifnferenceService.load(user, project, experiment_str, cropping, kserve_path_classification, kserve_path_crop, token)
+    return ifnferenceService.load(user, project, experiment_str, cropping, kserve_path_classification, kserve_path_crop, local_kserve)
 
 
 @app.route('/stop', methods=['POST'])
