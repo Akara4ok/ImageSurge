@@ -2,7 +2,7 @@ import { NotFoundError, ForbiddenError } from '../exceptions/GeneralException.js
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto';
 import 'dotenv/config'
-import { ProjectExistsError, ProjectTrainingError } from '../exceptions/ProjectExceptions.js';
+import { ProjectExistsError, ProjectTrainingError, ProjectProcessingError, ProjectNotLoadedError } from '../exceptions/ProjectExceptions.js';
 import { ioServer } from '../wssocket/wssocket.js';
 import axios from 'axios';
 import { existsSync, rmSync } from 'fs';
@@ -65,6 +65,16 @@ class ProjectService {
         return project;
     }
 
+    async getProjectWithProcessingByName(email, name) {
+        const project = await this.ProjectRepository.getProjectWithProcessingByName(email, name);
+
+        if (!project) {
+            throw new NotFoundError();
+        }
+
+        return project;
+    }
+
     async create(
         UserId, Name, Cropping, NeuralNetworkName, Datasets, Postprocessings
     ) {
@@ -90,7 +100,7 @@ class ProjectService {
             CroppingNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, modelCropping.Id); 
         }
         
-        const SecretKey = "Bearer " + jwt.sign({ id: UserId }, SECRET_KEY);
+        const SecretKey = jwt.sign({}, SECRET_KEY);
 
         const project = await this.ProjectRepository.create({
             Id: id,
@@ -117,6 +127,7 @@ class ProjectService {
                 experiment: EXPERIMENT,
                 model_name: NeuralNetworkName,
                 cropping: Cropping,
+                Level: 15,
                 "data-path": datasetList.map(dataset => DATA_PATH),
                 "dataset-names": datasetList.map(dataset => dataset.Name),
                 sources: datasetList.map(dataset => dataset.Source),
@@ -210,6 +221,43 @@ class ProjectService {
         
         ioServer.sendMessage("project", `Stop occured`, UserId);
         return project;
+    }
+
+    async process(email, name, secretKey, files){
+        const project = await this.getProjectWithProcessingByName(email, name);
+        if(project.Status !== "Running"){
+            throw new ProjectNotLoadedError();
+        }
+        if(project.SecretKey != secretKey){
+            throw new ForbiddenError();
+        }
+        
+        try{
+            const formData = new FormData();
+            formData.append('user', project.UserId);
+            formData.append('project', project.Id);
+            formData.append('experiment', EXPERIMENT);
+            formData.append('cropping', project.Cropping ? "True" : "False");
+            formData.append('level', project.Level);
+            if(project.Similarity){
+                formData.append('similarity', project.Similarity);
+            }
+            formData.append('postprocessing', "[" + project.ProjectProcessings.map(processing => {return '"' + processing.Value + '"'; }) + "]");
+
+            files.forEach(file => {
+                formData.append('file', new Blob([file.buffer], {type: file.mimetype}), file.originalname)
+            });
+
+            const response = await axios({
+                url: "http://localhost:5000/process",
+                method: "post",
+                data: formData,
+                responseType: 'stream'
+            })
+            return response;
+        } catch(error) {
+            throw new ProjectProcessingError();
+        }        
     }
 
     async delete(id, requestUserId) {

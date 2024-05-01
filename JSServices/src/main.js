@@ -14,6 +14,7 @@ import { initTestRoutes } from './routes/TestRoutes.js';
 
 import * as dotenv from 'dotenv';
 import { authMiddleware } from './middlewares/AuthMiddleware.js';
+import { initNotAuthRoutes } from './routes/NotAuthRoutes.js';
 dotenv.config();
 
 const PORT = getEnv('PORT') || 8000;
@@ -31,6 +32,7 @@ const main = async () => {
 
     const crudRoutes = initCrudRoutes(controllers);
     const authRoutes = initAuthRoutes(controllers.userController);
+    const notAuthRoutes = initNotAuthRoutes(controllers.projectController);
     const userRoutes = initUserRoutes(controllers.datasetController, controllers.userController, controllers.projectController, authMiddleware);
     const testRoutes = initTestRoutes();
 
@@ -40,6 +42,7 @@ const main = async () => {
         .use(json())
         .use(urlencoded({ extended: true }))
         .use(testRoutes)
+        .use(notAuthRoutes)
         .use(authRoutes)
         .use("/", userRoutes)
         .use(crudRoutes)

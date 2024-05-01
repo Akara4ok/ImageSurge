@@ -23,12 +23,13 @@ const initServices = ({
     const datasetService = new DatasetService(datasetRepository, categoryService);
     const neuralNetworkService = new NeuralNetworkService(neuralNetworkRepository);
     const modelService = new ModelService(modelRepository);
-    const projectProcessingService = new ProjectProcessingService(projectProcessingRepository)
-    const projectService = new ProjectService(projectRepository, datasetService, neuralNetworkService, modelService, categoryService);
+    const projectProcessingService = new ProjectProcessingService(projectProcessingRepository);
+    const logService = new LogService(logRepository);
+    const projectService = new ProjectService(projectRepository, datasetService, neuralNetworkService, modelService, categoryService, logService);
     return {
         userService: new UserService(userRepository),
-        logService: new LogService(logRepository),
         requestService: new RequestService(requestRepository),
+        logService: logService,
         projectProcessingService: projectProcessingService,
         categoryService: categoryService,
         modelService: modelService,

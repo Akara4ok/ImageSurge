@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import sys
 import cv2
+import time
 sys.path.append("OneClassML")
 from Pipeline.Inference import Inference
 from Pipeline.OneClassClassificationInference import OneClassClassificationInference
@@ -111,16 +112,24 @@ class InferenceHandler:
         dataset = InferenceImageDataset(IMAGE_HEIGHT, IMAGE_WIDTH)
         dataset.load(images)
         
+        validation_time = time.time()
         quality = self.validate(dataset.get_data())
+        validation_time = time.time() - validation_time
         
         inference = self.iference_map[inference_key]
+        
+        classification_time = time.time()
         result = inference.process(dataset.get_data().batch(self.batch_size))
+        classification_time = time.time() - classification_time
         
         result_crop = None
+        cropping_time = None
         if(cropping):
             inference_crop = self.iference_map[inference_crop_key]
+            cropping_time = time.time()
             result_crop = inference_crop.process(dataset.get_data(), result_classification = result.tolist(), 
                                                  level = level, similarity = similarity)
+            cropping_time = time.time() - cropping_time
             if(result_crop is not None):
                 recropped = []
                 for index, crop in enumerate(result_crop):
@@ -129,7 +138,7 @@ class InferenceHandler:
                 
                 result_crop = np.asarray(recropped)
         
-        return (result, quality, result_crop)
+        return (result, quality, result_crop, validation_time, classification_time, cropping_time)
     
     def postprocess(self, images: list[np.ndarray], postprocessings: list[str], cropping: np.ndarray) -> list[np.ndarray]:
         processed = images

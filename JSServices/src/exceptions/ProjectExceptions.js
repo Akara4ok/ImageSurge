@@ -19,4 +19,22 @@ class ProjectTrainingError extends HttpError {
     }
 }
 
-export { ProjectExistsError, ProjectTrainingError };
+class ProjectProcessingError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.INTERNAL_SERVER_ERROR,
+            message: 'Error during Project Processing',
+        });
+    }
+}
+
+class ProjectNotLoadedError extends HttpError {
+    constructor() {
+        super({
+            status: HttpStatusCode.INTERNAL_SERVER_ERROR,
+            message: 'Project not loaded',
+        });
+    }
+}
+
+export { ProjectExistsError, ProjectTrainingError, ProjectProcessingError, ProjectNotLoadedError };

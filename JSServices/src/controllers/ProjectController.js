@@ -1,5 +1,5 @@
 import { HttpStatusCode } from '../constants/enums/StatusCodes.js';
-
+import { Readable } from 'stream';
 class ProjectController {
     constructor(ProjectService) {
         this.ProjectService = ProjectService;
@@ -75,7 +75,21 @@ class ProjectController {
         });
     }
 
+    async process(req, res) {
+        const { email, name, secretKey } = req.body;
+        const files = req.files;
 
+        const response = await this.ProjectService.process(
+            email, name, secretKey, files
+        );
+
+        res.setHeader("Content-Type", "application/zip");
+        res.setHeader("Content-Disposition", "attachment; filename=result.zip");
+
+        response.data?.pipe(res);
+        const waitPipe = res => new Promise(resolve => response.data.on("finish", resolve));
+        await waitPipe();
+    }
 
     async delete(req, res) {
         const { id } = req.params;

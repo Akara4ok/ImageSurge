@@ -70,7 +70,6 @@ const initUserRoutes = (
         wrap(projectController.stop.bind(projectController)),
     );
 
-
     routes.delete(
         UserRoutes.DELETE_PROJECT,
         wrap(projectController.delete.bind(projectController)),

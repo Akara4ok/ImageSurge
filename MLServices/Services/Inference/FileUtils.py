@@ -30,13 +30,18 @@ def processFiles(files: list) -> tuple[list[np.ndarray], str]:
 
     return (images, filenames)
 
-def create_result_zip(result_classification: np.ndarray, quality: np.ndarray, result_crop: np.ndarray, images_names: list, images: list):
+def create_result_zip(result_classification: np.ndarray, quality: np.ndarray, result_crop: np.ndarray, 
+                      validation_time: float, classification_time: float, cropping_time: float, 
+                      images_names: list, images: list):
     if(len(images_names) != len(images)):
         return
     
     json_dict = {
         "result_classification": result_classification.tolist(),
         "quality": quality.tolist(),
+        "validation_time": validation_time,
+        "classification_time": classification_time,
+        "cropping_time": cropping_time,
     }
     if(result_crop is not None):
         json_dict["result_crop"] = result_crop.tolist()

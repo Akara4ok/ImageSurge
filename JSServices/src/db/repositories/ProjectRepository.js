@@ -27,6 +27,23 @@ class ProjectRepository {
         });
     }
 
+    getProjectWithProcessingByName(email, name) {
+        return this._dbClient.Project.findFirst({ 
+            where: {
+                User: {
+                    is: {
+                        Email: email
+                    }
+                },
+                Name: name 
+            },
+            include: {
+                ProjectProcessings: true,
+                User: true
+            }
+        });
+    }
+
     create(Project) {
         return this._dbClient.Project.create({
             data: Project,

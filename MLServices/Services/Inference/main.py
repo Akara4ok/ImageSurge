@@ -81,10 +81,10 @@ def process_endpoint():
         return {
                 "message": "Error during processing"
             }, 500
-    (result_classification, quality, result_crop) = result
+    (result_classification, quality, result_crop, validation_time, classification_time, cropping_time) = result
     images = inferenceHandler.postprocess(images, postprocessing, result_crop)
     
-    data = create_result_zip(result_classification, quality, result_crop, filenames, images)
+    data = create_result_zip(result_classification, quality, result_crop, validation_time, classification_time, cropping_time, filenames, images)
     return send_file(
         data,
         mimetype='application/zip',
