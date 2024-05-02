@@ -108,6 +108,7 @@ model NeuralNetwork {
     LocalKserve            Boolean
     Model                  Model     @relation(fields: [ModelId], references: [Id])
     ModelId                String    @db.Uuid
+    CropInference          Boolean   @default(false)
 }
 
 model Category {

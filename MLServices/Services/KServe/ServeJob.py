@@ -25,5 +25,12 @@ class ServeJob:
         
         
 if __name__ == "__main__":
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if (len(gpus) > 0):
+        try:
+            tf.config.experimental.set_virtual_device_configuration(gpus[0], 
+                                                                    [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=3000)])
+        except RuntimeError as e:
+            print(e)
     serve_job = ServeJob(port = 8080)
     serve_job.serve(["resnet50", "clip"], ["OneClassML/DefaultModels/resnet", "OneClassML/DefaultModels/clip"])

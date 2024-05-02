@@ -49,5 +49,5 @@ class Inference(Pipeline):
         
         self.cluster_center = FileHandler.loadNumpyArray(self.file_handler.get_file_path(PipelineStage.ClusterCenter, 
                                                                                       ArtifactType.NumpyArray))
-        
+
         self.is_loaded = (self.feature_extractor is not None) and (self.one_class is not None)

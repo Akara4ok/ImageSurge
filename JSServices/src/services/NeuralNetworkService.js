@@ -15,35 +15,38 @@ class NeuralNetworkService {
         return neuralNetwork;
     }
 
-    async getBestNetwork(categoryId, modelId){
+    async getBestNetwork(categoryId, modelId, Crop){
         const relatedNetworks = await this.NeuralNetworkRepository.getRelatedNetworks(categoryId, modelId);
         if (!relatedNetworks || relatedNetworks.length === 0) {
             throw new NotFoundError("NeuralNetworks");
         }
         let localKserveNetwork;
-        let nonLocalKserveNetwork;
+        let nonKserveNetwork;
         for (let index = 0; index < relatedNetworks.length; index++) {
             const element = relatedNetworks[index];
-            if(!localKserveNetwork && element.LocalKserve && element.KservePath){
+            if(!element.KservePath && element.CropInference === Crop){
+                nonKserveNetwork = element;
+            }
+            if(!localKserveNetwork && element.LocalKserve && element.KservePath && element.CropInference === Crop){
                 localKserveNetwork = element;
             }
-            if(!element.LocalKserve && element.KservePath){
+            if(!element.LocalKserve && element.KservePath && element.CropInference === Crop){
                 return element
             }
         }
-        if(nonLocalKserveNetwork){
-            return nonLocalKserveNetwork;
+        if(localKserveNetwork){
+            return localKserveNetwork;
         }
-        return relatedNetworks[0]
+        return nonKserveNetwork;
     }
 
     async create(
-        CategoryId, KservePath, LocalKserve, ModelId
+        CategoryId, KservePath, LocalKserve, ModelId, CropInference
     ) {
         const id = crypto.randomUUID();
         const neuralNetwork = await this.NeuralNetworkRepository.create({
             Id: id,
-            KservePath, LocalKserve, Category: { connect: { Id: CategoryId } }, Model: { connect: { Id: ModelId } }
+            KservePath, LocalKserve, CropInference, Category: { connect: { Id: CategoryId } }, Model: { connect: { Id: ModelId } }
         });
         return neuralNetwork;
     }
@@ -55,11 +58,11 @@ class NeuralNetworkService {
 
     async update(
         id,
-        CategoryId, KservePath, LocalKserve, ModelId
+        CategoryId, KservePath, LocalKserve, ModelId, CropInference
     ) {
         const neuralNetwork = await this.NeuralNetworkRepository.update({
             Id: id,
-            KservePath, LocalKserve, Category: { connect: { Id: CategoryId } }, Model: { connect: { Id: ModelId } }
+            KservePath, LocalKserve, CropInference, Category: { connect: { Id: CategoryId } }, Model: { connect: { Id: ModelId } }
         });
         return neuralNetwork;
     }

@@ -8,6 +8,7 @@ sys.path.append("OneClassML")
 from Pipeline.Inference import Inference
 from Pipeline.OneClassClassificationInference import OneClassClassificationInference
 from Pipeline.CropInference import CropInference
+from Pipeline.KserveCropInference import KserveCropInference
 from Pipeline.utils.FileHandler import FileHandler
 from utils.ExperimentInfo import ExperimentInfo
 from Dataset.InferenceImageDataset import InferenceImageDataset
@@ -60,7 +61,9 @@ class InferenceHandler:
             kserve_crop = None
             if(kserve_crop_path is not None):
                 kserve_crop = KServeModel(kserve_crop_path, token)
-            inference_crop = CropInference(file_handler_crop, kserve_model=kserve_crop)
+                inference_crop = KserveCropInference(file_handler_crop, kserve_model=kserve_crop, url=kserve_crop_path, token=token)
+            else: 
+                inference_crop = CropInference(file_handler_crop, kserve_model=kserve_crop)
             inference_crop.load()
             
             if(not inference_crop.is_loaded):

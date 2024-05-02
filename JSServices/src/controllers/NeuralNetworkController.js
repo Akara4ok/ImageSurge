@@ -14,10 +14,10 @@ class NeuralNetworkController {
     }
 
     async create(req, res) {
-        const { CategoryId, KservePath, LocalKserve, ModelId } = req.body;
+        const { CategoryId, KservePath, LocalKserve, ModelId, CropInference } = req.body;
 
         const neuralNetwork = await this.NeuralNetworkService.create(
-            CategoryId, KservePath, LocalKserve, ModelId
+            CategoryId, KservePath, LocalKserve, ModelId, CropInference
         );
 
         return res.status(HttpStatusCode.CREATED).json({
@@ -37,10 +37,10 @@ class NeuralNetworkController {
 
     async update(req, res) {
         const { id } = req.params;
-        const { CategoryId, KservePath, LocalKserve, ModelId } = req.body;
+        const { CategoryId, KservePath, LocalKserve, ModelId, CropInference } = req.body;
 
         const neuralNetwork = await this.NeuralNetworkService.update(
-            id, CategoryId, KservePath, LocalKserve, ModelId
+            id, CategoryId, KservePath, LocalKserve, ModelId, CropInference
         );
 
         return res.status(HttpStatusCode.OK).json({

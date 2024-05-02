@@ -16,6 +16,7 @@ const ARTIFACT_PATH = process.env.ARTIFACT_PATH;
 const EXPERIMENT = process.env.EXPERIMENT;
 const DATA_PATH = process.env.DATA_PATH;
 const KSERVE_URL = process.env.KSERVE_URL;
+const KSERVE_URL_CROP = process.env.KSERVE_URL_CROP;
 
 class ProjectService {
     constructor(ProjectRepository, DatasetService, NeuralNetworkService, ModelService, CategoryService, LogService, RequestService, LoadStatService) {
@@ -107,13 +108,13 @@ class ProjectService {
 
         const categoryId = (await this.DatasetService.getById(Datasets[0])).categoryId;
         const model = await this.ModelService.getByName(NeuralNetworkName);
-        const NeuralNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, model.Id); 
+        const NeuralNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, model.Id, false); 
         
         let modelCropping;
         let CroppingNetwork
         if(Cropping){
             modelCropping = await this.ModelService.getByName("ResNet");
-            CroppingNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, modelCropping.Id); 
+            CroppingNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, modelCropping.Id, true); 
         }
         
         const SecretKey = jwt.sign({}, SECRET_KEY);
@@ -149,7 +150,7 @@ class ProjectService {
                 sources: datasetList.map(dataset => dataset.Source),
                 "category": (await this.CategoryService.getById(categoryId)).Name,
                 "kserve-path-classification": NeuralNetwork.KservePath ? KSERVE_URL + NeuralNetwork.KservePath : undefined,
-                "kserve-path-crop": CroppingNetwork?.KservePath ? KSERVE_URL + CroppingNetwork.KservePath : undefined,
+                "kserve-path-crop": CroppingNetwork?.KservePath ? KSERVE_URL_CROP + CroppingNetwork.KservePath : undefined,
                 "local-kserve": NeuralNetwork.LocalKserve
             }
         }).then(async response => {

@@ -17,6 +17,7 @@ app = Flask(__name__)
 CORS(app)
 
 inferenceHandler = InferenceHandler(config.ARTIFACTS_DIR, 1)
+# inferenceHandler.load("test", "test", "test", True, kserve_crop_path="http://localhost:8080/v1/models/resnet50:predict")
 
 @app.route('/load', methods=['POST'])
 def load_endpoint():
@@ -75,7 +76,6 @@ def process_endpoint():
             }, 500
     
     images, filenames = process_files_result
-    
     result = inferenceHandler.process(images, user, project, experiment_str, cropping, level, similarity)
     if(result is None):
         return {
@@ -107,6 +107,6 @@ if __name__ == "__main__":
                                                                     [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=memory_limit)])
         except RuntimeError as e:
             print(e)
-            
+
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)

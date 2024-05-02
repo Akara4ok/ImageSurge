@@ -5,7 +5,8 @@ import base64
 import io
 import numpy as np
 import cv2
-from datetime import datetime
+import sys
+sys.path.append("OneClassML")
 
 from kserve import (
     Model,
@@ -18,25 +19,24 @@ from kserve.errors import InvalidInput
 from kserve.utils.utils import generate_uuid
 from Pipeline.ModelHandlers.ModelHandler import ModelHandler
 from Pipeline.ModelHandlers.ModelLoader import ModelLoader
+from Pipeline.CropInference import CropInference
+from kserve import ModelServer
 
 DEVICE = "cuda" if len(tf.config.list_physical_devices('GPU')) > 0 else "cpu"
 
-class KServeModelHandler(Model):
+class KServeCrop(Model):
     """ Class to serve Model Handlers with kserve """
-    def __init__(self, name: str, path: str, batch: int = None) -> None:
+    def __init__(self, name: str) -> None:
         super().__init__(name)
         self.name = name
         self.model_handler: ModelHandler = None 
-        self.batch = batch
-        self.path = path
-        self.model = None
+        self.path = "OneClassML/DefaultModels/resnet"
         self.ready = False
         self.load()
 
     def load(self) -> bool:
         # load model
         self.model_handler = ModelLoader.load(self.path)
-        self.model = self.model_handler.model
         self.ready = True
         return self.ready
     
@@ -44,8 +44,6 @@ class KServeModelHandler(Model):
         self, payload: Union[Dict, InferRequest], headers: Dict[str, str] = None
     ) -> tf.Tensor:
         result_tensor = []
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
         
         if isinstance(payload, Dict) and "instances" in payload:
             headers["request-type"] = "v1"
@@ -62,30 +60,30 @@ class KServeModelHandler(Model):
         else:
             raise InvalidInput("invalid payload")
 
-        result_tensor = np.asarray(result_tensor)
-        result_tensor = self.model_handler.preprocess(result_tensor)
+        result_tensor = {
+            "data": np.asarray(result_tensor),
+            "result_classification": payload["result_classification"],
+            "level": payload["level"],
+            "save_cache": payload["save_cache"],
+            "cluster_center": payload["cluster_center"]
+            }
+        if("similarity" in payload):
+            result_tensor["similarity"] = payload["similarity"]
         return result_tensor
 
     def predict(
-        self, input_tensor: tf.Tensor, headers: Dict[str, str] = None
+        self, input_tensor: dict, headers: Dict[str, str] = None
     ) -> Union[Dict, InferResponse]:
-        
-        result_data = input_tensor
-        output = None
-        if(self.batch is not None):
-            result_data = tf.data.Dataset.from_tensor_slices(input_tensor)
-            result_data = result_data.batch(self.batch)
-            for batch in result_data:
-                result = self.model_handler.extract_features(batch)
-                if(not isinstance(result, np.ndarray)):
-                    result = result.numpy()
-                if(output is None):
-                    output = result
-                else:
-                    output = np.concatenate((output, result))
-        else:
-            output = self.model_handler.extract_features(result_data)
-            
+        self.inference = CropInference(None, kserve_model=self.model_handler)
+        self.inference.feature_extractor = self.model_handler
+        self.inference.cluster_center = input_tensor["cluster_center"]
+        self.inference.is_loaded = True
+        input_data = tf.data.Dataset.from_tensor_slices(input_tensor["data"])
+        similarity = None
+        if("similarity" in input_tensor):
+            similarity = input_tensor["similarity"]
+        output = self.inference.process(input_data, result_classification = input_tensor["result_classification"], 
+                                                 level = input_tensor["level"], similarity = similarity)
         result_pred = output.tolist()
         response_id = generate_uuid()
         infer_output = InferOutput(
@@ -97,8 +95,20 @@ class KServeModelHandler(Model):
 
         if "request-type" in headers and headers["request-type"] == "v1":
             return {
-                "features": result_pred,
+                "result_crop": result_pred,
+                "similarity": self.inference.get_calc_similarity(),
                 "device": DEVICE,
             }
         else:
             return infer_response
+    
+if __name__ == "__main__":
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if (len(gpus) > 0):
+        try:
+            tf.config.experimental.set_virtual_device_configuration(gpus[0], 
+                                                                    [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=10000)])
+        except RuntimeError as e:
+            print(e)
+    model = KServeCrop("resnet50")
+    ModelServer(enable_docs_url=True, http_port=8080).start([model])
