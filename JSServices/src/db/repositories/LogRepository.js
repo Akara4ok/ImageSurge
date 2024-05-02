@@ -7,6 +7,10 @@ class LogRepository {
         return this._dbClient.Log.findFirst({ where: { Id: id } });
     }
 
+    getProjectLogs(id) {
+        return this._dbClient.Log.findMany({ where: { ProjectId: id } });
+    }
+
     create(Log) {
         return this._dbClient.Log.create({
             data: Log,

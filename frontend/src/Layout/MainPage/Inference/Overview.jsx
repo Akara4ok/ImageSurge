@@ -9,8 +9,8 @@ import { processingCreator } from '../../../utils/utils';
 
 const Overview = () => {
     const [popupMsg, setPopupMsg] = useState();
-    const [isLoading, setIsLoading] = useState();
     const [isPopupOpen, setPopupOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState();
     const [name, setName] = useState("");
     const [status, setStatus] = useState("");
     const [cropping, setCropping] = useState("");

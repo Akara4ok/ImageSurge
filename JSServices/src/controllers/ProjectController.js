@@ -28,6 +28,14 @@ class ProjectController {
         });
     }
 
+    async getProjectLogs(req, res) {
+        const { id } = req.params;
+        const logs = await this.ProjectService.getProjectLogs(id, req.user?.id);
+        return res.status(HttpStatusCode.OK).json({
+            logs,
+        });
+    }
+
     async getFullInfoById(req, res) {
         const { id } = req.params;
         const project = await this.ProjectService.getFullInfoById(id, req.user?.id);

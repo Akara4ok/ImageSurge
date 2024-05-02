@@ -1,4 +1,5 @@
 import { NotFoundError } from '../exceptions/GeneralException.js';
+import { ioServer } from '../wssocket/wssocket.js';
 import crypto from 'crypto';
 
 class LogService {
@@ -15,14 +16,26 @@ class LogService {
         return log;
     }
 
+    async getProjectLogs(ProjectId) {
+        const logs = await this.LogRepository.getProjectLogs(ProjectId);
+        return logs
+    }
+
     async create(
-        ProjectId, Value
+        ProjectId, StatusCode, Function, Value, UserId
     ) {
+        if(typeof Value === String){
+            return;
+        }
         const id = crypto.randomUUID();
+        const curDate = new Date();
         const log = await this.LogRepository.create({
-            Id: id,
-            Value, Project: { connect: { Id: ProjectId } }
+            Id: id,  Project: { connect: { Id: ProjectId } },
+            Time: curDate, StatusCode, Function, Value
         });
+        if(UserId){
+            ioServer.sendMessage("log",`${curDate}; ${StatusCode}; ${Function}; ${Value}`, UserId)
+        }
         return log;
     }
 
@@ -33,11 +46,11 @@ class LogService {
 
     async update(
         id,
-        ProjectId, Value
+        ProjectId, Time, StatusCode, Function, Value
     ) {
         const log = await this.LogRepository.update({
-            Id: id,
-            Value, Project: { connect: { Id: ProjectId } }
+            Id: id, Project: { connect: { Id: ProjectId } }, 
+            Time, StatusCode, Function, Value
         });
         return log;
     }

@@ -8,6 +8,7 @@ export const UserRoutes = Object.freeze({
     CREATE_PROJECT: '/project/',
     LOAD_PROJECT: '/project/load/:id',
     STOP_PROJECT: '/project/stop/:id',
+    PROJECT_LOGS: '/project/logs/:id',
     DELETE_PROJECT: '/project/:id',
     GET_CURRENT_USER: '/user/me',
     UPDATE_CURERENT_USER: '/user/me',

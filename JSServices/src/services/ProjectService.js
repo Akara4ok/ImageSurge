@@ -6,6 +6,7 @@ import { ProjectExistsError, ProjectTrainingError, ProjectProcessingError, Proje
 import { ioServer } from '../wssocket/wssocket.js';
 import axios from 'axios';
 import { existsSync, rmSync } from 'fs';
+import { HttpError } from '../exceptions/HttpErrors.js';
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const ARTIFACT_PATH = process.env.ARTIFACT_PATH;
@@ -14,12 +15,13 @@ const DATA_PATH = process.env.DATA_PATH;
 const KSERVE_URL = process.env.KSERVE_URL;
 
 class ProjectService {
-    constructor(ProjectRepository, DatasetService, NeuralNetworkService, ModelService, CategoryService) {
+    constructor(ProjectRepository, DatasetService, NeuralNetworkService, ModelService, CategoryService, LogService) {
         this.ProjectRepository = ProjectRepository;
         this.DatasetService = DatasetService;
         this.NeuralNetworkService = NeuralNetworkService;
         this.ModelService = ModelService;
         this.CategoryService = CategoryService;
+        this.LogService = LogService;
     }
 
     async getAll(userId) {
@@ -65,14 +67,13 @@ class ProjectService {
         return project;
     }
 
-    async getProjectWithProcessingByName(email, name) {
-        const project = await this.ProjectRepository.getProjectWithProcessingByName(email, name);
-
-        if (!project) {
-            throw new NotFoundError();
+    async getProjectLogs(ProjectId, UserId) {
+        const project = await this.getById(ProjectId);
+        if(project.UserId !== UserId){
+            throw new ForbiddenError();
         }
-
-        return project;
+        const logs = await this.LogService.getProjectLogs(ProjectId);
+        return logs
     }
 
     async create(
@@ -151,8 +152,15 @@ class ProjectService {
     }
 
     async load(UserId, ProjectId){
-        
-        const project = await this.getFullInfoById(ProjectId, UserId);
+        let project;
+        try{
+            project = await this.getFullInfoById(ProjectId, UserId);
+        } catch (error){
+            if(error instanceof HttpError){
+                await this.LogService.create(ProjectId, error.response.status, "Load", error.message, project?.UserId ?? UserId);
+            }
+            throw error
+        }
         
         await this.ProjectRepository.update({
             Id: ProjectId,
@@ -179,21 +187,34 @@ class ProjectService {
                 Id: ProjectId,
                 Status: "Running"
             });
+            
+            await this.LogService.create(ProjectId, 200, "Load", "Success", project?.UserId);
+
             ioServer.sendMessage("project", `loaded ${project.Name}`, UserId);
         }).catch(async error => {
             await this.ProjectRepository.update({
                 Id: ProjectId,
                 Status: "Stopped"
             });
+
+            await this.LogService.create(ProjectId, error.response.status, "Load", error.response?.data?.message ?? "Load Failed", project?.UserId ?? UserId);
+
             ioServer.sendMessage("project", `Load error`, UserId);
-            console.log
         });    
 
         return project;
     }
 
     async stop(UserId, ProjectId){
-        const project = await this.getFullInfoById(ProjectId, UserId);
+        let project;
+        try{
+            project = await this.getFullInfoById(ProjectId, UserId);
+        } catch (error){
+            if(error instanceof HttpError){
+                await this.LogService.create(ProjectId, error.response.status, "Stop", error.message, project?.UserId ?? UserId);
+            }
+            throw error
+        }
         
         try{
             const response = await axios({
@@ -212,11 +233,14 @@ class ProjectService {
                 Status: "Stopped"
             });
 
-        } catch {
+            await this.LogService.create(ProjectId, 200, "Stop", "Success", project?.UserId ?? UserId);
+
+        } catch(error) {
             await this.ProjectRepository.update({
                 Id: ProjectId,
                 Status: "Running"
             });
+            await this.LogService.create(ProjectId, error.response.status, "Stop", error.response?.data?.message ?? "Load Failed", project?.UserId ?? UserId);
         }
         
         ioServer.sendMessage("project", `Stop occured`, UserId);
@@ -224,11 +248,16 @@ class ProjectService {
     }
 
     async process(email, name, secretKey, files){
-        const project = await this.getProjectWithProcessingByName(email, name);
+        const project = await this.ProjectRepository.getProjectWithProcessingByName(email, name);
+        if (!project) {
+            throw new NotFoundError("Project or User");
+        }
         if(project.Status !== "Running"){
+            await this.LogService.create(project.Id, 400, "Process", "Project not loaded", project?.UserId ?? UserId);
             throw new ProjectNotLoadedError();
         }
         if(project.SecretKey != secretKey){
+            await this.LogService.create(project.Id, 403, "Process", "Access denied", project?.UserId ?? UserId);
             throw new ForbiddenError();
         }
         
@@ -254,8 +283,13 @@ class ProjectService {
                 data: formData,
                 responseType: 'stream'
             })
+
+            await this.LogService.create(project.Id, 200, "Process", "Processed " + files.length + " images", project?.UserId ?? UserId);
+
             return response;
         } catch(error) {
+            console.log(error)
+            await this.LogService.create(project.Id, error.response.status, "Process", error.response?.data ?? "Process Failed", project?.UserId ?? UserId);
             throw new ProjectProcessingError();
         }        
     }
@@ -279,16 +313,12 @@ class ProjectService {
     }
 
     async update(
-        id,
-        UserId, Status, Name, CreatedAt, Cropping, 
-            SecretKey, NeuralNetworkId, CroppingNetworkId, ArtifactPath, Level, Similarity, Datasets
+        id, UserId, Level, Similarity
     ) {
         const project = await this.ProjectRepository.update({
-            Id: id,
-            Status, Name, CreatedAt: CreatedAt ? CreatedAt : new Date(), Cropping, SecretKey, ArtifactPath, Level, Similarity, 
-            User: { connect: { Id: UserId } }, NeuralNetwork: { connect: { Id: NeuralNetworkId } }, 
-            CroppingNetwork: { connect: { Id: CroppingNetworkId } }, Datasets: {connect: Datasets.map(DatasetId => {return { Id: DatasetId } })},
+            Id: id, Level, Similarity, 
         });
+        await this.LogService.create(project.Id, 200, "Update", "New level: " + Level + " new simialirity: " + Similarity, project?.UserId ?? UserId);
         return project;
     }
 }

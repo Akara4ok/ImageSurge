@@ -13,11 +13,19 @@ class LogController {
         });
     }
 
+    async getProjectLogs(req, res) {
+        const { id } = req.params;
+        const logs = await this.LogService.getProjectLogs(id);
+        return res.status(HttpStatusCode.OK).json({
+            logs,
+        });
+    }
+
     async create(req, res) {
-        const { ProjectId, Value } = req.body;
+        const { ProjectId, StatusCode, Function, Value } = req.body;
 
         const log = await this.LogService.create(
-            ProjectId, Value
+            ProjectId, StatusCode, Function, Value
         );
 
         return res.status(HttpStatusCode.CREATED).json({
@@ -37,11 +45,11 @@ class LogController {
 
     async update(req, res) {
         const { id } = req.params;
-        const { ProjectId, Value } = req.body;
+        const { ProjectId, Time, StatusCode, Function, Value } = req.body;
 
         const log = await this.LogService.update(
             id,
-            ProjectId, Value
+            ProjectId, Time, StatusCode, Function, Value
         );
 
         return res.status(HttpStatusCode.OK).json({
