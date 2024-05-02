@@ -75,6 +75,11 @@ const initUserRoutes = (
         wrap(projectController.getProjectLogs.bind(projectController)),
     );
 
+    routes.get(
+        UserRoutes.PROJECT_STATS,
+        wrap(projectController.getProjectStats.bind(projectController)),
+    );
+
     routes.delete(
         UserRoutes.DELETE_PROJECT,
         wrap(projectController.delete.bind(projectController)),

@@ -19,6 +19,13 @@ const LogRoutes = Object.freeze({
     UPDATE_LOG: '/log/:id',
 });
 
+const LoadStatRoutes = Object.freeze({
+    GET_LOADSTAT: '/loadstat/:id',
+    CREATE_LOADSTAT: '/loadstat/',
+    DELETE_LOADSTAT: '/loadstat/:id',
+    UPDATE_LOADSTAT: '/loadstat/:id',
+});
+
 const ProjectProcessingRoutes = Object.freeze({
     GET_PROJECTPROCESSING: '/projectprocessing/:id',
     CREATE_PROJECTPROCESSING: '/projectprocessing/',
@@ -64,5 +71,5 @@ export {
     UserRoutes, RequestRoutes, LogRoutes, 
     ProjectProcessingRoutes, CategoryRoutes, 
     ModelRoutes, NeuralNetworkRoutes,
-    ProjectRoutes, DatasetRoutes
+    ProjectRoutes, DatasetRoutes, LoadStatRoutes
 }

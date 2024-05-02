@@ -15,6 +15,22 @@ class RequestService {
         return request;
     }
 
+    async getStatsByProjectId(id) {
+        const stat = await this.RequestRepository.getStatsByProjectId(id);
+        if (!stat) {
+            return {
+              TotalRequests: 0,
+              Images: 0,
+              ProcessingTime: 0,
+              ValidationTime: 0,
+              ClassificationTime: 0,
+              CroppingTime: 0,
+              Quality: 0,
+            };
+        }
+        return stat;
+    }
+
     async create(
         ProjectId,
         Images,

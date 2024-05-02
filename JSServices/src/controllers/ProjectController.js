@@ -36,6 +36,14 @@ class ProjectController {
         });
     }
 
+    async getProjectStats(req, res) {
+        const { id } = req.params;
+        const stats = await this.ProjectService.getProjectStats(id, req.user?.id);
+        return res.status(HttpStatusCode.OK).json({
+            stats,
+        });
+    }
+
     async getFullInfoById(req, res) {
         const { id } = req.params;
         const project = await this.ProjectService.getFullInfoById(id, req.user?.id);
@@ -87,15 +95,15 @@ class ProjectController {
         const { email, name, secretKey } = req.body;
         const files = req.files;
 
-        const response = await this.ProjectService.process(
+        const stream = await this.ProjectService.process(
             email, name, secretKey, files
         );
 
         res.setHeader("Content-Type", "application/zip");
         res.setHeader("Content-Disposition", "attachment; filename=result.zip");
 
-        response.data?.pipe(res);
-        const waitPipe = res => new Promise(resolve => response.data.on("finish", resolve));
+        stream?.pipe(res);
+        const waitPipe = res => new Promise(resolve => stream.on("finish", resolve));
         await waitPipe();
     }
 

@@ -7,6 +7,7 @@ import { ModelController } from './ModelController.js';
 import { NeuralNetworkController } from './NeuralNetworkController.js';
 import { DatasetController } from './DatasetController.js';
 import { ProjectController } from './ProjectController.js';
+import { LoadStatController } from './LoadStatController.js'; 
 
 const initControllers = ({
     userService,
@@ -18,6 +19,7 @@ const initControllers = ({
     neuralNetworkService,
     datasetService,
     projectService,
+    loadStatService,
 }) => {
     return {
         userController: new UserController(userService),
@@ -29,6 +31,7 @@ const initControllers = ({
         neuralNetworkController: new NeuralNetworkController(neuralNetworkService),
         datasetController: new DatasetController(datasetService),
         projectController: new ProjectController(projectService),
+        loadStatController: new LoadStatController(loadStatService),
     };
 };
 
@@ -42,5 +45,6 @@ export {
     ModelController,
     NeuralNetworkController,
     DatasetController,
-    ProjectController
+    ProjectController,
+    LoadStatController
 };

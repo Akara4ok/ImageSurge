@@ -1,7 +1,7 @@
 import { wrap } from '../helpers/requests.js';
 import { Router } from 'express';
 import { UserRoutes, LogRoutes, ProjectProcessingRoutes, RequestRoutes, CategoryRoutes, ModelRoutes, NeuralNetworkRoutes,
-    DatasetRoutes, ProjectRoutes } from '../constants/enums/CrudRoutes.js';
+    DatasetRoutes, ProjectRoutes, LoadStatRoutes } from '../constants/enums/CrudRoutes.js';
 
 const initCrudRoutes = ({
     userController,
@@ -13,6 +13,7 @@ const initCrudRoutes = ({
     neuralNetworkController,
     datasetController,
     projectController,
+    loadStatController,
 }) => {
     const routes = Router();
 
@@ -188,6 +189,27 @@ const initCrudRoutes = ({
     routes.put(
         ProjectRoutes.UPDATE_PROJECT,
         wrap(projectController.update.bind(projectController)),
+    );
+
+    //loadstats
+    routes.get(
+        LoadStatRoutes.GET_LOADSTAT,
+        wrap(loadStatController.getById.bind(loadStatController)),
+    );
+
+    routes.post(
+        LoadStatRoutes.CREATE_LOADSTAT,
+        wrap(loadStatController.create.bind(loadStatController)),
+    );
+
+    routes.delete(
+        LoadStatRoutes.DELETE_LOADSTAT,
+        wrap(loadStatController.delete.bind(loadStatController)),
+    );
+
+    routes.put(
+        LoadStatRoutes.UPDATE_LOADSTAT,
+        wrap(loadStatController.update.bind(loadStatController)),
     );
 
     return routes

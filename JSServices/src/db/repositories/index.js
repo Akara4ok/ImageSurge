@@ -7,6 +7,7 @@ import { ModelRepository } from './ModelRepository.js';
 import { NeuralNetworkRepository } from './NeuralNetworkRepository.js';
 import { DatasetRepository } from './DatasetRepository.js';
 import { ProjectRepository } from './ProjectRepository.js';
+import { LoadStatRepository } from './LoadStatRepository.js';
 
 const initRepositories = (prismaClient) => {
     return {
@@ -19,6 +20,7 @@ const initRepositories = (prismaClient) => {
         neuralNetworkRepository: new NeuralNetworkRepository(prismaClient),
         datasetRepository: new DatasetRepository(prismaClient),
         projectRepository: new ProjectRepository(prismaClient),
+        loadStatRepository: new LoadStatRepository(prismaClient),
     };
 };
 
@@ -32,5 +34,6 @@ export {
     ModelRepository,
     NeuralNetworkRepository,
     DatasetRepository,
-    ProjectRepository
+    ProjectRepository,
+    LoadStatRepository
 };

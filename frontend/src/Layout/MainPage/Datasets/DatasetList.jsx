@@ -44,7 +44,7 @@ const DatasetList = ({nameFilter}) => {
             status: dataset.Status,
             imagesNum: dataset.ImagesNum,
             category: dataset.Category.Name,
-            quality: 100 - parseFloat(dataset.Quality).toPrecision(4),
+            quality: (100 - parseFloat(dataset.Quality)).toPrecision(4),
             createdAt: (new Date(dataset.CreatedAt)).toLocaleString(),
           }
         }));

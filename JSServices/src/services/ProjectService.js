@@ -2,11 +2,14 @@ import { NotFoundError, ForbiddenError } from '../exceptions/GeneralException.js
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto';
 import 'dotenv/config'
-import { ProjectExistsError, ProjectTrainingError, ProjectProcessingError, ProjectNotLoadedError } from '../exceptions/ProjectExceptions.js';
+import { ProjectExistsError, ProjectProcessingError, ProjectNotLoadedError } from '../exceptions/ProjectExceptions.js';
 import { ioServer } from '../wssocket/wssocket.js';
 import axios from 'axios';
-import { existsSync, rmSync } from 'fs';
+import { existsSync, rmSync, stat } from 'fs';
 import { HttpError } from '../exceptions/HttpErrors.js';
+import { performance } from 'perf_hooks';
+import AdmZip from 'adm-zip';
+import { PassThrough, Readable } from 'stream';
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const ARTIFACT_PATH = process.env.ARTIFACT_PATH;
@@ -15,13 +18,15 @@ const DATA_PATH = process.env.DATA_PATH;
 const KSERVE_URL = process.env.KSERVE_URL;
 
 class ProjectService {
-    constructor(ProjectRepository, DatasetService, NeuralNetworkService, ModelService, CategoryService, LogService) {
+    constructor(ProjectRepository, DatasetService, NeuralNetworkService, ModelService, CategoryService, LogService, RequestService, LoadStatService) {
         this.ProjectRepository = ProjectRepository;
         this.DatasetService = DatasetService;
         this.NeuralNetworkService = NeuralNetworkService;
         this.ModelService = ModelService;
         this.CategoryService = CategoryService;
         this.LogService = LogService;
+        this.RequestService = RequestService;
+        this.LoadStatService = LoadStatService;
     }
 
     async getAll(userId) {
@@ -74,6 +79,16 @@ class ProjectService {
         }
         const logs = await this.LogService.getProjectLogs(ProjectId);
         return logs
+    }
+
+    async getProjectStats(ProjectId, UserId) {
+        const project = await this.getById(ProjectId);
+        if(project.UserId !== UserId){
+            throw new ForbiddenError();
+        }
+        const stats = await this.RequestService.getStatsByProjectId(ProjectId);
+        stats.TotalTime = await this.LoadStatService.getProjectWorkingTime(ProjectId);
+        return stats;
     }
 
     async create(
@@ -187,6 +202,7 @@ class ProjectService {
                 Id: ProjectId,
                 Status: "Running"
             });
+            await this.LoadStatService.create(project.Id, new Date());
             
             await this.LogService.create(ProjectId, 200, "Load", "Success", project?.UserId);
 
@@ -233,9 +249,12 @@ class ProjectService {
                 Status: "Stopped"
             });
 
+            await this.LoadStatService.updateLastLoaded(project.Id, new Date());
+
             await this.LogService.create(ProjectId, 200, "Stop", "Success", project?.UserId ?? UserId);
 
         } catch(error) {
+            // console.log(error);
             await this.ProjectRepository.update({
                 Id: ProjectId,
                 Status: "Running"
@@ -262,6 +281,7 @@ class ProjectService {
         }
         
         try{
+            let processTime = performance.now();
             const formData = new FormData();
             formData.append('user', project.UserId);
             formData.append('project', project.Id);
@@ -282,14 +302,30 @@ class ProjectService {
                 method: "post",
                 data: formData,
                 responseType: 'stream'
-            })
+            });
+            processTime = (performance.now() - processTime) / 1000;
+            
+            let buffers = [];
+            for await (const chunk of response.data) {
+                buffers.push(chunk);
+            }
+            const bufferedData = Buffer.concat(buffers);
 
+            const zip = new AdmZip(bufferedData);
+            const metainfo = JSON.parse(zip.readAsText("metainfo.json"));
+            
+            await this.RequestService.create(project.Id, files.length, processTime, 
+                metainfo?.validation_time ?? 0, 
+                metainfo?.classification_time ?? 0, 
+                metainfo?.cropping_time ?? 0,
+                metainfo?.quality?.reduce((a, b) => a + b, 0) ?? 0
+                );
+                
             await this.LogService.create(project.Id, 200, "Process", "Processed " + files.length + " images", project?.UserId ?? UserId);
-
-            return response;
+            return Readable.from(bufferedData);
         } catch(error) {
             console.log(error)
-            await this.LogService.create(project.Id, error.response.status, "Process", error.response?.data ?? "Process Failed", project?.UserId ?? UserId);
+            await this.LogService.create(project.Id, error.response?.status ?? 500, "Process", error.response?.data ?? "Process Failed", project?.UserId ?? UserId);
             throw new ProjectProcessingError();
         }        
     }
