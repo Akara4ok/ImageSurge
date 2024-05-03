@@ -8,7 +8,6 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
           kserve_path: str = None, local_kserve: bool = True, sleep_time: int = 120) -> None:
     """ gpu warmup """
     time.sleep(sleep_time)
-    
     # ws_url = main_service_url.replace("http", "ws")
     # ws_url = ws_url.replace("https", "wss")
     # ws = create_connection(ws_url + "/train_ws")
@@ -44,7 +43,7 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
     }
     if(kserve_path):
         load_data["kserve-path-classification"] = kserve_path
-        load_data["kserve-path-crop"] = kserve_path
+        load_data["kserve-path-crop"] = os.getenv('KSERVE_CROP')
         
     result = requests.post(main_service_url + "/load", json=load_data)
     print("Loading res", result.status_code, result.json())

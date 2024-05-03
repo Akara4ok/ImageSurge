@@ -8,4 +8,4 @@ RUN python3 -m pip install -r requirements.txt
 COPY ./OneClassML /app/OneClassML/
 COPY ./Services/KServe /app/Services/KServe/
 
-# ENTRYPOINT python3 Services/KServe/KServeCrop.py
+ENTRYPOINT python3 Services/KServe/ServeJob.py

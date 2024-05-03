@@ -86,7 +86,7 @@ const Stats = () => {
                 { key: "Total images", value: totalImgs },
                 { key: "Total working time", value: parseTime(totalWorkingTime) },
                 {
-                    key: "Image per request", value: totalImgs / totalRequests
+                    key: "Image per request", value: (totalImgs / totalRequests).toFixed(2)
                 },
                 {
                     key: "Average time per request", value: avgTimePerReques + "s"

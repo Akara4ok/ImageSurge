@@ -114,7 +114,7 @@ class ProjectService {
         let CroppingNetwork
         if(Cropping){
             modelCropping = await this.ModelService.getByName("ResNet");
-            CroppingNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, modelCropping.Id, true); 
+            CroppingNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, modelCropping.Id, false); 
         }
         
         const SecretKey = jwt.sign({}, SECRET_KEY);
@@ -150,7 +150,7 @@ class ProjectService {
                 sources: datasetList.map(dataset => dataset.Source),
                 "category": (await this.CategoryService.getById(categoryId)).Name,
                 "kserve-path-classification": NeuralNetwork.KservePath ? KSERVE_URL + NeuralNetwork.KservePath : undefined,
-                "kserve-path-crop": CroppingNetwork?.KservePath ? KSERVE_URL_CROP + CroppingNetwork.KservePath : undefined,
+                "kserve-path-crop": CroppingNetwork?.KservePath ? KSERVE_URL + CroppingNetwork.KservePath : undefined,
                 "local-kserve": NeuralNetwork.LocalKserve
             }
         }).then(async response => {
@@ -183,8 +183,13 @@ class ProjectService {
             Status: "Loading"
         });
 
+        let CroppingNetwork
+        if(project.Cropping){
+            const modelCropping = await this.ModelService.getByName("ResNet");
+            CroppingNetwork = await this.NeuralNetworkService.getBestNetwork(project.CategoryId, modelCropping.Id, true); 
+        }
+        
         ioServer.sendMessage("project", `Start loading ${project.Name}`, UserId);
-
 
         axios({
             url: "http://localhost:5000/load",
@@ -195,7 +200,7 @@ class ProjectService {
                 experiment: EXPERIMENT,
                 cropping: project.Cropping,
                 "kserve-path-classification": project.NeuralNetwork.KservePath ? KSERVE_URL + project.NeuralNetwork.KservePath : undefined,
-                "kserve-path-crop": project.CroppingNetwork?.KservePath ? KSERVE_URL + project.CroppingNetwork.KservePath : undefined,
+                "kserve-path-crop": project.CroppingNetwork?.KservePath ? KSERVE_URL + CroppingNetwork.KservePath : undefined,
                 "local-kserve": project.NeuralNetwork.LocalKserve
             }
         }).then(async response => {

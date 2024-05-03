@@ -11,16 +11,16 @@ const Home = ({ setActiveCallback, toggleMenu }) => {
 
     const faqs = [
     {
-        title: "What is React?",
-        content: "React is a declarative, efficient, and flexible JavaScript library for building user interfaces. It lets you compose complex UIs from small and isolated pieces of code called 'components'."
+        title: "How to send a request for image processing?",
+        content: "First, you should create a project and wait for it to train. Then go to the project settings and copy the secret key. Next, send a POST request to url/process with your email, project name, secret key, and a set of images "
     },
     {
-        title: "Why use React?",
-        content: "React is used to build single-page applications where you need a fast user interface with state management and modular components. It is maintained by Facebook and a community of individual developers and companies."
+        title: "What are the stages of creating a dataset?",
+        content: "First, you should specify the unique name and category of the dataset. Next, you need to upload the archive or a link to a Google drive to the archive with images. If the archive is damaged or the number of images is less than 100, the dataset cannot be created. The next step is validation, where the quality of the images is checked. The blur, noise, overall quality are checked and a corresponding rating is given. If it is too low, the image is not included in the final dataset. If the dataset has less than 100 images after validation, its creation is canceled."
     },
     {
-        title: "How do you use React?",
-        content: "You use React by creating components, either in JavaScript or TypeScript, and using them to build a dynamic user interface. React uses a declarative paradigm that makes it easier to reason about your application and aims to be both efficient and flexible."
+        title: "How to improve cropping?",
+        content: "Go to the project settings by clicking on it. Next, select the Cropping tab. Then click Load test images. There are 2 parameters that regulate the severity of the algorithm. Similarity and Level. The higher these parameters are, the more likely the algorithm will select a smaller but more likely area. When you change the parameters, you can see the result on the test images. After adjusting these parameters, you can upload new test images to make sure they are correct."
     }
     ];
 

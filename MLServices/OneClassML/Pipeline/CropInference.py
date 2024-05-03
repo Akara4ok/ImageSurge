@@ -32,7 +32,7 @@ class CropInference(Inference):
         if(not use_cache or self.cached_feauteres is None):
             for i, data in enumerate(dataset):
                 if(result_classification is not None and result_classification[i] == 0):
-                    return
+                    continue
                 if(is_test):
                     image = data[0]
                 else:

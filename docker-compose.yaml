@@ -83,6 +83,7 @@ services:
       - ./Data:/app/Data
     environment:
       - KSERVE_PATH=${DEFAULT_KSERVE_URL}
+      - KSERVE_CROP=${KSERVE_CROP}
     depends_on:
       - main_service
       - inference_cpu

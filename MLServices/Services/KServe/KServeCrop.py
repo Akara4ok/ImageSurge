@@ -84,6 +84,12 @@ class KServeCrop(Model):
             similarity = input_tensor["similarity"]
         output = self.inference.process(input_data, result_classification = input_tensor["result_classification"], 
                                                  level = input_tensor["level"], similarity = similarity)
+        if(output is None):
+            return {
+                "result_crop": [],
+                "similarity": 0,
+                "device": DEVICE,
+            }
         result_pred = output.tolist()
         response_id = generate_uuid()
         infer_output = InferOutput(

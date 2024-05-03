@@ -63,13 +63,16 @@ class KserveCropInference(Inference):
                 level: int = 15, use_cache: bool = False, save_cache: bool = False, is_test: bool = False, similarity=None) -> np.ndarray:
         result = []        
         similarity_from_kserve = []
-        total_imgs = len(dataset)
+        total_imgs = 0
         dataset = dataset.batch(self.max_elements_to_send)
         for index, batch in enumerate(dataset):
             data = self.create_request_data(batch, result_classification[index * self.max_elements_to_send : (index + 1) * self.max_elements_to_send],
                                             level, save_cache, similarity, self.cluster_center)
             processed = self.send_request(data)
             result.extend(processed[0])
-            similarity_from_kserve.append(processed[1] * len(batch))
-        self.calc_similarity = sum(similarity_from_kserve) / total_imgs
+            similarity_from_kserve.append(processed[1] * len(processed[0]))
+            total_imgs += len(processed[0])
+        self.calc_similarity = sum(similarity_from_kserve) / total_imgs if total_imgs > 0 else None
+        if(len(result) == 0):
+            return
         return np.asarray(result)
