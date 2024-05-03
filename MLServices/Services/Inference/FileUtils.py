@@ -33,7 +33,7 @@ def processFiles(files: list) -> tuple[list[np.ndarray], str]:
 def create_result_zip(result_classification: np.ndarray, quality: np.ndarray, result_crop: np.ndarray, 
                       validation_time: float, classification_time: float, cropping_time: float, 
                       images_names: list, images: list):
-    if(len(images_names) != len(images)):
+    if(np.sum(result_classification) != len(images)):
         return
     
     json_dict = {
@@ -48,10 +48,15 @@ def create_result_zip(result_classification: np.ndarray, quality: np.ndarray, re
         
     data = io.BytesIO()
     
+    truncated_names = []
+    for index, res in enumerate(result_classification):
+        if res == 1:
+            truncated_names.append(images_names[index])
+    
     with zipfile.ZipFile(data, mode='w') as z:
         z.writestr('metainfo.json', json.dumps(json_dict))
         for index, img in enumerate(images):
-            z.writestr(images_names[index], img)
+            z.writestr(truncated_names[index], img)
 
     data.seek(0)
     return data

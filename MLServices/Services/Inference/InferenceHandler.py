@@ -140,12 +140,15 @@ class InferenceHandler:
         
         return (result, quality, result_crop, validation_time, classification_time, cropping_time)
     
-    def postprocess(self, images: list[np.ndarray], postprocessings: list[str], cropping: np.ndarray) -> list[np.ndarray]:
-        processed = images
+    def postprocess(self, images: list[np.ndarray], postprocessings: list[str], result_class: np.ndarray, cropping: np.ndarray) -> list[np.ndarray]:
+        processed = []
         if(cropping is not None):
             cropping_op = "cropping" 
-            print(postprocessings)
             postprocessings.insert(0, cropping_op)
+        for index, image in enumerate(images):
+            if(result_class[index] != 1):
+                continue
+            processed.append(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         for postProcess in postprocessings:
             processed = applyPostprocessingToAll(processed, postProcess, cropping)
         
