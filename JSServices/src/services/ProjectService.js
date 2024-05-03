@@ -28,13 +28,14 @@ class ProjectService {
         this.LogService = LogService;
         this.RequestService = RequestService;
         this.LoadStatService = LoadStatService;
+        this.loadAll();
     }
 
     async getAll(userId) {
         if(!userId){
-            return await this.ProjectRepository.getAll();
+            return await this.ProjectRepository.getAll({orderBy: {CreatedAt: 'desc'}, include: {NeuralNetwork: true, CroppingNetwork: true}});
         }
-        return await this.ProjectRepository.getAll({where: {UserId: userId}});;
+        return await this.ProjectRepository.getAll({where: {UserId: userId}, orderBy: {CreatedAt: 'desc'}});;
     }
 
     async getById(id) {
@@ -167,7 +168,7 @@ class ProjectService {
         return project;
     }
 
-    async load(UserId, ProjectId){
+    async load(UserId, ProjectId, onStartup=false){
         let project;
         try{
             project = await this.getFullInfoById(ProjectId, UserId);
@@ -177,26 +178,32 @@ class ProjectService {
             }
             throw error
         }
-        
-        await this.ProjectRepository.update({
-            Id: ProjectId,
-            Status: "Loading"
-        });
 
+        return await this.loadProject(project)
+    }
+
+    async loadProject(project, onStartup = false){
         let CroppingNetwork
         if(project.Cropping){
             const modelCropping = await this.ModelService.getByName("ResNet");
             CroppingNetwork = await this.NeuralNetworkService.getBestNetwork(project.CategoryId, modelCropping.Id, true); 
         }
         
-        ioServer.sendMessage("project", `Start loading ${project.Name}`, UserId);
+        if(!onStartup){
+            ioServer.sendMessage("project", `Start loading ${project.Name}`, project.UserId);
+            await this.ProjectRepository.update({
+                Id: project.Id,
+                Status: "Loading"
+            });
+        }
+        
 
         axios({
             url: "http://localhost:5000/load",
             method:"POST",
             data: {
-                user: UserId,
-                project: ProjectId,
+                user: project.UserId,
+                project: project.Id,
                 experiment: EXPERIMENT,
                 cropping: project.Cropping,
                 "kserve-path-classification": project.NeuralNetwork.KservePath ? KSERVE_URL + project.NeuralNetwork.KservePath : undefined,
@@ -204,27 +211,50 @@ class ProjectService {
                 "local-kserve": project.NeuralNetwork.LocalKserve
             }
         }).then(async response => {
+            if(onStartup){
+                return project;
+            }
+
             await this.ProjectRepository.update({
-                Id: ProjectId,
+                Id: project.Id,
                 Status: "Running"
             });
             await this.LoadStatService.create(project.Id, new Date());
             
-            await this.LogService.create(ProjectId, 200, "Load", "Success", project?.UserId);
+            await this.LogService.create(project.Id, 200, "Load", "Success", project.UserId);
 
-            ioServer.sendMessage("project", `loaded ${project.Name}`, UserId);
+            ioServer.sendMessage("project", `loaded ${project.Name}`, project.UserId);
         }).catch(async error => {
             await this.ProjectRepository.update({
-                Id: ProjectId,
+                Id: project.Id,
                 Status: "Stopped"
             });
 
-            await this.LogService.create(ProjectId, error.response.status, "Load", error.response?.data?.message ?? "Load Failed", project?.UserId ?? UserId);
+            if(onStartup){
+                return project;
+            }
 
-            ioServer.sendMessage("project", `Load error`, UserId);
+            await this.LogService.create(project.Id, error.response.status, "Load", error.response?.data?.message ?? "Load Failed", project?.UserId ?? UserId);
+
+            ioServer.sendMessage("project", `Load error`, project.UserId);
         });    
 
         return project;
+    }
+
+    async loadAll(){
+        let projects;
+        try{
+            projects = await this.getAll();
+        } catch (error){
+            return;
+        }
+        for (let index = 0; index < projects.length; index++) {
+            const element = projects[index];
+            if(element.Status === "Running"){
+                this.loadProject(element, true);
+            }
+        }
     }
 
     async stop(UserId, ProjectId){
@@ -261,11 +291,20 @@ class ProjectService {
 
         } catch(error) {
             // console.log(error);
+            await this.LogService.create(ProjectId, error.response.status, "Stop", error.response?.data?.message ?? "Load Failed", project?.UserId ?? UserId);
+            if(error.response?.data?.message === "inferences not loaded"){
+                ioServer.sendMessage("project", `Stop failed`, UserId);
+                await this.ProjectRepository.update({
+                    Id: ProjectId,
+                    Status: "Stopped"
+                });
+                await this.LoadStatService.create(project.Id, new Date());
+                return project;
+            }
             await this.ProjectRepository.update({
                 Id: ProjectId,
                 Status: "Running"
             });
-            await this.LogService.create(ProjectId, error.response.status, "Stop", error.response?.data?.message ?? "Load Failed", project?.UserId ?? UserId);
         }
         
         ioServer.sendMessage("project", `Stop occured`, UserId);

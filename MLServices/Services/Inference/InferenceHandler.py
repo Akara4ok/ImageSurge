@@ -39,9 +39,6 @@ class InferenceHandler:
              token: str = None) -> bool:
         key = self.getKey(user, project, experiment_str, False)
         
-        if(key in self.iference_map.keys()):
-            return False
-        
         experiment = ExperimentInfo(user, project, experiment_str)
         file_handler = FileHandler(self.default_folder, experiment)
         kserve_classification = None

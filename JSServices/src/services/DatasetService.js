@@ -19,9 +19,9 @@ class DatasetService {
 
     async getAll(userId) {
         if(!userId){
-            return await this.DatasetRepository.getAll();
+            return await this.DatasetRepository.getAll({orderBy: {CreatedAt: 'desc'}});
         }
-        return await this.DatasetRepository.getAll({where: {UserId: userId}, include: {Category: true}});;
+        return await this.DatasetRepository.getAll({where: {UserId: userId}, include: {Category: true}, orderBy: {CreatedAt: 'desc'}});
     }
 
     async getById(id) {
