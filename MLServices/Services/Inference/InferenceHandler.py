@@ -148,7 +148,7 @@ class InferenceHandler:
         for index, image in enumerate(images):
             if(result_class[index] != 1):
                 continue
-            processed.append(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+            processed.append(image)
         for postProcess in postprocessings:
             processed = applyPostprocessingToAll(processed, postProcess, cropping)
         

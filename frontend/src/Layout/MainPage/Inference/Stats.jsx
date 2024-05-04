@@ -63,9 +63,9 @@ const Stats = () => {
               setTotalImgs(stats.Images);
               setTotalWirkingTime(stats.TotalTime);
               setAvgTimePerReques((stats.ProcessingTime / stats.TotalRequests).toFixed(2));
-              setValidationTime((stats.ValidationTime / stats.TotalRequests).toFixed(2));
-              setClassificationTime((stats.ClassificationTime / stats.TotalRequests).toFixed(2));
-              setCroppingTime((stats.CroppingTime / stats.TotalRequests).toFixed(2));
+              setValidationTime((stats.ValidationTime / stats.Images).toFixed(2));
+              setClassificationTime((stats.ClassificationTime / stats.Images).toFixed(2));
+              setCroppingTime((stats.CroppingTime / stats.Images).toFixed(2));
               setQuality((100 - stats.Quality / stats.Images).toFixed(2));
 
           }).catch((error) => {

@@ -44,6 +44,7 @@ class OneClassClassificationInference(Inference):
             self.final_processed_features = x
         
         #train one class classification
+        print("shape", x.shape)
         y_predicted = self.one_class.predict(x)
         y_predicted[y_predicted == -1] = 0
         return y_predicted

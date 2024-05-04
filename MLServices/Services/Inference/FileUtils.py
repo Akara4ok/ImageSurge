@@ -7,6 +7,7 @@ from PIL import Image, ImageOps
 import json
 import zipfile
 import io
+import tensorflow as tf
 
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/bmp"}
 
@@ -19,13 +20,15 @@ def processFiles(files: list) -> tuple[list[np.ndarray], str]:
             continue
 
         try:
-            input_image = Image.open(file).convert("RGB")
-            input_image = ImageOps.exif_transpose(input_image)
+            img = tf.io.decode_jpeg(file.stream.read(), channels=3)
+            img = tf.reverse(img, axis=[-1])
+            img = tf.image.resize(img, [224, 224])
+            img = tf.cast(img, tf.uint8)
+            img = img.numpy()
         except:
             continue
             
-        image = np.array(input_image)
-        images.append(image)
+        images.append(img)
         filenames.append(file.filename)
 
     return (images, filenames)

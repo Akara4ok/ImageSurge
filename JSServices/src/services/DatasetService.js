@@ -77,7 +77,9 @@ class DatasetService {
             if(response.data?.result &&  response.data?.result.length > MIN_IMG){
                 await this.DatasetRepository.update({
                     Id: id,
-                    Status: "Created"
+                    Status: "Created",
+                    ImagesNum: response.data?.result.length,
+                    Quality: response.data?.quality
                 });
                 this.DataHandler.deleteLowQualityImgs(PARENT_FOLDER + "/" + Name, response.data?.result)
                 ioServer.sendMessage("dataset", `created ${Name}`, UserId);

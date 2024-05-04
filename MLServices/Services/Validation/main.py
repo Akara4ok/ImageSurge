@@ -9,7 +9,7 @@ from Validation import BrisqueValidator
 app = Flask(__name__)
 CORS(app)
 
-validator = BrisqueValidator(threshold=os.getenv("THRESHOLD") if os.getenv("THRESHOLD") is not None else 40.0)
+validator = BrisqueValidator(threshold=os.getenv("THRESHOLD") if os.getenv("THRESHOLD") is not None else 60.0)
 
 @app.route('/validate', methods=['POST'])
 def validate_endpoint():
