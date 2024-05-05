@@ -64,6 +64,7 @@ class TrainService:
         for path in downloaded_paths:
             volumes.append(f"{self.abs_path + '/' + path}:{self.working_dir + path}")
         volumes.append(f"{self.abs_path + '/' + save_path}:{self.working_dir + save_path}")
+        volumes.append(f"{self.abs_path + '/' + self.get_ref_path(category)}:{self.working_dir + self.get_ref_path(category)}")
         
         with self.lock:
             free_memory = GpuMemory().get_free_video_memory()
@@ -76,7 +77,7 @@ class TrainService:
                 token = get_access_token()
                 
             kserve_but_not_enough = (kserve_path_classification is not None or kserve_path_crop is not None) and GpuMemory().enough_kserve_memory()
-                
+            
             if(kserve_path_classification and GpuMemory().enough_kserve_memory()):
                 command_args +=  ["--kserve-path-classification", kserve_path_classification]
                 if(not local_kserve):

@@ -35,7 +35,7 @@ def train(user: str, project: str, experiment_str: str, model_name: str, croppin
     dataset = None
     if(model_name == "ImprovedResnet"):
         dataloader_multi_class = GeneralMultiClassDataloader(ref_data_path)
-        dataset = TrainRefDataset(224, 224, 12, 42, dataloader_one_class, dataloader_multi_class)
+        dataset = TrainRefDataset(224, 224, 6, 42, dataloader_one_class, dataloader_multi_class)
     else:
         dataset = TrainOneClassDataset(224, 224, 10, 42, dataloader_one_class)
 
