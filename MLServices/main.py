@@ -38,6 +38,8 @@ def train_endpoint():
     kserve_path_crop = content["kserve-path-crop"] if "kserve-path-crop" in content else None
     local_kserve = content["local-kserve"] if "local-kserve" in content else None
     
+    print(kserve_path_classification, kserve_path_crop)
+    
     result = trainService.train(user, project, experiment_str, model_name, cropping, data_path, dataset_names, sources, category, 
                                 kserve_path_classification, kserve_path_crop, local_kserve)
     if(result['StatusCode'] == 0):
@@ -72,6 +74,7 @@ def stop_endpoint():
     cropping = content["cropping"]
     return ifnferenceService.stop(user, project, experiment_str, cropping)
     
+    
 @app.route('/process', methods=['POST'])
 def process_endpoint():
     content = request.form
@@ -89,6 +92,20 @@ def process_endpoint():
         return response.json(), response.status_code
     else:
         return Response(
+            response.content,
+            headers = dict(response.headers)
+        )
+        
+@app.route('/croptune', methods=['POST'])
+def croptune_endpoint():
+    content = request.get_json()
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    datasets = content["datasets"]
+    randomseed = content["random_seed"]
+    response = ifnferenceService.croptune(user, project, experiment_str, datasets, randomseed)
+    return Response(
             response.content,
             headers = dict(response.headers)
         )

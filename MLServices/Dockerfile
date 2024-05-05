@@ -15,6 +15,7 @@ COPY Services/GpuMemory.py Services/GpuMemory.py
 COPY Services/config.py Services/config.py
 COPY Services/data_utils.py Services/data_utils.py
 COPY OneClassML/utils/non_tf_functions.py OneClassML/utils/non_tf_functions.py
+COPY OneClassML/Dataloader OneClassML/Dataloader
 COPY .env .env
 
 ENTRYPOINT python3 main.py

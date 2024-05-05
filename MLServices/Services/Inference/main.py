@@ -92,6 +92,33 @@ def process_endpoint():
         download_name='result.zip'
     )
 
+@app.route('/croptune', methods=['POST'])
+def croptune_endpoint():
+    content = request.form
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    
+    images = request.files.getlist('file')
+    process_files_result  = processFiles(images)
+    if(process_files_result is None or len(process_files_result[0]) == 0):
+        return {
+                "message": str(len(process_files_result[0]))
+            }, 500
+    
+    images, filenames = process_files_result
+    result = inferenceHandler.croptune(images, user, project, experiment_str)
+    if(result is None):
+        return {
+                "message": "Error during processing"
+            }, 500
+    (features, similarity) = result
+    
+    return {
+                "features": features.tolist(),
+                "similarity": similarity
+            }, 200
+
 
 if __name__ == "__main__":
     parser=argparse.ArgumentParser()

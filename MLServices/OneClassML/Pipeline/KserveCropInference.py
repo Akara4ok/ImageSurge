@@ -56,7 +56,10 @@ class KserveCropInference(Inference):
         result_resp = response.json()
         result = result_resp["result_crop"]
         similarity = result_resp["similarity"]
-        return result, similarity
+        features = None
+        if(data["save_cache"]):
+            features = result_resp["features"]
+        return result, similarity, features
     
     @Inference.need_load
     def process(self, dataset: tf.data.Dataset, result_classification: list = None, algo: ImageTableAlgo = ImageTableAlgo.Similarity, 
@@ -65,6 +68,7 @@ class KserveCropInference(Inference):
         similarity_from_kserve = []
         total_imgs = 0
         dataset = dataset.batch(self.max_elements_to_send)
+        features = []
         for index, batch in enumerate(dataset):
             data = self.create_request_data(batch, result_classification[index * self.max_elements_to_send : (index + 1) * self.max_elements_to_send],
                                             level, save_cache, similarity, self.cluster_center)
@@ -72,7 +76,12 @@ class KserveCropInference(Inference):
             result.extend(processed[0])
             similarity_from_kserve.append(processed[1] * len(processed[0]))
             total_imgs += len(processed[0])
+            if(save_cache):
+                features.append(processed[2])
         self.calc_similarity = sum(similarity_from_kserve) / total_imgs if total_imgs > 0 else None
         if(len(result) == 0):
             return
+        if(save_cache):
+            features = np.concatenate(np.asarray(features))
+            self.cached_feauteres = features
         return np.asarray(result)

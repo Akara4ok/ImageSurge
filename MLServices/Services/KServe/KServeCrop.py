@@ -82,7 +82,7 @@ class KServeCrop(Model):
         similarity = None
         if("similarity" in input_tensor):
             similarity = input_tensor["similarity"]
-        output = self.inference.process(input_data, result_classification = input_tensor["result_classification"], 
+        output = self.inference.process(input_data, result_classification = input_tensor["result_classification"], save_cache=input_tensor["save_cache"],
                                                  level = input_tensor["level"], similarity = similarity)
         if(output is None):
             return {
@@ -103,6 +103,7 @@ class KServeCrop(Model):
             return {
                 "result_crop": result_pred,
                 "similarity": self.inference.get_calc_similarity(),
+                "features": self.inference.get_cache_data()[0].tolist() if input_tensor["save_cache"] else [],
                 "device": DEVICE,
             }
         else:

@@ -1,11 +1,14 @@
 import hashlib
 import requests
 import sys
+import random
+import os
 sys.path.append("OneClassML")
 from utils.non_tf_functions import get_access_token
 from GpuMemory import GpuMemory
 from multiprocessing.pool import ThreadPool
 from threading import Lock
+from Dataloader.DataloaderImpl.InferenceDataloader import InferenceDataloader
 
 class InferenceService:
     """ Class for sending request to inference microservice """
@@ -158,4 +161,46 @@ class InferenceService:
             self.lock.release()
         
         response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
+        return response
+    
+    def croptune(self, user: str, project: str, experiment_str: str, dataset_paths: str, seed: int): 
+        multipart_form_data = [
+            ('user', (None, user)),
+            ('project', (None, project)),
+            ('experiment', (None, experiment_str)),
+        ]
+        
+        dataloader = InferenceDataloader.create_from_multiple_paths(dataset_paths)
+        paths = dataloader.get_images_paths()
+        random.Random(seed).shuffle(paths)
+        paths = paths[:10]
+        
+        for image in paths:
+            multipart_form_data.append(('file', (os.path.basename(image), open(image, 'rb'), 'image/jpeg')))
+        
+        cpu_key = self.getKey(user, project, experiment_str, "cpu")
+        gpu_key = self.getKey(user, project, experiment_str, "gpu")
+        
+        self.lock.acquire(True)
+        if(cpu_key in self.device_map.keys() and GpuMemory().enough_kserve_memory() and self.device_map[cpu_key] == True):
+            GpuMemory().new_inference_request("kserve")
+            self.lock.release()
+            response = requests.post(self.cpu_url + "/croptune", files=multipart_form_data)
+            GpuMemory().inference_request_end("kserve")
+            return response
+        
+        if(not self.lock.locked()):
+            self.lock.acquire(True)
+        
+        if(gpu_key in self.device_map.keys() and GpuMemory().enough_gpu_inference_memory()):
+            GpuMemory().new_inference_request("gpu")
+            self.lock.release()
+            response = requests.post(self.gpu_url + "/croptune", files=multipart_form_data)
+            GpuMemory().inference_request_end("gpu")
+            return response
+        
+        if(self.lock.locked()):
+            self.lock.release()
+        
+        response = requests.post(self.cpu_url + "/croptune", files=multipart_form_data)
         return response

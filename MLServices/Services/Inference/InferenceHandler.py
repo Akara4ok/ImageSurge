@@ -158,3 +158,26 @@ class InferenceHandler:
             if(result_encode):
                 result.append(buffer)
         return result
+    
+    def croptune(self, images: list[np.ndarray], user: str, project: str, experiment_str: str):
+        inference_crop_key = self.getKey(user, project, experiment_str, True)
+        if(not(inference_crop_key in self.iference_map)):
+            print("Inference Crop is not loaded")
+            return None
+        
+        dataset = InferenceImageDataset(IMAGE_HEIGHT, IMAGE_WIDTH)
+        dataset.load(images)
+        
+        validation_time = time.time()
+        quality = self.validate(dataset.get_data())
+        validation_time = time.time() - validation_time
+        
+        inference_crop = self.iference_map[inference_crop_key]
+        result_crop = inference_crop.process(dataset.get_data(), result_classification = [1] * len(images), save_cache = True,
+                                                level = 15, similarity = None)
+        features = inference_crop.get_cache_data()[0]
+        if(result_crop is None):
+            print("Crop failed")
+            return None
+        
+        return features, inference_crop.get_calc_similarity()
