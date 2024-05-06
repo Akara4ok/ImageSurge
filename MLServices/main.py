@@ -104,7 +104,8 @@ def croptune_endpoint():
     experiment_str = content["experiment"]
     datasets = content["datasets"]
     randomseed = content["random_seed"]
-    response = ifnferenceService.croptune(user, project, experiment_str, datasets, randomseed)
+    count = content["count"]
+    response = ifnferenceService.croptune(user, project, experiment_str, count, datasets, randomseed)
     return Response(
             response.content,
             headers = dict(response.headers)

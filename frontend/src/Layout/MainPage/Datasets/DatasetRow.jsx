@@ -26,7 +26,7 @@ const DatasetRow = ({ dataset, onDelete }) => {
                 <span className="center-span">{dataset.quality}</span>
                 <span>{dataset.category}</span>
                 <span>{dataset.createdAt}</span>
-                <span className="end-span"><button className="delete-btn" onClick={deleteDataset}>Delete</button></span>
+                <span className="end-span"><button className="delete-btn" onClick={deleteDataset} disabled={dataset.status === "Creating"}>Delete</button></span>
             </div>
         </div>
     );

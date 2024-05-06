@@ -89,7 +89,6 @@ class TrainService:
                     command_args += ["--token", token]
                 
             command_args = " ".join(command_args)
-            
             if(free_memory > GpuMemory().train_container_limit and theoretical_free_memory > GpuMemory().train_container_limit 
                and not kserve_but_not_enough):
                 command_args += f" --memory-limit {GpuMemory().train_container_limit - config.MEMORY_SAFE_RESERVE}"

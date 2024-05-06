@@ -18,10 +18,6 @@ class LoadStatService {
 
     async getLastLoaded(id) {
         const loadStat = await this.LoadStatRepository.getLastLoaded(id);
-        if (!loadStat) {
-            throw new NotFoundError("Load statistics");
-        }
-
         return loadStat;
     }
 
@@ -37,7 +33,7 @@ class LoadStatService {
             return total + differenceInSeconds;
           }, 0);
         const lastLoaded = await this.getLastLoaded(ProjectId);
-        if(!lastLoaded.StopTime){
+        if(lastLoaded && !lastLoaded.StopTime){
             const loadDate = new Date(lastLoaded.LoadTime);
             const stopDate = new Date();
             const differenceInSeconds = (stopDate.getTime() - loadDate.getTime()) / 1000;
@@ -76,7 +72,10 @@ class LoadStatService {
     async updateLastLoaded(
         ProjectId, StopTime
     ) {
-        const lastLoaded = await this.getLastLoaded(ProjectId)
+        const lastLoaded = await this.getLastLoaded(ProjectId);
+        if (!lastLoaded) {
+            throw new NotFoundError("Load statistics");
+        }
         const loadStat = await this.LoadStatRepository.update({
             Id: lastLoaded.Id, StopTime
         });

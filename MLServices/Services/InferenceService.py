@@ -163,7 +163,7 @@ class InferenceService:
         response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
         return response
     
-    def croptune(self, user: str, project: str, experiment_str: str, dataset_paths: str, seed: int): 
+    def croptune(self, user: str, project: str, experiment_str: str, count: int, dataset_paths: str, seed: int): 
         multipart_form_data = [
             ('user', (None, user)),
             ('project', (None, project)),
@@ -173,7 +173,7 @@ class InferenceService:
         dataloader = InferenceDataloader.create_from_multiple_paths(dataset_paths)
         paths = dataloader.get_images_paths()
         random.Random(seed).shuffle(paths)
-        paths = paths[:10]
+        paths = paths[:count]
         
         for image in paths:
             multipart_form_data.append(('file', (os.path.basename(image), open(image, 'rb'), 'image/jpeg')))

@@ -1,5 +1,5 @@
 # Use base image with GPU support.
-FROM ubuntu:22.04
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 
 RUN apt-get update -y && apt-get install python3 python3-pip -y
 

@@ -40,6 +40,10 @@ const Stats = () => {
         return parts.join(" ");
     }
 
+    const divWithFixed = (a, b) => {
+        return (b !== 0 ? a / b : 0).toFixed(2)
+    }
+
     useEffect(() => {
         const token = "Bearer " + localStorage.getItem('token');
         setIsLoading(true);
@@ -62,11 +66,11 @@ const Stats = () => {
               setTotalRequests(stats.TotalRequests);
               setTotalImgs(stats.Images);
               setTotalWirkingTime(stats.TotalTime);
-              setAvgTimePerReques((stats.ProcessingTime / stats.TotalRequests).toFixed(2));
-              setValidationTime((stats.ValidationTime / stats.Images).toFixed(2));
-              setClassificationTime((stats.ClassificationTime / stats.Images).toFixed(2));
-              setCroppingTime((stats.CroppingTime / stats.Images).toFixed(2));
-              setQuality((100 - stats.Quality / stats.Images).toFixed(2));
+              setAvgTimePerReques(divWithFixed(stats.ProcessingTime, stats.TotalRequests));
+              setValidationTime(divWithFixed(stats.ValidationTime, stats.Images));
+              setClassificationTime(divWithFixed(stats.ClassificationTime, stats.Images));
+              setCroppingTime(divWithFixed(stats.CroppingTime, stats.Images));
+              setQuality((100 - divWithFixed(stats.Quality, stats.Images)).toFixed(2));
 
           }).catch((error) => {
             setIsLoading(false);
@@ -86,14 +90,14 @@ const Stats = () => {
                 { key: "Total images", value: totalImgs },
                 { key: "Total working time", value: parseTime(totalWorkingTime) },
                 {
-                    key: "Image per request", value: (totalImgs / totalRequests).toFixed(2)
+                    key: "Image per request", value: divWithFixed(totalImgs, totalRequests)
                 },
                 {
                     key: "Average time per request", value: avgTimePerReques + "s"
                 }
             ]} />
              <List options={[
-                { key: "Average image processing time", value: ((avgTimePerReques / (totalImgs / totalRequests)).toFixed(2)) + "s" },
+                { key: "Average image processing time", value: divWithFixed(avgTimePerReques * totalRequests, totalImgs) + "s" },
                 { key: "Validation time", value: validationTime + "s" },
                 { key: "Classification time", value: classificationTime + "s" },
                 {

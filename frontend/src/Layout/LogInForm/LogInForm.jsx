@@ -17,17 +17,6 @@ const LogInForm = () => {
 
     const navigate = useNavigate();
 
-    const showForgotPasswordPopup = () => {
-        setPopupOpen(true);
-        setPopupMsg(<div className='forgotEmail'>
-            <h3>Write your email</h3>
-            <div>
-                <Input type="email" placeholder="Email" />
-                <Button text="Send" />
-            </div>
-            </div>)
-    }
-
     const handleSubmit = (event) => {
         event.preventDefault();
         setIsLoading(true);
@@ -63,9 +52,6 @@ const LogInForm = () => {
                     <h1>Log In</h1>
                         <Input type="email" onChange={(value) => setEmailValue(value)} value={emailValue} placeholder="Email" />
                         <Input type="password" onChange={(value) => setPasswordValue(value)} value={passwordValue} placeholder="Password" />
-                        <div className="forgot-password">
-                            <a role="button" onClick={showForgotPasswordPopup}>Forgot Password →</a>
-                        </div>
                         <Button text="Log In" className="primary" onClick={event => handleSubmit(event)} />
                 </form>
             </div>

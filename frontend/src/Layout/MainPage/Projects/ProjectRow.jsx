@@ -80,6 +80,10 @@ const ProjectRow = ({ project, onDelete }) => {
         navigate("/project/" + project.id)
     }
 
+    const isLoading = () => {
+        return project.status === "Loading" || project.status === "Creating";
+    }
+
     return (
         <div className="project-table-row-wrapper">
             <div className="table-row">
@@ -88,8 +92,8 @@ const ProjectRow = ({ project, onDelete }) => {
                 <span className="center-span">{project.cropping ? <MdOutlineCheckBox size={iconSize} /> : <MdOutlineCheckBoxOutlineBlank size={iconSize} />}</span>
                 <span>{project.createdAt}</span>
                 <span className="action-span">
-                    <button className="action-button" onClick={onActionButtonClick}>{project.status === "Stopped" ? <FaPlay size={iconSize} /> : <FaPause size={iconSize} />}</button>
-                    <button className="delete-btn" onClick={deleteProject}>Delete</button>
+                    <button className="action-button" onClick={onActionButtonClick} disabled={isLoading()}>{project.status === "Stopped" ? <FaPlay size={iconSize} /> : <FaPause size={iconSize} />}</button>
+                    <button className="delete-btn" onClick={deleteProject} disabled={isLoading()}>Delete</button>
                 </span>
             </div>
             {isPopupOpen && <Popup message={popupMsg} onClose={() => {setPopupOpen(false)}} />}
