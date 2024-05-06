@@ -2,10 +2,11 @@ import React, {useState} from 'react';
 import './Cropping.scss';
 import Slider from '../../../Components/Slider/Slider';
 import Button from '../../../Components/Button/Button';
+import { ImageTable } from '../../../utils/ImageTable';
 
 const Cropping = () => {
     const [enabled, setEnabled] = useState('True');
-    const [images, setImages] = useState(['0','0','0','0','0','0','0','0','0','0']) 
+    const [images, setImages] = useState(['0','0','0','0','0']) 
 
     return (
         <div className='cropping-wrapper'>
