@@ -66,7 +66,6 @@ const Settings = ({ setActiveCallback, toggleMenu }) => {
         OldPassword: oldPasswordValue
       }
     }).then((response) => {
-      console.log(response)
       setIsLoading(false);
       setPopupMsg("Data updated");
       setPopupOpen(true);

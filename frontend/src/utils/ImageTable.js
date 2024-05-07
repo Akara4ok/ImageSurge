@@ -28,10 +28,10 @@ const cosine_similarity = (array, B) => {
 }
 
 const recrop = (tl_x, tl_y, br_x, br_y, width, height, ref_width, ref_height) => {
-    tl_x = (tl_x / width) * ref_width;
-    tl_y = (tl_y / height) * ref_height;
-    br_x = (br_x / width) * ref_width;
-    br_y = (br_y / height) * ref_height;
+    tl_x = (tl_x / width) * ref_width + 1;
+    tl_y = (tl_y / height) * ref_height + 1;
+    br_x = (br_x / width) * ref_width - 1;
+    br_y = (br_y / height) * ref_height - 1;
     return {tl_x, tl_y, br_x, br_y}
 }
 
@@ -41,6 +41,7 @@ class Cell{
         this.y = y;
         this.size_x = size_x;
         this.size_y = size_y;
+        this.recognized_count = 0;
     }
 
     union(tl_x, tl_y, br_x, br_y){
@@ -98,7 +99,7 @@ class BigBox{
 }
 
 class ImageTable{
-    constructor(small_box_count = 20, small_box_in_big = 5, cluster_center){
+    constructor(cluster_center, small_box_count = 20, small_box_in_big = 5){
         this.small_box_count = small_box_count;
         this.small_box_in_big = small_box_in_big;
         
@@ -143,7 +144,7 @@ class ImageTable{
                     continue;
                 }
                 
-                current_row.push(Cell(cur_x, cur_y, this.step, this.step));
+                current_row.push(new Cell(cur_x, cur_y, this.step, this.step));
                 cur_x += this.step;
             }
             cur_y += this.step;
@@ -154,8 +155,24 @@ class ImageTable{
         return cells;
     }
 
+    build_big_boxes(){
+        const big_boxes = [];
+        for (let y = 0; y < this.cells.length + 1 - this.small_box_in_big; y++) {
+            for (let x = 0; x < this.cells[y].length + 1 - this.small_box_in_big; x++) {
+                const bix_box_cells = [];
+                for (let y1 = 0; y1 < this.small_box_in_big; y1++) {
+                    for (let x1 = 0; x1 < this.small_box_in_big; x1++) {
+                        bix_box_cells.push(this.cells[y + y1][x + x1])
+                    }
+                }
+                big_boxes.push(new BigBox(bix_box_cells));
+            }
+        }
+        return big_boxes;
+    }
+
     clear_recognized(){
-        for (let index = 0; index < this.cells; index++) {
+        for (let index = 0; index < this.cells.length; index++) {
             const row = this.cells[index];
             for (let index = 0; index < row.length; index++) {
                 const box = row[index];
@@ -167,9 +184,11 @@ class ImageTable{
     similarity_algo(cropped_features, similarity){
         this.clear_recognized();
         const similarities = cosine_similarity(cropped_features, this.cluster_center);
+        let check = 0;
         for (let index = 0; index < this.big_boxes.length; index++) {
             const box = this.big_boxes[index];
             if(similarities[index] > similarity){
+                check++;
                 box.check_recognized();
             }
         }
@@ -183,11 +202,10 @@ class ImageTable{
         let br_x = -1;
         let br_y = -1;
         
-        for (let index = 0; index < this.cells; index++) {
+        for (let index = 0; index < this.cells.length; index++) {
             const row = this.cells[index];
             for (let index = 0; index < row.length; index++) {
                 const box = row[index];
-                box.recognized_count = 0;
                 if(box.recognized_count >= level){
                     ({tl_x, tl_y, br_x, br_y} = box.union(tl_x, tl_y, br_x, br_y));
                 }
@@ -201,14 +219,16 @@ class ImageTable{
         return {tl_x, tl_y, br_x, br_y};
     }
 
-    async calc_and_draw_box(image_buffer, cropped_features, level, similarity){
-        this.clear_recognized();
-        this.image = await Image.load(image_buffer);
-        let {tl_x, tl_y, br_x, br_y} = this.get_crop_bbox(cropped_features, level, similarity);
-        ({tl_x, tl_y, br_x, br_y} = recrop(tl_x, tl_y, br_x, br_y, this.width, this.height, this.image.width, this.image.height));
-
-        this.image.paintPolygon([[tl_x, tl_y],[tl_x, br_y],[br_x, br_y],[br_x, tl_y]]);
-        return this.image.toDataURL();
+    calc_and_draw_box(image_buffer, cropped_features, level, similarity){
+        return new Promise(async (resolve, reject) => {
+            this.clear_recognized();
+            this.image = await Image.load(image_buffer);
+            let {tl_x, tl_y, br_x, br_y} = this.get_crop_bbox(cropped_features, level, similarity);
+            console.log({tl_x, tl_y, br_x, br_y});
+            ({tl_x, tl_y, br_x, br_y} = recrop(tl_x, tl_y, br_x, br_y, this.width, this.height, this.image.width, this.image.height));
+            this.image = this.image.paintPolyline([[tl_x, tl_y],[tl_x, br_y],[br_x, br_y],[br_x, tl_y]], {closed: true});
+            resolve(this.image.toDataURL());
+        });
     }
 }
 

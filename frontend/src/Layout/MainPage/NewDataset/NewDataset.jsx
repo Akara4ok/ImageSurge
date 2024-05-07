@@ -87,7 +87,6 @@ const NewDataset = ({ setActiveCallback, toggleMenu }) => {
         if(!validate()){
             return;
         }
-        console.log(file)
         const token = "Bearer " + localStorage.getItem('token');
         const formData = new FormData();
         

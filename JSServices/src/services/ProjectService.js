@@ -10,12 +10,14 @@ import { HttpError } from '../exceptions/HttpErrors.js';
 import { performance } from 'perf_hooks';
 import AdmZip from 'adm-zip';
 import { PassThrough, Readable } from 'stream';
+import fs from 'fs'
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const ARTIFACT_PATH = process.env.ARTIFACT_PATH;
 const EXPERIMENT = process.env.EXPERIMENT;
 const DATA_PATH = process.env.DATA_PATH;
 const KSERVE_URL = process.env.KSERVE_URL;
+const DOCKER_FOLDER = process.env.DOCKER_FOLDER;
 const KSERVE_URL_CROP = process.env.KSERVE_URL_CROP;
 
 class ProjectService {
@@ -41,7 +43,7 @@ class ProjectService {
     async getById(id) {
         const project = await this.ProjectRepository.getById(id);
         if (!project) {
-            throw new NotFoundError();
+            throw new NotFoundError("Project");
         }
 
         return project;
@@ -371,6 +373,63 @@ class ProjectService {
         } catch(error) {
             console.log(error)
             await this.LogService.create(project.Id, error.response?.status ?? 500, "Process", error.response?.data ?? "Process Failed", project?.UserId ?? UserId);
+            throw new ProjectProcessingError();
+        }        
+    }
+
+    async getFilePath(filename, datasets){
+        for (let index = 0; index < datasets.length; index++) {
+            const dataset = datasets[index];
+            try{
+                if(existsSync(dataset.ParentFolder + "/" + dataset.Name + "/" + filename)){
+                    return dataset.ParentFolder + "/" + dataset.Name + "/" + filename;
+                }
+            } catch {}
+        }
+    }
+
+    async getImage(id, userId, filename) {
+        const project = await this.getFullInfoById(id, userId);
+        
+        if(project.Status !== "Running"){
+            throw new ProjectNotLoadedError();
+        }
+
+        const imagePath = await this.getFilePath(filename, project.Datasets)
+        console.log(imagePath)
+        return new Promise((resolve, reject) => {
+            fs.readFile(imagePath, (err, data) => {
+                if (err) {
+                    reject('Image not found');
+                } else {
+                    console.log(data)
+                    resolve(Readable.from(data));
+                }
+            });
+        });
+    }
+    
+
+    async croptune(id, userId){
+        const project = await this.getFullInfoById(id, userId);
+        if(project.Status !== "Running"){
+            throw new ProjectNotLoadedError();
+        }
+        
+        try{
+            return await axios({
+                url: "http://localhost:5000/croptune",
+                method: "post",
+                data: {
+                    user: userId,
+                    project: id,
+                    experiment: "project",
+                    datasets: project.Datasets.map(dataset => DOCKER_FOLDER + dataset.Name),
+                    count: 5
+                },
+            });
+        } catch(error) {
+            console.log(error.response.data)
             throw new ProjectProcessingError();
         }        
     }

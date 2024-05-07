@@ -112,11 +112,13 @@ def croptune_endpoint():
         return {
                 "message": "Error during processing"
             }, 500
-    (features, similarity) = result
+    (features, cluster_center, similarity) = result
     
     return {
                 "features": features.tolist(),
-                "similarity": similarity
+                "cluster_center": cluster_center.tolist(),
+                "similarity": similarity,
+                "filenames": filenames
             }, 200
 
 

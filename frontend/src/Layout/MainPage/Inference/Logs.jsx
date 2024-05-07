@@ -60,7 +60,6 @@ const Logs = () => {
         }, []);
 
     useEffect(() => {
-        console.log("log")
         logRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [logs])
 

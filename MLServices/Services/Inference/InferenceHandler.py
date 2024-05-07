@@ -168,10 +168,6 @@ class InferenceHandler:
         dataset = InferenceImageDataset(IMAGE_HEIGHT, IMAGE_WIDTH)
         dataset.load(images)
         
-        validation_time = time.time()
-        quality = self.validate(dataset.get_data())
-        validation_time = time.time() - validation_time
-        
         inference_crop = self.iference_map[inference_crop_key]
         result_crop = inference_crop.process(dataset.get_data(), result_classification = [1] * len(images), save_cache = True,
                                                 level = 15, similarity = None)
@@ -180,4 +176,4 @@ class InferenceHandler:
             print("Crop failed")
             return None
         
-        return features, inference_crop.get_calc_similarity()
+        return features, np.squeeze(inference_crop.cluster_center), inference_crop.get_calc_similarity()

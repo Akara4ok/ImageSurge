@@ -103,7 +103,7 @@ def croptune_endpoint():
     project = content["project"]
     experiment_str = content["experiment"]
     datasets = content["datasets"]
-    randomseed = content["random_seed"]
+    randomseed = content["random_seed"] if "random_seed" in content else None
     count = content["count"]
     response = ifnferenceService.croptune(user, project, experiment_str, count, datasets, randomseed)
     return Response(

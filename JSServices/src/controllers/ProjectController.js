@@ -107,6 +107,24 @@ class ProjectController {
         await waitPipe();
     }
 
+    async croptune(req, res) {
+        const { id } = req.params;
+
+        const response = await this.ProjectService.croptune(id, req.user?.id);
+
+        return res.status(HttpStatusCode.OK).json(response.data);
+    }
+
+    async getImage(req, res) {
+        const { id } = req.params;
+        const { filename } = req.params;
+        const imageData = await this.ProjectService.getImage(id, req.user?.id, filename);
+        res.setHeader("Content-Type", "image/jpeg");
+        imageData?.pipe(res);
+        const waitPipe = res => new Promise(resolve => imageData.on("finish", resolve));
+        await waitPipe();
+    }
+
     async delete(req, res) {
         const { id } = req.params;
 

@@ -30,7 +30,6 @@ const Overview = () => {
             }
           }).then((response) => {
               setIsLoading(false);
-              console.log(response.data)
               const project = response.data.project;
               if(!project){
                 setPopupMsg("Undefined Error");

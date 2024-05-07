@@ -10,6 +10,8 @@ export const UserRoutes = Object.freeze({
     STOP_PROJECT: '/project/stop/:id',
     PROJECT_LOGS: '/project/logs/:id',
     PROJECT_STATS: '/project/stats/:id',
+    PROJECT_CROPIMAGE: '/project/cropimage/:id/:filename',
+    PROJECT_CROPTUNE: '/project/croptune/:id',
     DELETE_PROJECT: '/project/:id',
     GET_CURRENT_USER: '/user/me',
     UPDATE_CURERENT_USER: '/user/me',

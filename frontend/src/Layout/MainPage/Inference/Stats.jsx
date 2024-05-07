@@ -55,7 +55,6 @@ const Stats = () => {
             }
           }).then((response) => {
               setIsLoading(false);
-              console.log(response.data)
               const stats = response.data.stats;
               if(!stats){
                 setPopupMsg("Undefined Error");

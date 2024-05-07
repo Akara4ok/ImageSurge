@@ -80,6 +80,16 @@ const initUserRoutes = (
         wrap(projectController.getProjectStats.bind(projectController)),
     );
 
+    routes.get(
+        UserRoutes.PROJECT_CROPIMAGE,
+        wrap(projectController.getImage.bind(projectController)),
+    );
+
+    routes.get(
+        UserRoutes.PROJECT_CROPTUNE,
+        wrap(projectController.croptune.bind(projectController)),
+    );
+
     routes.delete(
         UserRoutes.DELETE_PROJECT,
         wrap(projectController.delete.bind(projectController)),

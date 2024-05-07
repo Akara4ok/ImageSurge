@@ -10,7 +10,6 @@ const Projects = ({ setActiveCallback, toggleMenu }) => {
 
     const handleSearchChange = (newValue) => {
         setSearchValue(newValue);
-        console.log("Current search value:", newValue);
     };
 
     useEffect(() => {

@@ -172,7 +172,10 @@ class InferenceService:
         
         dataloader = InferenceDataloader.create_from_multiple_paths(dataset_paths)
         paths = dataloader.get_images_paths()
-        random.Random(seed).shuffle(paths)
+        if(seed is None):
+            random.shuffle(paths)
+        else:
+            random.Random(seed).shuffle(paths)
         paths = paths[:count]
         
         for image in paths:
