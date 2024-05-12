@@ -186,11 +186,6 @@ const initCrudRoutes = ({
         wrap(projectController.getById.bind(projectController)),
     );
 
-    routes.put(
-        ProjectRoutes.UPDATE_PROJECT,
-        wrap(projectController.update.bind(projectController)),
-    );
-
     //loadstats
     routes.get(
         LoadStatRoutes.GET_LOADSTAT,

@@ -96,8 +96,8 @@ def process_endpoint():
             headers = dict(response.headers)
         )
         
-@app.route('/croptune', methods=['POST'])
-def croptune_endpoint():
+@app.route('/croptunestart', methods=['POST'])
+def croptunestart_endpoint():
     content = request.get_json()
     user = content["user"]
     project = content["project"]
@@ -105,7 +105,33 @@ def croptune_endpoint():
     datasets = content["datasets"]
     randomseed = content["random_seed"] if "random_seed" in content else None
     count = content["count"]
-    response = ifnferenceService.croptune(user, project, experiment_str, count, datasets, randomseed)
+    response = ifnferenceService.croptune_start(user, project, experiment_str, count, datasets, randomseed)
+    return Response(
+            response.content,
+            headers = dict(response.headers)
+        )
+    
+@app.route('/croptunetest', methods=['POST'])
+def croptunetest_endpoint():
+    content = request.get_json()
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    level = content["level"] if "level" in content else None
+    similarity = content["similarity"] if "similarity" in content else None
+    response = ifnferenceService.croptune_test(user, project, experiment_str, level, similarity)
+    return Response(
+            response.content,
+            headers = dict(response.headers)
+        )
+    
+@app.route('/croptunestop', methods=['POST'])
+def croptunestop_endpoint():
+    content = request.get_json()
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    response = ifnferenceService.croptune_stop(user, project, experiment_str)
     return Response(
             response.content,
             headers = dict(response.headers)

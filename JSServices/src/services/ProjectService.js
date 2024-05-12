@@ -396,13 +396,11 @@ class ProjectService {
         }
 
         const imagePath = await this.getFilePath(filename, project.Datasets)
-        console.log(imagePath)
         return new Promise((resolve, reject) => {
             fs.readFile(imagePath, (err, data) => {
                 if (err) {
                     reject('Image not found');
                 } else {
-                    console.log(data)
                     resolve(Readable.from(data));
                 }
             });
@@ -410,7 +408,7 @@ class ProjectService {
     }
     
 
-    async croptune(id, userId){
+    async croptuneStart(id, userId){
         const project = await this.getFullInfoById(id, userId);
         if(project.Status !== "Running"){
             throw new ProjectNotLoadedError();
@@ -418,7 +416,7 @@ class ProjectService {
         
         try{
             return await axios({
-                url: "http://localhost:5000/croptune",
+                url: "http://localhost:5000/croptunestart",
                 method: "post",
                 data: {
                     user: userId,
@@ -432,6 +430,64 @@ class ProjectService {
             console.log(error.response.data)
             throw new ProjectProcessingError();
         }        
+    }
+
+    async croptuneTest(id, userId, level, similarity){
+        const project = await this.getFullInfoById(id, userId);
+        if(project.Status !== "Running"){
+            throw new ProjectNotLoadedError();
+        }
+        
+        try{
+            return await axios({
+                url: "http://localhost:5000/croptunetest",
+                method: "post",
+                data: {
+                    user: userId,
+                    project: id,
+                    experiment: "project",
+                    level: level,
+                    similarity: similarity
+                },
+            });
+        } catch(error) {
+            console.log(error.response.data)
+            throw new ProjectProcessingError();
+        }        
+    }
+
+    async croptuneStop(id, userId){
+        const project = await this.getFullInfoById(id, userId);
+        if(project.Status !== "Running"){
+            throw new ProjectNotLoadedError();
+        }
+        
+        try{
+            return await axios({
+                url: "http://localhost:5000/croptunestop",
+                method: "post",
+                data: {
+                    user: userId,
+                    project: id,
+                    experiment: "project",
+                },
+            });
+        } catch(error) {
+            console.log(error.response.data)
+            throw new ProjectProcessingError();
+        }        
+    }
+
+    async cropInfo(id, userId){
+        const project = await this.getFullInfoById(id, userId);
+        if(project.Status !== "Running"){
+            throw new ProjectNotLoadedError();
+        }
+        
+        return {
+            level: project.Level,
+            similarity: project.Similarity
+        }
     }
 
     async delete(id, requestUserId) {
@@ -455,6 +511,10 @@ class ProjectService {
     async update(
         id, UserId, Level, Similarity
     ) {
+        const requestProject = await this.ProjectRepository.getById(id);
+        if(!UserId || UserId !== requestProject?.UserId){
+            throw new ForbiddenError();
+        }
         const project = await this.ProjectRepository.update({
             Id: id, Level, Similarity, 
         });

@@ -107,12 +107,36 @@ class ProjectController {
         await waitPipe();
     }
 
-    async croptune(req, res) {
+    async croptuneStart(req, res) {
         const { id } = req.params;
 
-        const response = await this.ProjectService.croptune(id, req.user?.id);
+        const response = await this.ProjectService.croptuneStart(id, req.user?.id);
 
         return res.status(HttpStatusCode.OK).json(response.data);
+    }
+
+    async croptuneTest(req, res) {
+        const { id, level, similarity } = req.params;
+
+        const response = await this.ProjectService.croptuneTest(id, req.user?.id, level, similarity);
+
+        return res.status(HttpStatusCode.OK).json(response.data);
+    }
+
+    async croptuneStop(req, res) {
+        const { id } = req.params;
+
+        const response = await this.ProjectService.croptuneStop(id, req.user?.id);
+
+        return res.status(HttpStatusCode.OK).json(response.data);
+    }
+
+    async cropInfo(req, res) {
+        const { id } = req.params;
+
+        const result = await this.ProjectService.cropInfo(id, req.user?.id);
+
+        return res.status(HttpStatusCode.OK).json(result);
     }
 
     async getImage(req, res) {
@@ -137,13 +161,9 @@ class ProjectController {
 
     async update(req, res) {
         const { id } = req.params;
-        const { UserId, Status, Name, CreatedAt, Cropping, 
-            SecretKey, NeuralNetworkId, CroppingNetworkId, ArtifactPath, level, similarity, Datasets } = req.body;
-
-        const project = await this.ProjectService.update(
-            id, UserId, Status, Name, CreatedAt, Cropping, 
-            SecretKey, NeuralNetworkId, CroppingNetworkId, ArtifactPath, level, similarity, Datasets
-        );
+        const { level, similarity } = req.body;
+        
+        const project = await this.ProjectService.update(id, req.user?.id, level, similarity);
 
         return res.status(HttpStatusCode.OK).json({
             project,

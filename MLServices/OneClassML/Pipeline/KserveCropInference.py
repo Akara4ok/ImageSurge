@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import requests
 from .Inference import Inference
+from .CropInference import CropInference
 from .utils.FileHandler import FileHandler
 from .ImageTable import ImageTableAlgo, ImageTable
 from .ModelHandlers.KServeModel import KServeModel
@@ -19,6 +20,19 @@ class KserveCropInference(Inference):
         self.url = url
         self.token = token
         self.max_elements_to_send = 1200
+        
+    def clone(self):
+        """ Some fields are shallow coppied """
+        result = KserveCropInference(self.file_handler, self.small_box_count, self.big_box_count, self.kserve_model, self.url, self.token)
+        result.is_loaded = self.is_loaded
+        result.feature_extractor = self.feature_extractor
+        result.scaler = self.scaler
+        result.feature_reduction = self.feature_reduction
+        result.one_class = self.one_class
+        result.cluster_center = self.cluster_center
+        result.cached_feauteres = self.cached_feauteres
+        result.cached_labels = self.cached_labels
+        return result
         
     def get_calc_similarity(self) -> float:
         """ Return similarity which calculated automatically """
@@ -60,6 +74,19 @@ class KserveCropInference(Inference):
         if(data["save_cache"]):
             features = result_resp["features"]
         return result, similarity, features
+    
+    def create_inference_from_features(self, dataset: tf.data.Dataset, features: np.ndarray):
+        result = CropInference(None)
+        result.is_loaded = True
+        result.cluster_center = self.cluster_center
+        
+        result.cached_img_tables = []
+        result.cached_feauteres = features
+        for i, image in enumerate(dataset):
+            image = image.numpy()
+            img_table = ImageTable(image, self.small_box_count, self.big_box_count, self.cluster_center)
+            result.cached_img_tables.append(img_table)
+        return result
     
     @Inference.need_load
     def process(self, dataset: tf.data.Dataset, result_classification: list = None, algo: ImageTableAlgo = ImageTableAlgo.Similarity, 

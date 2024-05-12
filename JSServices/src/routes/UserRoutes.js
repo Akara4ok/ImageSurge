@@ -60,6 +60,11 @@ const initUserRoutes = (
         wrap(projectController.create.bind(projectController)),
     );
 
+    routes.put(
+        UserRoutes.PROJECT_UPDATE,
+        wrap(projectController.update.bind(projectController)),
+    );
+
     routes.get(
         UserRoutes.LOAD_PROJECT,
         wrap(projectController.load.bind(projectController)),
@@ -86,8 +91,23 @@ const initUserRoutes = (
     );
 
     routes.get(
-        UserRoutes.PROJECT_CROPTUNE,
-        wrap(projectController.croptune.bind(projectController)),
+        UserRoutes.PROJECT_GET_CROP_INFO,
+        wrap(projectController.cropInfo.bind(projectController)),
+    );
+
+    routes.get(
+        UserRoutes.PROJECT_CROPTUNE_TEST,
+        wrap(projectController.croptuneTest.bind(projectController)),
+    );
+
+    routes.get(
+        UserRoutes.PROJECT_CROPTUNE_START,
+        wrap(projectController.croptuneStart.bind(projectController)),
+    );
+
+    routes.get(
+        UserRoutes.PROJECT_CROPTUNE_STOP,
+        wrap(projectController.croptuneStop.bind(projectController)),
     );
 
     routes.delete(

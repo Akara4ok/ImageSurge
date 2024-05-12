@@ -92,8 +92,8 @@ def process_endpoint():
         download_name='result.zip'
     )
 
-@app.route('/croptune', methods=['POST'])
-def croptune_endpoint():
+@app.route('/croptunestart', methods=['POST'])
+def croptunestart_endpoint():
     content = request.form
     user = content["user"]
     project = content["project"]
@@ -107,18 +107,51 @@ def croptune_endpoint():
             }, 500
     
     images, filenames = process_files_result
-    result = inferenceHandler.croptune(images, user, project, experiment_str)
+    result = inferenceHandler.croptune_start(images, user, project, experiment_str)
     if(result is None):
         return {
                 "message": "Error during processing"
             }, 500
-    (features, cluster_center, similarity) = result
     
     return {
-                "features": features.tolist(),
-                "cluster_center": cluster_center.tolist(),
-                "similarity": similarity,
+                "similarity": result,
                 "filenames": filenames
+            }, 200
+    
+@app.route('/croptunetest', methods=['POST'])
+def croptunetest_endpoint():
+    content = request.form
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    level = int(content["level"]) if "level" in content else 15
+    similarity = float(content["similarity"]) if "similarity" in content else None
+    
+    result = inferenceHandler.croptune_test(user, project, experiment_str, level, similarity)
+    if(result is None):
+        return {
+                "message": "Error during processing"
+            }, 500
+    
+    return {
+                "result_crop": result.tolist(),
+            }, 200
+    
+@app.route('/croptunestop', methods=['POST'])
+def croptunestop_endpoint():
+    content = request.form
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    
+    result = inferenceHandler.croptune_stop(user, project, experiment_str)
+    if(result is None):
+        return {
+                "message": "Error during processing"
+            }, 500
+    
+    return {
+                "message": "Success",
             }, 200
 
 

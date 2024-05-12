@@ -24,6 +24,7 @@ class InferenceHandler:
     def __init__(self, default_folder: str, batch_size: int = 10, validation_folder: str = "Services/Validation") -> None:
         self.default_folder = default_folder
         self.iference_map: dict[str, Inference] = {}
+        self.croptune_map: dict[str, KserveCropInference] = {}
         self.batch_size = batch_size
         self.validation_folder = validation_folder
         
@@ -159,7 +160,7 @@ class InferenceHandler:
                 result.append(buffer)
         return result
     
-    def croptune(self, images: list[np.ndarray], user: str, project: str, experiment_str: str):
+    def croptune_start(self, images: list[np.ndarray], user: str, project: str, experiment_str: str):
         inference_crop_key = self.getKey(user, project, experiment_str, True)
         if(not(inference_crop_key in self.iference_map)):
             print("Inference Crop is not loaded")
@@ -168,12 +169,26 @@ class InferenceHandler:
         dataset = InferenceImageDataset(IMAGE_HEIGHT, IMAGE_WIDTH)
         dataset.load(images)
         
-        inference_crop = self.iference_map[inference_crop_key]
-        result_crop = inference_crop.process(dataset.get_data(), result_classification = [1] * len(images), save_cache = True,
-                                                level = 15, similarity = None)
-        features = inference_crop.get_cache_data()[0]
-        if(result_crop is None):
-            print("Crop failed")
+        inference_crop: KserveCropInference = self.iference_map[inference_crop_key].clone()
+        inference_crop.process(dataset.get_data(), result_classification = [1] * len(images), save_cache = True,
+                                        level = 15, similarity = None)
+        self.croptune_map[inference_crop_key] = inference_crop.create_inference_from_features(dataset.get_data(), inference_crop.get_cache_data()[0])
+        return inference_crop.get_calc_similarity()
+    
+    def croptune_test(self, user: str, project: str, experiment_str: str, level: int, similarity: float):
+        inference_crop_key = self.getKey(user, project, experiment_str, True)
+        if(not(inference_crop_key in self.croptune_map)):
+            print("Inference Crop is not loaded")
             return None
         
-        return features, np.squeeze(inference_crop.cluster_center), inference_crop.get_calc_similarity()
+        inference_crop = self.croptune_map[inference_crop_key]
+        result = inference_crop.process(None, None, use_cache = True, level = level, similarity = similarity)
+        return result
+    
+    def croptune_stop(self, user: str, project: str, experiment_str: str):
+        inference_crop_key = self.getKey(user, project, experiment_str, True)
+        if(not(inference_crop_key in self.croptune_map)):
+            return None
+        
+        self.croptune_map.pop(inference_crop_key)  
+        return True

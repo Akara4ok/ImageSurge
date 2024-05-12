@@ -35,7 +35,7 @@ model Project {
     CroppingNetworkId  String?             @db.Uuid
     ArtifactPath       String
     Level              Int                 @default(15)
-    Similarity         Int?
+    Similarity         Float?
     Requests           Request[]
     Logs               Log[]
     LoadStats          LoadStat[]
