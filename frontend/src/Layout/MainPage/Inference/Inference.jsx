@@ -18,7 +18,6 @@ const Inference = ({ setActiveCallback, toggleMenu }) => {
 
     return (
         <div className='inference-wrapper'>
-            <Header text="Projects" toggleMenu={toggleMenu}/>
             <div className='inference-content-wrapper'>
                 <div className='inference-content'>
                     <div className='inference-header'>

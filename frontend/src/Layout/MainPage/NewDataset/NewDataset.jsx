@@ -132,7 +132,6 @@ const NewDataset = ({ setActiveCallback, toggleMenu }) => {
 
     return (
         <div className='home-wrapper'>
-            <Header text="Datasets" toggleMenu={toggleMenu} />
             <div className='datasets-create-wrapper'>
                 <div className='datasets-create-content'>
                     <div className='datasets-create-header'>

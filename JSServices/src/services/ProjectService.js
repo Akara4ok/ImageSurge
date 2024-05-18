@@ -19,6 +19,7 @@ const DATA_PATH = process.env.DATA_PATH;
 const KSERVE_URL = process.env.KSERVE_URL;
 const DOCKER_FOLDER = process.env.DOCKER_FOLDER;
 const KSERVE_URL_CROP = process.env.KSERVE_URL_CROP;
+const LOAD_SLEEP = process.env.LOAD_SLEEP ?? 0;
 
 class ProjectService {
     constructor(ProjectRepository, DatasetService, NeuralNetworkService, ModelService, CategoryService, LogService, RequestService, LoadStatService) {
@@ -30,7 +31,10 @@ class ProjectService {
         this.LogService = LogService;
         this.RequestService = RequestService;
         this.LoadStatService = LoadStatService;
-        this.loadAll();
+        setTimeout(() => {
+            this.loadAll();
+            console.log("loaded");
+        }, LOAD_SLEEP)
     }
 
     async getAll(userId) {

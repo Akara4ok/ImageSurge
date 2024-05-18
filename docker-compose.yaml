@@ -1,5 +1,6 @@
 name: "image_surge"
 services:
+#ML Services
   validation:
     image: akara4ok/validation:latest
     container_name: validation
@@ -90,6 +91,66 @@ services:
       - inference_gpu
     command: python3 Services/warmup.py --main-service http://127.0.0.1:5000 --data-path Data/ --source 2 --local-kserve False --sleep 10
 
+#JS Service
+  pg-sql:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD', 'curl', '-s', 'http://localhost:5432']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+        main_network:
+
+  pg-migration:
+    build:
+      context: ./JSServices
+      dockerfile: Dockerfile.migration
+    environment:
+      - DB_URL=${DB_URL}  
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    command: sh -c "npx prisma migrate deploy && psql ${DB_URL_NO_SCHEMA} -f /initial.sql"
+    depends_on:
+      - pg-sql
+    networks:
+        main_network:
+
+  api-service:
+    network_mode: "host"
+    build:
+      context: ./JSServices
+      dockerfile: Dockerfile
+    environment:
+      - LOAD_SLEEP=10000 
+    depends_on:
+      - pg-sql
+      - pg-migration
+      - main_service
+      - inference_cpu
+      - inference_gpu
+    ports:
+      - 8000:8000
+    volumes:
+      - ./Data:/Data
+
+#frontend
+  frontend-service:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:80
+    depends_on:
+      - api-service
 
 networks:
   main_network:

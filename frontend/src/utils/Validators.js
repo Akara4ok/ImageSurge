@@ -35,6 +35,9 @@ export const emailValidate = (email) => {
 }
 
 export const nameValidate = (name) => {
+    if (name.trim().length == 0) {
+        return 'Field is emty';
+    }
     if (name.trim().split(/\s+/).length > 1) {
         return 'Input must contain only one word';
     }

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { AiOutlineBell } from "react-icons/ai";
 import './Notification.scss';
 import { socket } from '../../utils/socket';
+import { capitalize } from '../../utils/utils';
 
 const Notification = () => {
   const [notifications, setNotifications] = useState([]);
@@ -38,8 +39,7 @@ const Notification = () => {
     if(message.includes("Start loading")){
       return;
     }
-    const capitalize = (s) => { return s && s[0].toUpperCase() + s.slice(1); }
-    const newMessage =  capitalize(topic) + ": " + capitalize(message)
+    const newMessage = capitalize(topic) + ": " + capitalize(message)
     setNotifications(notifications => [newMessage, ...notifications]);
     setNNewNotification(newMessage)
     setTimeout(() => {

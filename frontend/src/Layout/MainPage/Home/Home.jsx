@@ -26,7 +26,6 @@ const Home = ({ setActiveCallback, toggleMenu }) => {
 
     return (
         <div className='home-wrapper'>
-            <Header text="Home" toggleMenu={toggleMenu}/>
             <div className='home-content'>
                 <div className='button-wrapper'>
                     <Link to="/createdataset"><button>+ New Dataset</button></Link>

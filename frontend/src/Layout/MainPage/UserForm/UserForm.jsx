@@ -75,7 +75,7 @@ const UserForm = ({ defaultValueProp, firstPassPlaceholder, seconfPassPlaceholde
             <Input type="email" errorMsg={emailValueError} onChange={(value) => setEmailValue(value)} value={emailValue} placeholder="Email Address" />
         </div>
         <div className={`single-line ${phoneNumberError ? "error-line" : ""}`}>
-            <CountrySelector onChange={(value) => setCountry(value)} currentValue={country} />
+            <CountrySelector onChange={(value) => setCountry(value)} currentValue={country}  errorMsg={countryError}/>
             <Input type="tel" errorMsg={phoneNumberError} onChange={(value) => setPhoneNumber(value)} value={phoneNumber} placeholder="Phone Number" />
         </div>
         <div className={`single-line ${firstPasswordValueError || secondPasswordValueError ? "error-line" : ""}`}>

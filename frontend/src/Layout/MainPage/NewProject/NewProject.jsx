@@ -179,7 +179,6 @@ const NewProject = ({ setActiveCallback, toggleMenu }) => {
 
     return (
         <div className='home-wrapper'>
-            <Header text="Projects" toggleMenu={toggleMenu}/>
             <div className='projects-create-wrapper'>
                 <div className='projects-create-content'>
                     <div className='projects-create-header'>

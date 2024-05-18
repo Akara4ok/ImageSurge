@@ -6,6 +6,8 @@ import { FaDatabase } from "react-icons/fa6";
 import { IoIosSettings } from "react-icons/io";
 import { Link } from 'react-router-dom';
 import BurgerMenu from '../../Components/BurgerMenu/BurgerMenu';
+import Header from './Header/Header';
+import { capitalize } from '../../utils/utils';
 
 const MainPage = ({ active, children, isMenuOpen, toggleMenu }) => {
     const iconSize = "18px"
@@ -31,6 +33,7 @@ const MainPage = ({ active, children, isMenuOpen, toggleMenu }) => {
                 </ul>
             </nav>
             <div className='main-content'>
+                <Header text={capitalize(active)} toggleMenu={toggleMenu}/>
                 {children}
             </div>
         </div>

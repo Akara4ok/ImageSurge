@@ -78,7 +78,6 @@ const Settings = ({ setActiveCallback, toggleMenu }) => {
 
   return (
     <div className='settings-wrapper'>
-      <Header text="Settings" toggleMenu={toggleMenu} />
       <div className='setting-content'>
         <UserForm defaultValueProp={{...lastSavedUser}}
           requestFun = {updateData} samePasswords={false}
