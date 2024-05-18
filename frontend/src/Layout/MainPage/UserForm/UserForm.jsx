@@ -55,11 +55,11 @@ const UserForm = ({ defaultValueProp, firstPassPlaceholder, seconfPassPlaceholde
       }
     }
     setSecondPasswordValueError(secondPasswordValueError);
-
+    
     const countryError = !country ? "Country is empty" : ""
     setCountryError(countryError)
-
-    if(firstNameError || lastNameError || emailValueError || countryError || phoneNumber || firstPasswordValueError || secondPasswordValueError){
+    
+    if(firstNameError || lastNameError || emailValueError || countryError || phoneNumberError || firstPasswordValueError || secondPasswordValueError){
       return;
     }
     requestFun(firstName, lastName, country, phoneNumber, emailValue, firstPasswordValue, secondPasswordValue)

@@ -43,8 +43,10 @@ function RouterComponent() {
     let currentDate = new Date();
     if (decodedToken.exp * 1000 < currentDate.getTime() && location.pathname !== '/signup') {
       navigate('/login');
+      return;
     }
-    socket.emit('authenticate', token)
+    socket.connect();
+    socket.emit('authenticate', token);
   }, [navigate, location.pathname]); // Include location.pathname in the dependency array
 
   return (

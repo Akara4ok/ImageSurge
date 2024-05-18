@@ -5,6 +5,7 @@ import Popup from '../../Components/Popup/Popup';
 import Spinner from '../../Components/Spinner/Spinner';
 import { useNavigate } from 'react-router-dom';
 import UserForm from '../MainPage/UserForm/UserForm';
+import { socket } from '../../utils/socket';
 
 const SignUpForm = () => {
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -37,6 +38,8 @@ const SignUpForm = () => {
               }).then((response) => {
                 setIsLoading(false);
                 localStorage.setItem('token', response?.data?.token);
+                socket.connect();
+                socket.emit('authenticate', token);
                 navigate("/");
               }).catch((error) => {
                 setIsLoading(false);

@@ -6,6 +6,7 @@ import Popup from '../../Components/Popup/Popup';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../Components/Spinner/Spinner';
+import {socket} from '../../utils/socket'
 
 const LogInForm = () => {
     const [isPopupOpen, setPopupOpen] = useState(false);
@@ -30,7 +31,8 @@ const LogInForm = () => {
         }).then((response) => {
           setIsLoading(false);
           localStorage.setItem('token', response?.data?.token);
-          
+          socket.connect();
+          socket.emit('authenticate', response?.data?.token);
           navigate("/");
         }).catch((error) => {
           setIsLoading(false);
