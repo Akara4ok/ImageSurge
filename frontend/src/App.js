@@ -45,8 +45,8 @@ function RouterComponent() {
       navigate('/login');
       return;
     }
-    socket.connect();
     socket.emit('authenticate', token);
+    console.log("socket")
   }, [navigate, location.pathname]); // Include location.pathname in the dependency array
 
   return (

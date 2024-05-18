@@ -56,7 +56,8 @@ class DatasetService {
             await this.DataHandler.downloadFile(GDriveLink, getDatasetPath(Name));
         }
 
-        this.DataHandler.checkZipFile(getDatasetPath(Name));
+        const imagesNum = this.DataHandler.checkZipFile(getDatasetPath(Name));
+        console.log(imagesNum)
         this.DataHandler.extractAll(getDatasetPath(Name), PARENT_FOLDER, Name)
 
         const dataset = await this.DatasetRepository.create({
@@ -82,7 +83,7 @@ class DatasetService {
                     Quality: response.data?.quality
                 });
                 this.DataHandler.deleteLowQualityImgs(PARENT_FOLDER + "/" + Name, response.data?.result)
-                ioServer.sendMessage("dataset", `created ${Name}`, UserId);
+                ioServer.sendMessage("dataset", `created ${Name}, deleteing ${imagesNum - response.data?.result.length}`, UserId);
             } else {
                 ioServer.sendMessage("dataset", `Too small number of images pass validation`, UserId);
                 throw new ArchiveSizeError(); 
@@ -109,7 +110,7 @@ class DatasetService {
                 rmSync(dataset.ParentFolder + "/" + dataset.Name + ".zip", {recursive: true, force: true});
             }
         } catch {}
-
+        ioServer.sendMessage("dataset", `Deleted ${dataset.Name}`, requestUserId);
         return dataset;
     }
 

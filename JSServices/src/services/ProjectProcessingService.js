@@ -9,7 +9,7 @@ class ProjectProcessingService {
     async getById(id) {
         const projectProcessing = await this.ProjectProcessingRepository.getById(id);
         if (!projectProcessing) {
-            throw new NotFoundError();
+            throw new NotFoundError("ProjectProcessing");
         }
 
         return projectProcessing;

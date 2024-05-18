@@ -40,41 +40,7 @@ export class DataHandler {
         if(zipEntries.length < MIN_IMG || zipEntries.length > 10000){
             throw new ArchiveSizeError();
         }
-    }
-
-    checkZipFile(zipPath) {
-        let zip;
-        try{
-            zip = new AdmZip(zipPath);
-            if(!zip){
-                throw new DatasetArchiveError();
-            }
-        } catch(error) {
-            console.log(zipPath);
-            console.log(error)
-            throw new DatasetArchiveError();
-        }
-
-        const zipEntries = zip.getEntries();
-
-        let directoryCount = 0;
-        zipEntries.forEach((entry) => {
-            if (entry.isDirectory) {
-                directoryCount++;
-            } else {
-                if (!entry.entryName.match(/\.(jpg|png|jpeg)$/i)) {
-                    throw new DatasetArchiveError();
-                }
-            }
-        });
-
-        if(directoryCount > 1){
-            throw new DatasetArchiveError();
-        }
-
-        if(zipEntries.length < MIN_IMG || zipEntries.length > 10000){
-            throw new ArchiveSizeError();
-        }
+        return zipEntries.length - directoryCount
     }
 
     extractAll(path, folder, dataset_name){

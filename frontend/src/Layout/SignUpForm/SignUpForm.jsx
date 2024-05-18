@@ -39,7 +39,7 @@ const SignUpForm = () => {
                 setIsLoading(false);
                 localStorage.setItem('token', response?.data?.token);
                 socket.connect();
-                socket.emit('authenticate', token);
+                socket.emit('authenticate', response?.data?.token);
                 navigate("/");
               }).catch((error) => {
                 setIsLoading(false);

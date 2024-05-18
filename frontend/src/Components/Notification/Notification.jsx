@@ -1,13 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AiOutlineBell } from "react-icons/ai";
 import './Notification.scss';
+import { socket } from '../../utils/socket';
 
 const Notification = () => {
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: 'New message from John' },
-    { id: 2, message: 'Meeting at 3 PM' },
-    { id: 3, message: 'Update available' }
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [newNotification, setNNewNotification] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const bellRef = useRef(null);
 
@@ -36,6 +34,24 @@ const Notification = () => {
     };
   }, [bellRef]);
 
+  const onNewMessage = (topic, message) => {
+    if(message.includes("Start loading")){
+      return;
+    }
+    const capitalize = (s) => { return s && s[0].toUpperCase() + s.slice(1); }
+    const newMessage =  capitalize(topic) + ": " + capitalize(message)
+    setNotifications(notifications => [newMessage, ...notifications]);
+    setNNewNotification(newMessage)
+    setTimeout(() => {
+      setNNewNotification();
+    }, 1000)
+  }
+
+  useEffect(() => {
+    socket.on('project', (message) => { onNewMessage('project', message) });
+    socket.on('dataset', (message) => { onNewMessage('dataset', message) });
+  }, []);
+
   return (
     <div className="notification-bell" ref={bellRef}>
       <button className={`bell-icon ${isOpen ? 'open' : 'closed'}`} onClick={toggleDropdown}>
@@ -46,10 +62,15 @@ const Notification = () => {
       </button>
       {isOpen && (
         <ul className="dropdown">
-          {notifications.map((notification) => (
-            <li key={notification.id}>{notification.message}</li>
+          {notifications.map((notification, index) => (
+            <li key={notification + index }>{notification}</li>
           ))}
           <li className="clear" onClick={closeDropdown}>Clear Notifications</li>
+        </ul>
+      )}
+      {newNotification && (
+        <ul className="dropdown">
+            <li>{newNotification}</li>
         </ul>
       )}
     </div>

@@ -72,7 +72,7 @@ class UserService {
     ) {
         const user = await this.UserRepository.getById(id);
         if (!user) {
-            throw new NotFoundError();
+            throw new NotFoundError("User");
         }
         
         let NewHashedPassword = user.Password
@@ -114,7 +114,7 @@ class UserService {
         const user = await this.UserRepository.getByFilter({where: {Email: email}});
 
         if (!user) {
-            throw new NotFoundError();
+            throw new NotFoundError("User");
         }
 
         const isValidPassword = await bcrypt.compare(password, user.Password);

@@ -52,7 +52,7 @@ class ProjectService {
     async getKey(id, UserId) {
         const project = await this.ProjectRepository.getById(id);
         if (!project) {
-            throw new NotFoundError();
+            throw new NotFoundError("ProjectProcessing");
         }
         if (project.UserId !== UserId){
             throw new ForbiddenError();
@@ -66,7 +66,7 @@ class ProjectService {
         delete project.SecretKey;
 
         if (!project) {
-            throw new NotFoundError();
+            throw new NotFoundError("ProjectProcessing");
         }
 
         if(project.UserId != UserId){
@@ -309,7 +309,7 @@ class ProjectService {
             });
         }
         
-        ioServer.sendMessage("project", `Stop occured`, UserId);
+        ioServer.sendMessage("project", `Stopped ` + project.Name , UserId);
         return project;
     }
 
@@ -504,6 +504,7 @@ class ProjectService {
                 rmSync(project.ArtifactPath + "/" + project.UserId + "/" + project.Id, {recursive: true, force: true});
             }
         } catch {}
+        ioServer.sendMessage("project", `Deleted ` + project.Name , requestUserId);
 
         return project;
     }
@@ -519,6 +520,7 @@ class ProjectService {
             Id: id, Level, Similarity, 
         });
         await this.LogService.create(project.Id, 200, "Update", "New level: " + Level + " new simialirity: " + Similarity, project?.UserId ?? UserId);
+        ioServer.sendMessage("project", `Updated ` + project.Name , UserId);
         return project;
     }
 }
