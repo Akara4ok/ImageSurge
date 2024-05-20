@@ -1,0 +1,126 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DB_URL")
+}
+
+model User {
+    Id          String    @id @default(uuid()) @db.Uuid
+    FirstName   String
+    LastName    String
+    Email       String    @unique
+    PhoneNumber String    @unique
+    Country     String
+    Password    String
+    Projects    Project[]
+    Datasets    Dataset[]
+    Role        String    @default("user")
+}
+
+model Project {
+    Id                 String              @id @default(uuid()) @db.Uuid
+    User               User                @relation(fields: [UserId], references: [Id])
+    UserId             String              @db.Uuid
+    Status             String
+    Name               String
+    CreatedAt          DateTime
+    Cropping           Boolean
+    SecretKey          String
+    NeuralNetwork      NeuralNetwork       @relation(name: "Classification", fields: [NeuralNetworkId], references: [Id], map: "Project_Classification_fkey")
+    NeuralNetworkId    String              @db.Uuid
+    CroppingNetwork    NeuralNetwork?      @relation(name: "Cropping", fields: [CroppingNetworkId], references: [Id], map: "Project_Cropping_fkey")
+    CroppingNetworkId  String?             @db.Uuid
+    ArtifactPath       String
+    Level              Int                 @default(15)
+    Similarity         Float?
+    Requests           Request[]
+    Logs               Log[]
+    LoadStats          LoadStat[]
+    ProjectProcessings ProjectProcessing[]
+    Datasets           Dataset[]
+}
+
+model Request {
+    Id                 String  @id @default(uuid()) @db.Uuid
+    Project            Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
+    ProjectId          String  @db.Uuid
+    Images             Int
+    ProcessingTime     Float
+    ValidationTime     Float
+    ClassificationTime Float
+    CroppingTime       Float
+    Quality            Float
+}
+
+model Log {
+    Id         String  @id @default(uuid()) @db.Uuid
+    Project    Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
+    ProjectId  String  @db.Uuid
+    Value      String
+    Time       DateTime
+    StatusCode Int
+    Function   String
+}
+
+model LoadStat {
+    Id         String  @id @default(uuid()) @db.Uuid
+    Project    Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
+    ProjectId  String  @db.Uuid
+    LoadTime   DateTime
+    StopTime   DateTime?
+}
+
+model ProjectProcessing {
+    Id        String  @id @default(uuid()) @db.Uuid
+    Project   Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
+    ProjectId String  @db.Uuid
+    Value     String
+}
+
+model Dataset {
+    Id           String    @id @default(uuid()) @db.Uuid
+    Status       String    @default("Creating")
+    Projects     Project[]
+    User         User      @relation(fields: [UserId], references: [Id])
+    UserId       String    @db.Uuid
+    Name         String
+    ImagesNum    Int
+    Category     Category  @relation(fields: [CategoryId], references: [Id])
+    CategoryId   String    @db.Uuid
+    CreatedAt    DateTime
+    ParentFolder String
+    Source       Int
+    Quality      Float
+
+    @@map("Dataset")
+}
+
+model NeuralNetwork {
+    Id                     String    @id @default(uuid()) @db.Uuid
+    ClassificationProjects Project[] @relation("Classification")
+    CroppingProjects       Project[] @relation("Cropping")
+    Category               Category  @relation(fields: [CategoryId], references: [Id])
+    CategoryId             String    @db.Uuid
+    KservePath             String
+    LocalKserve            Boolean
+    Model                  Model     @relation(fields: [ModelId], references: [Id])
+    ModelId                String    @db.Uuid
+    CropInference          Boolean   @default(false)
+}
+
+model Category {
+    Id             String          @id @default(uuid()) @db.Uuid
+    Datasets       Dataset[]
+    NeuralNetworks NeuralNetwork[]
+    Name           String          @unique
+}
+
+model Model {
+    Id             String          @id @default(uuid()) @db.Uuid
+    NeuralNetworks NeuralNetwork[]
+    Name           String          @unique
+    Description    String?
+}

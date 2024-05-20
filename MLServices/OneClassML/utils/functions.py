@@ -104,3 +104,13 @@ def recrop(x: np.ndarray, width: int, height: int, ref_width: int, ref_height) -
     arr_copy[:, 2] = (arr_copy[:, 2] / width) * ref_width
     arr_copy[:, 3] = (arr_copy[:, 3] / height) * ref_height
     return arr_copy
+
+def recrop_1d(x: np.ndarray, width: int, height: int, ref_width: int, ref_height) -> np.ndarray:
+    """ Recrop bbox from one size to ref size """
+    
+    arr_copy = np.copy(x)
+    arr_copy[0] = (arr_copy[0] / width) * ref_width
+    arr_copy[1] = (arr_copy[1] / height) * ref_height
+    arr_copy[2] = (arr_copy[2] / width) * ref_width
+    arr_copy[3] = (arr_copy[3] / height) * ref_height
+    return arr_copy

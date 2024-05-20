@@ -5,24 +5,24 @@ import FileUpload from '../FileUpload/FileUpload';
 import MultiSelect from '../MultiSelect/MultiSelect';
 import MultiSelect2 from '../MultiSelect2/MultiSelect2';
 
-const Input2 = ({ label, type, placeholder, defaultValue, options, tooltips, onValueChanged, ...props }) => {
+const Input2 = ({ label, type, errorMsg, onChange, placeholder, value, options, tooltips, ...props }) => {
     let inputField;
 
     switch (type) {
         case 'select':
             inputField = (
                 <CustomSelect
+                    onChange={onChange}
                     options={options}
                     tooltips={tooltips}
-                    onOptionSelect={onValueChanged}
                 />
             );
             break;
         case 'multi-select':
             inputField = (
                 <MultiSelect
+                    onChange={onChange}
                     options={options}
-                    onOptionSelect={onValueChanged}
                     {...props}
                 />
             );
@@ -30,8 +30,8 @@ const Input2 = ({ label, type, placeholder, defaultValue, options, tooltips, onV
         case 'multi-select-2':
             inputField = (
                 <MultiSelect2
+                    onChange={onChange}
                     options={options}
-                    onOptionSelect={onValueChanged}
                     {...props}
                 />
             );
@@ -40,23 +40,29 @@ const Input2 = ({ label, type, placeholder, defaultValue, options, tooltips, onV
             inputField = <div className='switch-wrapper'>
                 <p>{placeholder}</p>
                 <label className="switch" htmlFor="checkbox">
-                    <input type="checkbox" id="checkbox" />
+                    <input onChange={(event) => onChange ? onChange(event.currentTarget?.checked) : null} type="checkbox" value={value} id="checkbox" />
                     <div className="slider round"></div>
                 </label>
             </div>
 
             break;
         case 'files':
-            inputField = <FileUpload />
+            inputField = <FileUpload value={value} onChange={(file) => onChange ? onChange(file) : null} />
             break
         default:
-            inputField = <input type={type} placeholder={placeholder} {...props} defaultValue={defaultValue} />;
+            inputField = <input
+                onChange={(event) => onChange ? onChange(event.target?.value) : null}
+                type={type}
+                placeholder={placeholder}
+                {...props}
+                value={value} />;
     }
 
     return (
-        <div className={`input-component-2 ${type}`}>
+        <div className={`input-component-2 ${type} ${errorMsg ? 'error-input' : ''}`}>
             {label && <label>{label}</label>}
             {inputField}
+            {errorMsg ? <div className='error-input-msg'>{errorMsg}</div> : null}
         </div>
     );
 };

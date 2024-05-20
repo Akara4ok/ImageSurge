@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-from flask import Flask, request
+from flask import Flask, request, Response
 from flask_cors import CORS
 from flask_sock import Sock
 import sys
@@ -38,11 +38,13 @@ def train_endpoint():
     kserve_path_crop = content["kserve-path-crop"] if "kserve-path-crop" in content else None
     local_kserve = content["local-kserve"] if "local-kserve" in content else None
     
+    print(kserve_path_classification, kserve_path_crop)
+    
     result = trainService.train(user, project, experiment_str, model_name, cropping, data_path, dataset_names, sources, category, 
                                 kserve_path_classification, kserve_path_crop, local_kserve)
-    if(result == 0):
+    if(result['StatusCode'] == 0):
         return {
-                "message": "Training successfully started"
+                "message": "Successfully trained"
             }, 200
 
     return {
@@ -58,9 +60,9 @@ def load_endpoint():
     cropping = content["cropping"]
     kserve_path_classification = content["kserve-path-classification"] if "kserve-path-classification" in content else None
     kserve_path_crop = content["kserve-path-crop"] if "kserve-path-crop" in content else None
-    token = content["token"] if "token" in content else None
+    local_kserve = content["local-kserve"] if "local-kserve" in content else None
     
-    return ifnferenceService.load(user, project, experiment_str, cropping, kserve_path_classification, kserve_path_crop, token)
+    return ifnferenceService.load(user, project, experiment_str, cropping, kserve_path_classification, kserve_path_crop, local_kserve)
 
 
 @app.route('/stop', methods=['POST'])
@@ -72,6 +74,7 @@ def stop_endpoint():
     cropping = content["cropping"]
     return ifnferenceService.stop(user, project, experiment_str, cropping)
     
+    
 @app.route('/process', methods=['POST'])
 def process_endpoint():
     content = request.form
@@ -81,10 +84,58 @@ def process_endpoint():
     cropping = content["cropping"]
     level = content["level"]
     similarity = content["similarity"] if "similarity" in content else None
+    postprocessing = content["postprocessing"] if "postprocessing" in content else None
     
     images = request.files.getlist('file')
+    response = ifnferenceService.process(images, user, project, experiment_str, cropping, level, similarity=similarity, postprocessing=postprocessing)
+    if(response.status_code != 200):
+        return response.json(), response.status_code
+    else:
+        return Response(
+            response.content,
+            headers = dict(response.headers)
+        )
+        
+@app.route('/croptunestart', methods=['POST'])
+def croptunestart_endpoint():
+    content = request.get_json()
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    datasets = content["datasets"]
+    randomseed = content["random_seed"] if "random_seed" in content else None
+    count = content["count"]
+    response = ifnferenceService.croptune_start(user, project, experiment_str, count, datasets, randomseed)
+    return Response(
+            response.content,
+            headers = dict(response.headers)
+        )
     
-    return ifnferenceService.process(images, user, project, experiment_str, cropping, level, similarity)
+@app.route('/croptunetest', methods=['POST'])
+def croptunetest_endpoint():
+    content = request.get_json()
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    level = content["level"] if "level" in content else None
+    similarity = content["similarity"] if "similarity" in content else None
+    response = ifnferenceService.croptune_test(user, project, experiment_str, level, similarity)
+    return Response(
+            response.content,
+            headers = dict(response.headers)
+        )
+    
+@app.route('/croptunestop', methods=['POST'])
+def croptunestop_endpoint():
+    content = request.get_json()
+    user = content["user"]
+    project = content["project"]
+    experiment_str = content["experiment"]
+    response = ifnferenceService.croptune_stop(user, project, experiment_str)
+    return Response(
+            response.content,
+            headers = dict(response.headers)
+        )
 
 @sock.route('/train_ws')
 def echo(ws):

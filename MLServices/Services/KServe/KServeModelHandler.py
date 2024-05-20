@@ -59,18 +59,6 @@ class KServeModelHandler(Model):
                     raw_img_data = base64.b64decode(img_data)
                     input_image = Image.open(io.BytesIO(raw_img_data))
                     result_tensor.append(input_image)
-        elif isinstance(payload, InferRequest):
-            for infer_input in payload.inputs:
-                if infer_input.datatype == "BYTES":
-                    if payload.from_grpc:
-                        raw_img_data = infer_input.data
-                    else:
-                        raw_img_data = base64.b64decode(infer_input.data)
-                    input_image = Image.open(io.BytesIO(raw_img_data))
-                    result_tensor.append(input_image)
-                elif infer_input.datatype == "FP32":
-                    input_np = infer_input.as_numpy()
-                    result_tensor.append(input_np)
         else:
             raise InvalidInput("invalid payload")
 

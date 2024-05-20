@@ -11,7 +11,7 @@ const Header = ({ text, toggleMenu }) => {
         <p>{text}</p>
         <div className='separator'></div>
         <Notification/>
-        <a href="/login">
+        <a onClick={() => {localStorage.removeItem('token')}} href="/login">
             <FiLogOut size="22"/>
         </a> 
     </div>

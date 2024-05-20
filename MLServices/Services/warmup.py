@@ -8,10 +8,9 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
           kserve_path: str = None, local_kserve: bool = True, sleep_time: int = 120) -> None:
     """ gpu warmup """
     time.sleep(sleep_time)
-    
-    ws_url = main_service_url.replace("http", "ws")
-    ws_url = ws_url.replace("https", "wss")
-    ws = create_connection(ws_url + "/train_ws")
+    # ws_url = main_service_url.replace("http", "ws")
+    # ws_url = ws_url.replace("https", "wss")
+    # ws = create_connection(ws_url + "/train_ws")
 
     user = "default"
     project = "default"
@@ -20,7 +19,7 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
         "user": user,
         "project": project,
         "experiment": experiment,
-        "model_name": "Resnet",
+        "model_name": "ResNet",
         "cropping": True,
         "data-path": [data_path],
         "dataset-names": [dataset_names],
@@ -32,9 +31,9 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
         train_data["kserve-path-crop"] = kserve_path
         
     result = requests.post(main_service_url + "/train", json=train_data)
-    print("Training start res", result.status_code, result.json())
-    print("Training end res", ws.recv())
-    ws.close()
+    print("Training res", result.status_code, result.json())
+    # print("Training end res", ws.recv())
+    # ws.close()
     load_data = {
         "user": user,
         "project": project,
@@ -44,7 +43,7 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
     }
     if(kserve_path):
         load_data["kserve-path-classification"] = kserve_path
-        load_data["kserve-path-crop"] = kserve_path
+        load_data["kserve-path-crop"] = os.getenv('KSERVE_CROP')
         
     result = requests.post(main_service_url + "/load", json=load_data)
     print("Loading res", result.status_code, result.json())
@@ -60,7 +59,7 @@ def warmup(main_service_url: str, data_path: str, dataset_names: str, sources: s
             ('file', (name, open(dataset_path + name, 'rb'), "image/jpg")),
         ]
     result = requests.post(main_service_url + "/process", files=multipart_form_data)
-    print("Processing res", result.status_code, result.json())
+    print("Processing res", result.status_code)
     
     stop_data = {
         "user": user,

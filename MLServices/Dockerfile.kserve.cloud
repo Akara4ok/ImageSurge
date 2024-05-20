@@ -5,12 +5,7 @@ WORKDIR /app
 COPY ./requirements.txt /app
 RUN python3 -m pip install -r requirements.txt
 
-COPY ./OneClassML/Dataloader /app/OneClassML/Dataloader/
-COPY ./OneClassML/Dataset /app/OneClassML/Dataset/
-COPY ./OneClassML/Pipeline/ModelHandlers /app/OneClassML/Pipeline/ModelHandlers/
-COPY ./OneClassML/Pipeline/__init__.py /app/OneClassML/Pipeline/__init__.py
-COPY ./OneClassML/utils /app/OneClassML/utils/
-COPY ./OneClassML/DefaultModels /app/OneClassML/DefaultModels/
+COPY ./OneClassML /app/OneClassML/
 COPY ./Services/KServe /app/Services/KServe/
 
-# ENTRYPOINT python3 Services/KServe/ServeJob.py
+ENTRYPOINT python3 Services/KServe/ServeJob.py

@@ -75,12 +75,12 @@ class KServeModel(PreTrainedModel):
         if(is_train_ds):
             for one_batch_x, _ in dataset:
                 if(len(one_batch_x.shape) == 3):
-                    return None
+                    return 1
                 return one_batch_x.shape[0]
         
         for one_batch_x in dataset:
             if(len(one_batch_x.shape) == 3):
-                return None
+                return 1
             return one_batch_x.shape[0]
         
     
@@ -103,7 +103,7 @@ class KServeModel(PreTrainedModel):
                 result_y = result[1]
             else:
                 result_y = np.concatenate((result_y, result[1]))
-
+            dataset = dataset.skip(batch_count_in_send)
         return result_x, result_y
     
     def save(self, save_path: str) -> None:

@@ -1,8 +1,11 @@
 @import '../../../global/global.scss';
 
+.selector-wrapper{
+    width: 100%;
+}
+
 .selector-component {
-    margin: 20px;
-    width: 750px;
+    width: 100%;
 }
 
 @media (max-width: 800px) {

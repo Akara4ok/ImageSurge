@@ -1,11 +1,14 @@
 import hashlib
 import requests
 import sys
+import random
+import os
 sys.path.append("OneClassML")
 from utils.non_tf_functions import get_access_token
 from GpuMemory import GpuMemory
 from multiprocessing.pool import ThreadPool
 from threading import Lock
+from Dataloader.DataloaderImpl.InferenceDataloader import InferenceDataloader
 
 class InferenceService:
     """ Class for sending request to inference microservice """
@@ -117,13 +120,14 @@ class InferenceService:
 
 
     def process(self, images: list, user: str, project: str, experiment_str: str, cropping: str,
-                level: str, similarity: str = None): 
+                level: str, similarity: str = None, postprocessing: str = None): 
         multipart_form_data = [
             ('user', (None, user)),
             ('project', (None, project)),
             ('experiment', (None, experiment_str)),
             ('cropping', (None, cropping)),
             ('level', (None, level)),
+            ('postprocessing', (None, postprocessing)),
         ]
         
         if(similarity is not None):
@@ -141,7 +145,7 @@ class InferenceService:
             self.lock.release()
             response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
             GpuMemory().inference_request_end("kserve")
-            return response.json(), response.status_code
+            return response
         
         if(not self.lock.locked()):
             self.lock.acquire(True)
@@ -151,10 +155,129 @@ class InferenceService:
             self.lock.release()
             response = requests.post(self.gpu_url + "/process", files=multipart_form_data)
             GpuMemory().inference_request_end("gpu")
-            return response.json(), response.status_code
+            return response
         
         if(self.lock.locked()):
             self.lock.release()
         
         response = requests.post(self.cpu_url + "/process", files=multipart_form_data)
-        return response.json(), response.status_code
+        return response
+    
+    def croptune_start(self, user: str, project: str, experiment_str: str, count: int, dataset_paths: str, seed: int): 
+        multipart_form_data = [
+            ('user', (None, user)),
+            ('project', (None, project)),
+            ('experiment', (None, experiment_str)),
+        ]
+        
+        dataloader = InferenceDataloader.create_from_multiple_paths(dataset_paths)
+        paths = dataloader.get_images_paths()
+        if(seed is None):
+            random.shuffle(paths)
+        else:
+            random.Random(seed).shuffle(paths)
+        paths = paths[:count]
+        
+        for image in paths:
+            multipart_form_data.append(('file', (os.path.basename(image), open(image, 'rb'), 'image/jpeg')))
+        
+        cpu_key = self.getKey(user, project, experiment_str, "cpu")
+        gpu_key = self.getKey(user, project, experiment_str, "gpu")
+        
+        self.lock.acquire(True)
+        if(cpu_key in self.device_map.keys() and GpuMemory().enough_kserve_memory() and self.device_map[cpu_key] == True):
+            GpuMemory().new_inference_request("kserve")
+            self.lock.release()
+            response = requests.post(self.cpu_url + "/croptunestart", files=multipart_form_data)
+            GpuMemory().inference_request_end("kserve")
+            return response
+        
+        if(not self.lock.locked()):
+            self.lock.acquire(True)
+        
+        if(gpu_key in self.device_map.keys() and GpuMemory().enough_gpu_inference_memory()):
+            GpuMemory().new_inference_request("gpu")
+            self.lock.release()
+            response = requests.post(self.gpu_url + "/croptunestart", files=multipart_form_data)
+            GpuMemory().inference_request_end("gpu")
+            return response
+        
+        if(self.lock.locked()):
+            self.lock.release()
+        
+        response = requests.post(self.cpu_url + "/croptunestart", files=multipart_form_data)
+        return response
+    
+    def croptune_test(self, user: str, project: str, experiment_str: str, level: int, similarity: int): 
+        cpu_key = self.getKey(user, project, experiment_str, "cpu")
+        gpu_key = self.getKey(user, project, experiment_str, "gpu")
+        
+        data = {
+            "user": user,
+            "project": project,
+            "experiment": experiment_str,
+        }
+        
+        if(level is not None):
+            data["level"] = level
+            
+        if(similarity is not None):
+            data["similarity"] = similarity
+        
+        self.lock.acquire(True)
+        if(cpu_key in self.device_map.keys() and GpuMemory().enough_kserve_memory() and self.device_map[cpu_key] == True):
+            GpuMemory().new_inference_request("kserve")
+            self.lock.release()
+            response = requests.post(self.cpu_url + "/croptunetest", data=data)
+            GpuMemory().inference_request_end("kserve")
+            return response
+        
+        if(not self.lock.locked()):
+            self.lock.acquire(True)
+        
+        if(gpu_key in self.device_map.keys() and GpuMemory().enough_gpu_inference_memory()):
+            GpuMemory().new_inference_request("gpu")
+            self.lock.release()
+            response = requests.post(self.gpu_url + "/croptunetest", data=data)
+            GpuMemory().inference_request_end("gpu")
+            return response
+        
+        if(self.lock.locked()):
+            self.lock.release()
+        
+        response = requests.post(self.cpu_url + "/croptunetest", data=data)
+        return response
+    
+    def croptune_stop(self, user: str, project: str, experiment_str: str): 
+        cpu_key = self.getKey(user, project, experiment_str, "cpu")
+        gpu_key = self.getKey(user, project, experiment_str, "gpu")
+        
+        data = {
+            "user": user,
+            "project": project,
+            "experiment": experiment_str,
+        }
+        
+        self.lock.acquire(True)
+        if(cpu_key in self.device_map.keys() and GpuMemory().enough_kserve_memory() and self.device_map[cpu_key] == True):
+            GpuMemory().new_inference_request("kserve")
+            self.lock.release()
+            response = requests.post(self.cpu_url + "/croptunestop", data=data)
+            GpuMemory().inference_request_end("kserve")
+            return response
+        
+        if(not self.lock.locked()):
+            self.lock.acquire(True)
+        
+        if(gpu_key in self.device_map.keys() and GpuMemory().enough_gpu_inference_memory()):
+            GpuMemory().new_inference_request("gpu")
+            self.lock.release()
+            response = requests.post(self.gpu_url + "/croptunestop", data=data)
+            GpuMemory().inference_request_end("gpu")
+            return response
+        
+        if(self.lock.locked()):
+            self.lock.release()
+        
+        response = requests.post(self.cpu_url + "/croptunestop", data=data)
+        return response

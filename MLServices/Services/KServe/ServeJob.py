@@ -3,6 +3,7 @@ sys.path.append("OneClassML")
 
 from kserve import ModelServer
 from KServeModelHandler import KServeModelHandler
+from KServeCrop import KServeCrop
 import tensorflow as tf
 
 KSERVE_BATCH = 32
@@ -21,6 +22,7 @@ class ServeJob:
         for i in range(len(names)):
             model_list.append(KServeModelHandler(names[i], paths[i], KSERVE_BATCH))
         
+        model_list.append(KServeCrop("crop"))
         ModelServer(enable_docs_url=True, http_port=8080).start(model_list)
         
         

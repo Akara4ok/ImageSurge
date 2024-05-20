@@ -1,39 +1,92 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Settings.scss';
 import Header from '../Header/Header';
-import FAQAccordion from '../../../Components/FAQAccordion/FAQAccordion';
-import Input from '../../../Components/Input/Input';
-import CountrySelector from '../../../Components/CountrySelector/CountrySelector';
-import Button from '../../../Components/Button/Button';
+import axios from 'axios';
+import Popup from '../../../Components/Popup/Popup';
+import Spinner from '../../../Components/Spinner/Spinner';
+import UserForm from '../UserForm/UserForm';
 
 const Settings = ({ setActiveCallback, toggleMenu }) => {
-    useEffect(() => {
-        setActiveCallback("settings");
-      }, []);
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [popupMsg, setPopupMsg] = useState();
+  const [isLoading, setIsLoading] = useState();
 
-    return (
-        <div className='settings-wrapper'>
-            <Header text="Settings" toggleMenu={toggleMenu}/>
-            <form className='settings-content'>
-                <div className="single-line">
-                    <Input type="text" defaultValue="First Name" />
-                    <Input type="text" defaultValue="Second Name" />
-                </div>
-                <div className="single-line">
-                <Input type="email" defaultValue="vladshpilka86@gmail.com" />
-                </div>
-                <div className="single-line">
-                    <CountrySelector defaultValue="Ukraine"/>
-                    <Input type="tel" defaultValue="066161616" />
-                </div>
-                <div className="single-line">
-                    <Input type="password" placeholder="Old password" />
-                    <Input type="password" placeholder="New password" />
-                </div>
-                <Button text="Save"/>
-            </form>
-        </div>
-    );
+  const [lastSavedUser, setLastSavedUser] = useState();
+
+  useEffect(() => {
+    setActiveCallback("settings");
+    const token = "Bearer " + localStorage.getItem('token');
+    axios({
+      method: 'get',
+      url: 'http://localhost:8000/user/me/',
+      headers: {
+        authorization: token
+      }
+    }).then((response) => {
+      setIsLoading(false);
+      setLastSavedUser({
+        firstName: response.data?.user?.FirstName,
+        lastName: response.data?.user?.LastName,
+        country: response.data?.user?.Country,
+        phoneNumber: response.data?.user?.PhoneNumber,
+        emailValue: response.data?.user?.Email,
+      });
+    }).catch((error) => {
+      setIsLoading(false);
+      setPopupMsg(error.response?.data ?? "Undefined Error");
+      setPopupOpen(true);
+    });
+  }, []);
+
+  const checkUserCahnged = (firstName, lastName, country, phoneNumber, emailValue, oldPasswordValue, passwordValue) => {
+    return lastSavedUser?.firstName !== firstName || lastSavedUser?.lastName !== lastName || lastSavedUser?.country !== country ||
+      lastSavedUser?.phoneNumber !== phoneNumber || lastSavedUser?.emailValue !== emailValue || (oldPasswordValue && passwordValue)
+  }
+
+  const updateData = (firstName, lastName, country, phoneNumber, emailValue, oldPasswordValue, passwordValue) => {
+    if (!checkUserCahnged(firstName, lastName, country, phoneNumber, emailValue, oldPasswordValue, passwordValue)) {
+      return;
+    }
+
+    const token = "Bearer " + localStorage.getItem('token');
+    setIsLoading(true);
+    axios({
+      method: 'put',
+      url: 'http://localhost:8000/user/me/',
+      headers: {
+        authorization: token
+      },
+      data: {
+        FirstName: firstName,
+        LastName: lastName,
+        Email: emailValue,
+        PhoneNumber: phoneNumber,
+        Country: country,
+        NewPassword: passwordValue,
+        OldPassword: oldPasswordValue
+      }
+    }).then((response) => {
+      setIsLoading(false);
+      setPopupMsg("Data updated");
+      setPopupOpen(true);
+    }).catch((error) => {
+      setIsLoading(false);
+      setPopupMsg(error.response?.data?.error ?? "Undefined Error");
+      setPopupOpen(true);
+    })
+  }
+
+  return (
+    <div className='settings-wrapper'>
+      <div className='setting-content'>
+        <UserForm defaultValueProp={{...lastSavedUser}}
+          requestFun = {updateData} samePasswords={false}
+          firstPassPlaceholder="OldPassword" seconfPassPlaceholder="New Password" />
+      </div>
+      {isPopupOpen && <Popup message={popupMsg} onClose={() => { setPopupOpen(false) }} />}
+      {isLoading ? <Spinner /> : null}
+    </div>
+  );
 };
 
 export default Settings;

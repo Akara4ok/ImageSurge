@@ -1,12 +1,8 @@
 @import '../../../global/global.scss';
 
 .input-component {
-  margin: 20px;
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="tel"],
-  select {
+  padding: 0px;
+  input, select {
     width: 340px;
     height: 70px;
     padding-left: 10px;
@@ -17,6 +13,18 @@
     color: $input-color;
     font-family: 'Lato';
   }
+}
+
+.error-input{
+  input{
+    border: 1px solid $error-color;
+  }
+}
+
+.error-input-msg{
+  padding: 5px 10px;
+  color: $error-color;
+  font-family: 'Lato';
 }
 
 input:-webkit-autofill,
@@ -31,11 +39,7 @@ input:-webkit-autofill:active{
 
 @media (max-width: 380px) {
   .input-component {
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="tel"],
-    select {
+    input, select {
       width: auto;
     }
   }

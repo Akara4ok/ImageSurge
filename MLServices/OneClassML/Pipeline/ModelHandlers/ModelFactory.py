@@ -18,7 +18,7 @@ class ModelFactory:
         match model_name:
             case "VGG":
                 return SimpleKerasModel(IMAGE_HEIGHT, IMAGE_WIDTH, KerasModels.VGG)
-            case "Resnet":
+            case "ResNet":
                 return SimpleKerasModel(IMAGE_HEIGHT, IMAGE_WIDTH, KerasModels.Resnet)
             case "Clip":
                 return ClipModel()

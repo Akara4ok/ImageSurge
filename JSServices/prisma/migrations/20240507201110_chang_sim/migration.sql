@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Project" ALTER COLUMN "Similarity" SET DATA TYPE DOUBLE PRECISION;

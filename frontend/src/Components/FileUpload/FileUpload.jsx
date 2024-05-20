@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import './FileUpload.scss'
 
 const fileTypes = ["ZIP"];
 
-const FileUpload = () => {
+const FileUpload = ({onChange, value}) => {
   const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    setFile(value);
+  }, [value]);
+
   const handleChange = (file) => {
-    console.log(file)
-    setFile(file);
+    onChange(file)
   };
+
   return (
     <>
         <FileUploader handleChange={handleChange} label="Drop zip file here or browse" classes="width-class" name="file" types={fileTypes} />

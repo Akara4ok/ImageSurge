@@ -3,14 +3,18 @@ import numpy as np
 import tensorflow as tf
 import sys
 import cv2
+import time
 sys.path.append("OneClassML")
 from Pipeline.Inference import Inference
 from Pipeline.OneClassClassificationInference import OneClassClassificationInference
 from Pipeline.CropInference import CropInference
+from Pipeline.KserveCropInference import KserveCropInference
 from Pipeline.utils.FileHandler import FileHandler
 from utils.ExperimentInfo import ExperimentInfo
 from Dataset.InferenceImageDataset import InferenceImageDataset
 from Pipeline.ModelHandlers.KServeModel import KServeModel
+from PostProcessings import applyPostprocessingToAll
+from utils.functions import recrop_1d
 
 IMAGE_HEIGHT = 224
 IMAGE_WIDTH = 224
@@ -20,6 +24,7 @@ class InferenceHandler:
     def __init__(self, default_folder: str, batch_size: int = 10, validation_folder: str = "Services/Validation") -> None:
         self.default_folder = default_folder
         self.iference_map: dict[str, Inference] = {}
+        self.croptune_map: dict[str, KserveCropInference] = {}
         self.batch_size = batch_size
         self.validation_folder = validation_folder
         
@@ -34,9 +39,6 @@ class InferenceHandler:
              kserve_classification_path: str = None, kserve_crop_path: str = None, 
              token: str = None) -> bool:
         key = self.getKey(user, project, experiment_str, False)
-        
-        if(key in self.iference_map.keys()):
-            return False
         
         experiment = ExperimentInfo(user, project, experiment_str)
         file_handler = FileHandler(self.default_folder, experiment)
@@ -57,7 +59,9 @@ class InferenceHandler:
             kserve_crop = None
             if(kserve_crop_path is not None):
                 kserve_crop = KServeModel(kserve_crop_path, token)
-            inference_crop = CropInference(file_handler_crop, kserve_model=kserve_crop)
+                inference_crop = KserveCropInference(file_handler_crop, kserve_model=kserve_crop, url=kserve_crop_path, token=token)
+            else: 
+                inference_crop = CropInference(file_handler_crop, kserve_model=kserve_crop)
             inference_crop.load()
             
             if(not inference_crop.is_loaded):
@@ -109,15 +113,82 @@ class InferenceHandler:
         dataset = InferenceImageDataset(IMAGE_HEIGHT, IMAGE_WIDTH)
         dataset.load(images)
         
+        validation_time = time.time()
         quality = self.validate(dataset.get_data())
+        validation_time = time.time() - validation_time
         
         inference = self.iference_map[inference_key]
+        
+        classification_time = time.time()
         result = inference.process(dataset.get_data().batch(self.batch_size))
+        classification_time = time.time() - classification_time
         
         result_crop = None
+        cropping_time = None
         if(cropping):
             inference_crop = self.iference_map[inference_crop_key]
+            cropping_time = time.time()
             result_crop = inference_crop.process(dataset.get_data(), result_classification = result.tolist(), 
                                                  level = level, similarity = similarity)
+            cropping_time = time.time() - cropping_time
+            if(result_crop is not None):
+                recropped = []
+                for index, crop in enumerate(result_crop):
+                    was_width, was_height = images[index].shape[:2]
+                    recropped.append(recrop_1d(crop, IMAGE_WIDTH, IMAGE_HEIGHT, was_width, was_height))
+                
+                result_crop = np.asarray(recropped)
         
-        return (result, quality, result_crop)
+        return (result, quality, result_crop, validation_time, classification_time, cropping_time)
+    
+    def postprocess(self, images: list[np.ndarray], postprocessings: list[str], result_class: np.ndarray, cropping: np.ndarray) -> list[np.ndarray]:
+        processed = []
+        if(cropping is not None):
+            cropping_op = "cropping" 
+            postprocessings.insert(0, cropping_op)
+        for index, image in enumerate(images):
+            if(result_class[index] != 1):
+                continue
+            processed.append(image)
+        for postProcess in postprocessings:
+            processed = applyPostprocessingToAll(processed, postProcess, cropping)
+        
+        result = []
+        for img in processed:
+            result_encode, buffer = cv2.imencode('.jpg', img)
+            if(result_encode):
+                result.append(buffer)
+        return result
+    
+    def croptune_start(self, images: list[np.ndarray], user: str, project: str, experiment_str: str):
+        inference_crop_key = self.getKey(user, project, experiment_str, True)
+        if(not(inference_crop_key in self.iference_map)):
+            print("Inference Crop is not loaded")
+            return None
+        
+        dataset = InferenceImageDataset(IMAGE_HEIGHT, IMAGE_WIDTH)
+        dataset.load(images)
+        
+        inference_crop: KserveCropInference = self.iference_map[inference_crop_key].clone()
+        inference_crop.process(dataset.get_data(), result_classification = [1] * len(images), save_cache = True,
+                                        level = 15, similarity = None)
+        self.croptune_map[inference_crop_key] = inference_crop.create_inference_from_features(dataset.get_data(), inference_crop.get_cache_data()[0])
+        return inference_crop.get_calc_similarity()
+    
+    def croptune_test(self, user: str, project: str, experiment_str: str, level: int, similarity: float):
+        inference_crop_key = self.getKey(user, project, experiment_str, True)
+        if(not(inference_crop_key in self.croptune_map)):
+            print("Inference Crop is not loaded")
+            return None
+        
+        inference_crop = self.croptune_map[inference_crop_key]
+        result = inference_crop.process(None, None, use_cache = True, level = level, similarity = similarity)
+        return result
+    
+    def croptune_stop(self, user: str, project: str, experiment_str: str):
+        inference_crop_key = self.getKey(user, project, experiment_str, True)
+        if(not(inference_crop_key in self.croptune_map)):
+            return None
+        
+        self.croptune_map.pop(inference_crop_key)  
+        return True

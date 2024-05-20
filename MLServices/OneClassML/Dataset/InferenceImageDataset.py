@@ -1,6 +1,7 @@
 import tensorflow as tf
 from .Dataset import Dataset
 import numpy as np
+import cv2
 
 class InferenceImageDataset(Dataset):
     """ Implementation of dataset for user requests """
@@ -16,9 +17,8 @@ class InferenceImageDataset(Dataset):
 
     def load(self, images: list[np.ndarray]) -> None:
         """ Load data from dataloader to tf.Data """
-        self.dataset = tf.data.Dataset.from_tensor_slices(images).map(
-            self.process_ready_image, num_parallel_calls=tf.data.AUTOTUNE)
-            
+        result = [cv2.resize(img, (self.image_width, self.image_height)) for img in images]
+        self.dataset = tf.data.Dataset.from_tensor_slices(result)
         self.is_loaded = True
 
     def get_data(self) -> tf.data.Dataset:

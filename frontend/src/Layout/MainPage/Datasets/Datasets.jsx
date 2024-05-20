@@ -19,7 +19,6 @@ const Datasets = ({ setActiveCallback, toggleMenu }) => {
 
     return (
         <div className='datasets-wrapper'>
-            <Header text="Datasets" toggleMenu={toggleMenu}/>
             <div className='datasets-content'>
                 <div className="project-header">
                     <SearchBar onChange={handleSearchChange} />

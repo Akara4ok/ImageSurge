@@ -4,11 +4,11 @@
     border-bottom: 1px solid $border-items-color;
 
     .table-row {
-        padding: 10px;
+        padding: 10px 0px;
 
         display: grid;
         grid-template-columns: 150px 1fr 1fr 1fr 1fr;
-        font-size: 20px;
+        font-size: 18px;
         font-family: 'Source Sans Pro';
 
         border: 1px solid $border-color;
@@ -17,6 +17,19 @@
         span{
             display: flex;
             align-items: center;
+            .name-button{
+                height: 100%;
+                width: 100%;
+                cursor: pointer;
+                background-color: transparent;
+                border: none;
+                display: flex;
+                justify-content: start;
+                align-items: center;
+                font: inherit;
+                padding: 0px;
+                margin: 0px;
+            }
         }
 
         .status-icon {
@@ -27,6 +40,7 @@
             border: none;
             cursor: pointer;
             background-color: transparent;
+            display: flex;
         }
 
         .delete-btn {
@@ -46,7 +60,11 @@
             display: flex;
             gap: 20px;
             align-items: center;
-            justify-content: space-around;
+            justify-content: end;
+            padding-right: 40px;
+            @media (max-width: 1200px) {
+                padding-right: 5px;
+            }
         }
     }
 
@@ -56,7 +74,7 @@
             flex-wrap: wrap;
             grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
             justify-content: space-around;
-            font-size: 15px;
+            font-size: 12px;
         }
     }
 }

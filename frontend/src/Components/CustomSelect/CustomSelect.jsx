@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import './CustomSelect.scss'; // Make sure the SCSS file is in the same directory
 import { CiCircleInfo } from "react-icons/ci";
 
-const CustomSelect = ({ className, options, tooltips, onOptionSelect }) => {
+const CustomSelect = ({ className, options, tooltips, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [filter, setFilter] = useState('');
@@ -40,11 +40,11 @@ const CustomSelect = ({ className, options, tooltips, onOptionSelect }) => {
     }
   };
 
-  const handleOptionClick = (option, index) => {
+  const handleOptionClick = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
-    if(onOptionSelect){
-      onOptionSelect(option, index);
+    if(onChange){
+      onChange(option);
     }
     setFilter('');
   };
@@ -65,8 +65,8 @@ const CustomSelect = ({ className, options, tooltips, onOptionSelect }) => {
       </div>
       {isOpen && (
         <ul className="select-options">
-          {filteredOptions.map((option, index) => (
-            <li key={index} onClick={() => handleOptionClick(option, index)}>
+          {filteredOptions?.map((option, index) => (
+            <li key={index} onClick={() => handleOptionClick(option)}>
               {option}
               {tooltips ? <CiCircleInfo className="tooltip" size="20px"></CiCircleInfo> : null}
               {tooltips && tooltips[index] ? <span className="tooltiptext">{tooltips[index]}</span> : null}

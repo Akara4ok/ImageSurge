@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import './MultiSelect.scss'; // Make sure the SCSS file is in the same directory
 import { CiCircleInfo } from "react-icons/ci";
 
-const MultiSelect = ({ className, options, tooltips, onOptionSelect }) => {
+const MultiSelect = ({ className, options, tooltips, onChange, customFilter }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [filter, setFilter] = useState('');
@@ -17,12 +17,14 @@ const MultiSelect = ({ className, options, tooltips, onOptionSelect }) => {
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
     }
-    setFilteredOptions(
-      options.filter(option =>
-        option?.toLowerCase().includes(filter.toLowerCase())
-      ).filter(option =>
-        !selectedItems.includes(option))
-    );
+
+    const filtered = options.filter(option =>
+                      option?.toLowerCase().includes(filter.toLowerCase())
+                    ).filter(option =>
+                      !selectedItems.includes(option));
+
+
+    setFilteredOptions(customFilter ? customFilter(filtered, selectedItems) : filtered);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -46,10 +48,11 @@ const MultiSelect = ({ className, options, tooltips, onOptionSelect }) => {
   };
 
   const handleOptionClick = (option) => {
-    setSelectedItems([...selectedItems, option]);
+    const newItems = [...selectedItems, option]
+    setSelectedItems(newItems);
     setIsOpen(false);
-    if(onOptionSelect){
-      onOptionSelect(selectedItems);
+    if(onChange){
+      onChange(newItems);
     }
     setFilter('');
   };

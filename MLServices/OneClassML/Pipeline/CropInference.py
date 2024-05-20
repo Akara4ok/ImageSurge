@@ -18,12 +18,13 @@ class CropInference(Inference):
     def get_calc_similarity(self) -> float:
         """ Return similarity which calculated automatically """
         return self.calc_similarity
-    
+                
+
     @Inference.need_load
     def process(self, dataset: tf.data.Dataset, result_classification: list = None, algo: ImageTableAlgo = ImageTableAlgo.Similarity, 
                 level: int = 15, use_cache: bool = False, save_cache: bool = False, is_test: bool = False, **kwargs) -> np.ndarray:
         
-        if(self.feature_extractor is None or self.cluster_center is None):
+        if((self.feature_extractor is None and not use_cache) or self.cluster_center is None):
             raise Exception("Inference not loaded models")
         
         result: list[tuple[int, int, int, int]] = []
@@ -32,7 +33,7 @@ class CropInference(Inference):
         if(not use_cache or self.cached_feauteres is None):
             for i, data in enumerate(dataset):
                 if(result_classification is not None and result_classification[i] == 0):
-                    return
+                    continue
                 if(is_test):
                     image = data[0]
                 else:
