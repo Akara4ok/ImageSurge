@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 example.py --email vlad11 --name=CatRecognition --secretKey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MTQ1ODczNjN9.RKQLH2WPImRMz7pfzzUVi_r56seT3SqVai9OOiSMDl0 --path=./test/ --output="../../result"
+python3 example.py --email vlad@gmail.com --name=DiCaprio --secretKey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MTYxMjk5Mjd9.DCmkDvpSwJi6DWbgGB8wdagXaRQQIXUWq7oTHWTuBQ0 --path=./test/ --output="./"
