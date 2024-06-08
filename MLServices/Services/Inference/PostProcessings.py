@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 def blur(img: np.ndarray, kernel: int) -> np.ndarray:
-    return cv2.GaussianBlur(img, (kernel, kernel))
+    return cv2.GaussianBlur(img, (kernel, kernel), 0)
 
 def rotate(img: np.ndarray, degree: int) -> np.ndarray:
     if(degree == 90):
