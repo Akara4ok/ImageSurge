@@ -24,13 +24,13 @@ class NeuralNetworkService {
         let nonKserveNetwork;
         for (let index = 0; index < relatedNetworks.length; index++) {
             const element = relatedNetworks[index];
-            if(!element.KservePath && element.CropInference === Crop){
+            if(!element.KservePath && element.CropInference === Crop && element.Working){
                 nonKserveNetwork = element;
             }
-            if(!localKserveNetwork && element.LocalKserve && element.KservePath && element.CropInference === Crop){
+            if(!localKserveNetwork && element.LocalKserve && element.KservePath && element.CropInference === Crop && element.Working){
                 localKserveNetwork = element;
             }
-            if(!element.LocalKserve && element.KservePath && element.CropInference === Crop){
+            if(!element.LocalKserve && element.KservePath && element.CropInference === Crop && element.Working){
                 return element
             }
         }

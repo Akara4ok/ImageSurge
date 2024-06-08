@@ -42,7 +42,7 @@ class InferenceService:
         }
         
         token = None
-        if(not local_kserve):
+        if(kserve_classification_path is not None and not local_kserve):
             token = get_access_token()
             
         

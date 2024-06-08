@@ -73,19 +73,19 @@ class TrainService:
             theoretical_free_memory = GpuMemory().theretical_train_free_memory()
             
             token = None
-            if(not local_kserve):
+            if(kserve_path_classification is not None and not local_kserve):
                 token = get_access_token()
                 
             kserve_but_not_enough = (kserve_path_classification is not None or kserve_path_crop is not None) and GpuMemory().enough_kserve_memory()
             
             if(kserve_path_classification and GpuMemory().enough_kserve_memory()):
                 command_args +=  ["--kserve-path-classification", kserve_path_classification]
-                if(not local_kserve):
+                if(kserve_path_classification is not None and not local_kserve):
                     command_args += ["--token", token]
                 
             if(kserve_path_crop and GpuMemory().enough_kserve_memory()):
                 command_args +=  ["--kserve-path-crop", kserve_path_crop]
-                if(kserve_path_classification is None and not local_kserve):
+                if(kserve_path_crop is None and not local_kserve):
                     command_args += ["--token", token]
                 
             command_args = " ".join(command_args)

@@ -56,9 +56,9 @@ model Request {
 }
 
 model Log {
-    Id         String  @id @default(uuid()) @db.Uuid
-    Project    Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
-    ProjectId  String  @db.Uuid
+    Id         String   @id @default(uuid()) @db.Uuid
+    Project    Project  @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
+    ProjectId  String   @db.Uuid
     Value      String
     Time       DateTime
     StatusCode Int
@@ -66,11 +66,11 @@ model Log {
 }
 
 model LoadStat {
-    Id         String  @id @default(uuid()) @db.Uuid
-    Project    Project @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
-    ProjectId  String  @db.Uuid
-    LoadTime   DateTime
-    StopTime   DateTime?
+    Id        String    @id @default(uuid()) @db.Uuid
+    Project   Project   @relation(fields: [ProjectId], references: [Id], onDelete: Cascade)
+    ProjectId String    @db.Uuid
+    LoadTime  DateTime
+    StopTime  DateTime?
 }
 
 model ProjectProcessing {
@@ -109,6 +109,7 @@ model NeuralNetwork {
     Model                  Model     @relation(fields: [ModelId], references: [Id])
     ModelId                String    @db.Uuid
     CropInference          Boolean   @default(false)
+    Working                Boolean   @default(false)
 }
 
 model Category {

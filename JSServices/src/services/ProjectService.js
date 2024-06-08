@@ -115,7 +115,8 @@ class ProjectService {
 
         const categoryId = (await this.DatasetService.getById(Datasets[0])).categoryId;
         const model = await this.ModelService.getByName(NeuralNetworkName);
-        const NeuralNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, model.Id, false); 
+        const NeuralNetwork = await this.NeuralNetworkService.getBestNetwork(categoryId, model.Id, false);
+        console.log(NeuralNetwork)
         
         let modelCropping;
         let CroppingNetwork

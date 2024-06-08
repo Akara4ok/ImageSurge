@@ -28,4 +28,7 @@ class ServeJob:
         
 if __name__ == "__main__":
     serve_job = ServeJob(port = 8080)
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    for gpu in gpus:
+        tf.config.experimental.set_memory_growth(gpu, True)
     serve_job.serve(["resnet50", "clip"], ["OneClassML/DefaultModels/resnet", "OneClassML/DefaultModels/clip"])
