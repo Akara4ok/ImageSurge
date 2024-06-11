@@ -4,7 +4,7 @@ import fs, { existsSync } from 'fs';
 import axios from 'axios';
 import path from 'path';
 
-export const MIN_IMG = 0;
+export const MIN_IMG = 100;
 
 export class DataHandler {
     checkZipFile(zipPath) {

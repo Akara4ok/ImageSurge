@@ -69,7 +69,7 @@ const Stats = () => {
               setValidationTime(divWithFixed(stats.ValidationTime, stats.Images));
               setClassificationTime(divWithFixed(stats.ClassificationTime, stats.Images));
               setCroppingTime(divWithFixed(stats.CroppingTime, stats.Images));
-              setQuality((100 - divWithFixed(stats.Quality, stats.Images)).toFixed(2));
+              setQuality(divWithFixed(stats.Quality, stats.Images));
 
           }).catch((error) => {
             setIsLoading(false);

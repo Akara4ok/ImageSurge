@@ -21,7 +21,7 @@ def validate_endpoint():
     if(result):
         return {
                 "result": result,
-                "quality": quality
+                "quality": 100 - quality
             }, 200
 
     return {

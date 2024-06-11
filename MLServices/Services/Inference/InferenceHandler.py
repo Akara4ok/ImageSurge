@@ -94,7 +94,7 @@ class InferenceHandler:
             score = cv2.quality.QualityBRISQUE_compute(image, self.validation_folder + "/brisque_model_live.yml", 
                                                        self.validation_folder + "/brisque_range_live.yml")
             result.append(score[0])
-        return np.asarray(result)
+        return 100 - np.asarray(result)
 
     def process(self, images: list[np.ndarray], user: str, project: str, experiment_str: str, cropping: bool,
                 level: int = 15, similarity: int = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
